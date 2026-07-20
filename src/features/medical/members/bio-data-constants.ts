@@ -93,9 +93,10 @@ export const bioDataFieldNames: (keyof BioDataFormData)[] = [
   "cardToMember",
 ];
 
-export function getBioDataFields(names: (keyof BioDataFormData)[]) {
+export function getBioDataFields(names: (keyof BioDataFormData)[]): BioDataField[] {
   const byName = new Map(bioDataFields.map((field) => [field.name, field]));
-  return names
-    .map((name) => byName.get(name))
-    .filter((field): field is BioDataField => Boolean(field));
+  return names.flatMap((name) => {
+    const field = byName.get(name);
+    return field ? [field] : [];
+  });
 }

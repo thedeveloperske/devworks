@@ -111,11 +111,12 @@ export const principalInformationFieldNames: (keyof PrincipalInformationFormData
 
 export function getPrincipalInformationFields(
   names: (keyof PrincipalInformationFormData)[]
-) {
+): PrincipalInformationField[] {
   const byName = new Map(
     principalInformationFields.map((field) => [field.name, field])
   );
-  return names
-    .map((name) => byName.get(name))
-    .filter((field): field is PrincipalInformationField => Boolean(field));
+  return names.flatMap((name) => {
+    const field = byName.get(name);
+    return field ? [field] : [];
+  });
 }

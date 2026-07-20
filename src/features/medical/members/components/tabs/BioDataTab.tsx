@@ -28,7 +28,7 @@ type CardDateName = (typeof cardDateFields)[number]["name"];
 type BioDataTabProps = {
   value: BioDataFormData;
   onChange: (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => void;
   fieldLabelClass: string;
   fieldInputClass: string;
@@ -85,7 +85,7 @@ export function BioDataTab({
   };
 
   const handlePhotoSwitch = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     onChange(e);
     if (e.target.value === "1") {
@@ -227,13 +227,7 @@ export function BioDataTab({
               onChange={
                 disabled
                   ? () => undefined
-                  : (e) =>
-                      // Bio data fields only render inputs/selects, never textareas.
-                      onChange(
-                        e as React.ChangeEvent<
-                          HTMLInputElement | HTMLSelectElement
-                        >
-                      )
+                  : (e) => onChange(e)
               }
               disabled={disabled}
               inputClassName={

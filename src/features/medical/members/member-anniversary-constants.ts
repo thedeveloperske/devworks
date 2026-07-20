@@ -59,11 +59,12 @@ export const memberAnniversaryFieldNames: (keyof MemberAnniversaryFormData)[] =
 
 export function getMemberAnniversaryFields(
   names: (keyof MemberAnniversaryFormData)[]
-) {
+): MemberAnniversaryField[] {
   const byName = new Map(
     memberAnniversaryFields.map((field) => [field.name, field])
   );
-  return names
-    .map((name) => byName.get(name))
-    .filter((field): field is MemberAnniversaryField => Boolean(field));
+  return names.flatMap((name) => {
+    const field = byName.get(name);
+    return field ? [field] : [];
+  });
 }

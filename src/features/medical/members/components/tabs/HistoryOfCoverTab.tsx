@@ -10,7 +10,7 @@ type HistoryOfCoverTabProps = {
   rows: MemberAnniversaryFormData[];
   onRowChange: (
     index: number,
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => void;
   fieldInputClass: string;
 };

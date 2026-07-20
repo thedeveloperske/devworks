@@ -10,7 +10,7 @@ type CoverDatesFormProps = {
   corporateAgentId: string;
   agentOptions: LookupOption[];
   onChange: (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => void;
   fieldLabelClass: string;
   fieldInputClass: string;

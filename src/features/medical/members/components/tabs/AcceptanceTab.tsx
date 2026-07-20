@@ -10,7 +10,9 @@ import { defRejOptions } from "@/features/medical/lookups";
 type AcceptanceTabProps = {
   value: MemberAcceptanceFormData;
   onChange: (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => void;
   fieldLabelClass: string;
   fieldInputClass: string;
@@ -69,7 +71,7 @@ export function AcceptanceTab({
   };
 
   const handleStatusChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const previous = value.status;
     onChange(e);

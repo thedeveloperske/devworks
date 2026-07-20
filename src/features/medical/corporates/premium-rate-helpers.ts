@@ -74,7 +74,7 @@ function buildPremiumRateRowData(
   }
 
   const numberFields: {
-    key: keyof PremiumRateInput;
+    key: Exclude<keyof PremiumRateInput, "idx" | "benefit">;
     label: string;
   }[] = [
     { key: "premiumType", label: "Premium type" },

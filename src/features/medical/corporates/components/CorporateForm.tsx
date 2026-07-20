@@ -122,7 +122,7 @@ export function CorporateForm({
   };
 
   const handleCoverDateChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
     setCoverDateForm((prev) => {

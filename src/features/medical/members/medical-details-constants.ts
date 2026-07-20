@@ -88,9 +88,12 @@ export const medicalDetailsFieldNames: (keyof MedicalDetailsFormData)[] = [
   "expectedDeliveryDate",
 ];
 
-export function getMedicalDetailsFields(names: (keyof MedicalDetailsFormData)[]) {
+export function getMedicalDetailsFields(
+  names: (keyof MedicalDetailsFormData)[]
+): MedicalDetailsField[] {
   const byName = new Map(medicalDetailsFields.map((field) => [field.name, field]));
-  return names
-    .map((name) => byName.get(name))
-    .filter((field): field is MedicalDetailsField => Boolean(field));
+  return names.flatMap((name) => {
+    const field = byName.get(name);
+    return field ? [field] : [];
+  });
 }

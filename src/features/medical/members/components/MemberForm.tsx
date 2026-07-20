@@ -246,7 +246,7 @@ export function MemberForm({
   }, [benefitOptions, benefitRows, categoryBenefitRows]);
 
   const handlePrincipalInformationChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
     if (name === "memberNo") {
@@ -311,7 +311,7 @@ export function MemberForm({
   };
 
   const handleBioDataChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
     setBioData((prev) => {
@@ -326,7 +326,7 @@ export function MemberForm({
   };
 
   const handleMedicalDetailsChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
     const detailFieldBySwitch: Partial<
@@ -351,7 +351,7 @@ export function MemberForm({
   };
 
   const handleAcceptanceChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
     setAcceptance((prev) => {
@@ -369,7 +369,7 @@ export function MemberForm({
 
   const handleCoverHistoryRowChange = (
     index: number,
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
     setCoverHistoryRows((prev) =>

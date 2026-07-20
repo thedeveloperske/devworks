@@ -19,7 +19,7 @@ import { FamilyDependantsTable } from "./FamilyDependantsTable";
 type PrincipalInformationTabProps = {
   value: PrincipalInformationFormData;
   onChange: (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => void;
   agentOptions: LookupOption[];
   categoryOptions: LookupOption[];
@@ -130,13 +130,7 @@ export function PrincipalInformationTab({
                   onChange={
                     locked
                       ? () => undefined
-                      : (e) =>
-                          // This tab renders only inputs/selects, never textareas.
-                          onChange(
-                            e as React.ChangeEvent<
-                              HTMLInputElement | HTMLSelectElement
-                            >
-                          )
+                      : (e) => onChange(e)
                   }
                   disabled={locked}
                   inputClassName={

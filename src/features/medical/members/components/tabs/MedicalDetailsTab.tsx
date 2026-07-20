@@ -13,7 +13,7 @@ import {
 type MedicalDetailsTabProps = {
   value: MedicalDetailsFormData;
   onChange: (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => void;
   fieldLabelClass: string;
   fieldInputClass: string;

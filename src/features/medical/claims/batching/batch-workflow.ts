@@ -2,7 +2,7 @@ import type { ClaimsBatchListItem } from "./types";
 
 export function hasEntrantAssigned(batch: {
   dataEntryUser: string | null;
-  dateEntryDate: string | null;
+  dateEntryDate: string | Date | null;
 }) {
   return Boolean(batch.dataEntryUser?.trim() && batch.dateEntryDate);
 }
@@ -13,7 +13,7 @@ export function canAssignVetter(batch: ClaimsBatchListItem) {
 
 export function hasVetterAssigned(batch: {
   vettingUser: string | null;
-  vettingUserDate: string | null;
+  vettingUserDate: string | Date | null;
 }) {
   return Boolean(batch.vettingUser?.trim() && batch.vettingUserDate);
 }

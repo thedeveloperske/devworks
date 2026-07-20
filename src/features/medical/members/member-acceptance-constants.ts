@@ -33,11 +33,12 @@ export const memberAcceptanceFieldNames: (keyof MemberAcceptanceFormData)[] = [
 
 export function getMemberAcceptanceFields(
   names: (keyof MemberAcceptanceFormData)[]
-) {
+): MemberAcceptanceField[] {
   const byName = new Map(
     memberAcceptanceFields.map((field) => [field.name, field])
   );
-  return names
-    .map((name) => byName.get(name))
-    .filter((field): field is MemberAcceptanceField => Boolean(field));
+  return names.flatMap((name) => {
+    const field = byName.get(name);
+    return field ? [field] : [];
+  });
 }
