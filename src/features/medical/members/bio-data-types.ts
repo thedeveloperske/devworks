@@ -1,0 +1,42 @@
+export type BioDataFormData = {
+  memberNo: string;
+  familyNo: string;
+  surname: string;
+  firstName: string;
+  otherNames: string;
+  dob: string;
+  occupation: string;
+  idPpNo: string;
+  bloodGroup: string;
+  relationToPrincipal: string;
+  userId: string;
+  dateEntered: string;
+  familyTitle: string;
+  dealingUser: string;
+  cancelled: string;
+  employmentNo: string;
+  gender: string;
+  cardToMember: string;
+  passportNo: string;
+  nhifCardNo: string;
+  height: string;
+  weight: string;
+  photoNForm: string;
+  photoNo: string;
+  infoToPrinter: string;
+  cardFromPrinter: string;
+  appFormDate: string;
+  maritalStatus: string;
+  dateEmployed: string;
+  depPos: string;
+  corpId: string;
+  mobileNo: string;
+  emailAdd: string;
+};
+
+export type BioDataField = {
+  name: keyof BioDataFormData;
+  label: string;
+  type?: React.HTMLInputTypeAttribute;
+  required?: boolean;
+};

@@ -1,0 +1,40 @@
+export type MemberBenefitFormData = {
+  memberNo: string;
+  benefit: string;
+  anniv: string;
+  policyLimit: string;
+  sharing: string;
+  reInsurer: string;
+  subLimitOf: string;
+  suspended: string;
+  suspendedDate: string;
+  suspendReason: string;
+  suspendUser: string;
+  suspendedEntry: string;
+  expense: string;
+  balance: string;
+  percent: string;
+  status: string;
+  reserve: string;
+  claims: string;
+  fund: string;
+  cap: string;
+  copayAmount: string;
+  corpId: string;
+  changeFactor: string;
+  ceiling: string;
+  changeLimit: string;
+  statusUser: string;
+  verifyStatus: string;
+  waitingPeriod: string;
+  bedLimit: string;
+  sync: string;
+  allocateTo: string;
+};
+
+export type MemberBenefitField = {
+  name: keyof MemberBenefitFormData;
+  label: string;
+  type?: React.HTMLInputTypeAttribute;
+  required?: boolean;
+};

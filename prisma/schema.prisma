@@ -1,0 +1,648 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum MemberStatus {
+  ACTIVE
+  INACTIVE
+  PENDING
+}
+
+enum MemberType {
+  PRINCIPAL
+  DEPENDANT
+}
+
+enum ClaimStatus {
+  SUBMITTED
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+  PAID
+}
+
+enum PreauthStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  EXPIRED
+  CANCELLED
+}
+
+enum PremiumStatus {
+  PENDING
+  PAID
+  OVERDUE
+  CANCELLED
+}
+
+enum CommissionStatus {
+  PENDING
+  APPROVED
+  PAID
+}
+
+enum TreatyType {
+  QUOTA_SHARE
+  SURPLUS
+  EXCESS_OF_LOSS
+}
+
+enum TreatyStatus {
+  ACTIVE
+  EXPIRED
+  CANCELLED
+}
+
+enum AdminRole {
+  SUPER_ADMIN
+  ADMIN
+  OPERATOR
+  VIEWER
+}
+
+enum AdminUserStatus {
+  ACTIVE
+  INACTIVE
+}
+
+model Corporate {
+  id                  String              @id @default(cuid())
+  corpId              String              @unique @default(dbgenerated("lpad(nextval('corporate_corp_id_seq'::regclass)::text, 10, '0')")) @map("corp_id") @db.VarChar(10)
+  corporate           String
+  telNo               String?             @map("tel_no")
+  mobileNo            String?             @map("mobile_no")
+  postalAdd           String?             @map("postal_add")
+  town                String?
+  physicalLocation    String?             @map("physical_location")
+  email               String?
+  userId              String?             @map("user_id")
+  agentId             String?             @map("agent_id")
+  scheme              String?
+  cancelled           Boolean             @default(false)
+  policyNo            String?             @map("policy_no")
+  businessClass       String?             @map("business_class")
+  individual          Boolean             @default(false)
+  dateEntered         DateTime?           @map("date_entered")
+  branch              String?
+  currency            String?
+  channel             String?
+  notes               String?
+  pinNumber           String?             @map("pin_number")
+  occupation          String?
+  shareData           Boolean             @default(false) @map("share_data")
+  faxNo               String?             @map("fax_no")
+  insurer             String?
+  underwrite          Boolean             @default(false)
+  waitingPeriod       String?             @map("waiting_period")
+  enhanced            Boolean             @default(false)
+  acctNo              String?             @map("acct_no")
+  premiums            Premium[]
+  commissions         Commission[]
+  reinsuranceTreaties ReinsuranceTreaty[]
+  corpAnniversaries   CorpAnniversary[] @relation("CorpAnniversaryByCorpId")
+  corpContactPersons  CorpContactPerson[] @relation("CorpContactPersonByCorpId")
+  corpGroups          CorpGroup[]         @relation("CorpGroupByCorpId")
+  corpProviders       CorpProvider[]      @relation("CorpProviderByCorpId")
+  clientRates         ClientRate[]        @relation("ClientRateByCorpId")
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+
+  @@map("corporate")
+}
+
+model CorpAnniversary {
+  idx         Int       @id @default(autoincrement())
+  corpId      String    @map("corp_id") @db.VarChar(10)
+  corporate   Corporate @relation("CorpAnniversaryByCorpId", fields: [corpId], references: [corpId], onDelete: Cascade)
+  anniv       Int
+  startDate   DateTime  @map("start_date") @db.Date
+  endDate     DateTime  @map("end_date") @db.Date
+  renewalDate DateTime  @map("renewal_date") @db.Date
+  agentId     String    @map("agent_id") @db.VarChar(10)
+  userId      String?   @map("user_id") @db.VarChar(10)
+  dateEntered DateTime? @map("date_entered") @db.Date
+  sync        Decimal?  @db.Decimal(10, 0)
+  smartSync   Decimal?  @map("smart_sync") @db.Decimal(10, 0)
+
+  @@index([corpId])
+  @@map("corp_anniversary")
+}
+
+model CorpContactPerson {
+  idx        Int       @id @default(autoincrement())
+  corpId     String    @map("corp_id") @db.VarChar(10)
+  corporate  Corporate @relation("CorpContactPersonByCorpId", fields: [corpId], references: [corpId], onDelete: Cascade)
+  title      Int?
+  surname    String?   @db.VarChar(20)
+  firstName  String?   @map("first_name") @db.VarChar(20)
+  otherNames String?   @map("other_names") @db.VarChar(20)
+  jobTitle   Int       @map("job_title")
+  mobileNo   String?   @map("mobile_no") @db.VarChar(30)
+  telNo      String?   @map("tel_no") @db.VarChar(20)
+  email      String?   @db.VarChar(40)
+
+  @@index([corpId])
+  @@map("corp_contact_person")
+}
+
+model CorpGroup {
+  idx              Int        @id @default(autoincrement())
+  corpId           String?    @map("corp_id") @db.VarChar(10)
+  corporate        Corporate? @relation("CorpGroupByCorpId", fields: [corpId], references: [corpId], onDelete: Cascade)
+  anniv            Decimal?   @db.Decimal(2, 0)
+  category         String?    @db.VarChar(10)
+  benefit          Int?
+  fund             Int?
+  policyLimit      Decimal?   @map("limit") @db.Decimal(10, 0)
+  subLimitOf       Int?       @map("sub_limit_of")
+  sharing          Int?
+  cap              Decimal?   @db.Decimal(15, 2)
+  copayAmount      Decimal?   @map("copay_amount") @db.Decimal(15, 2)
+  groupSize        Decimal?   @map("size") @db.Decimal(2, 0)
+  plan             Int?
+  changeFactor     Decimal?   @map("change_factor") @db.Decimal(15, 2)
+  ceiling          Decimal?   @db.Decimal(5, 0)
+  status           Int?
+  statusUser       String?    @map("status_user") @db.VarChar(15)
+  waitingPeriod    Int?       @map("waiting_period")
+  sync             Int?
+  deactivate       Int?
+  activationSync   Int?       @map("activation_sync")
+  activationUser   String?    @map("activation_user") @db.VarChar(50)
+  deactivateReason Int?       @map("deactivate_reason")
+  allocateTo       Int?       @map("allocate_to")
+  isRenewed        String?    @map("is_renewed") @db.VarChar(30)
+
+  @@index([corpId])
+  @@map("corp_groups")
+}
+
+model CorpProvider {
+  idx       Int        @id @default(autoincrement())
+  provider  Decimal    @db.Decimal(5, 0)
+  corpId    String     @map("corp_id") @db.VarChar(10)
+  corporate Corporate  @relation("CorpProviderByCorpId", fields: [corpId], references: [corpId], onDelete: Cascade)
+  sync      Decimal?   @db.Decimal(10, 0)
+  smartSync Decimal?   @map("smart_sync") @db.Decimal(10, 0)
+  anniv     Decimal?   @db.Decimal(10, 0)
+
+  @@index([corpId])
+  @@map("corp_provider")
+}
+
+model ClientRate {
+  benefit     Decimal    @db.Decimal(10, 0)
+  premiumType Decimal?   @map("premium_type") @db.Decimal(2, 0)
+  familySize  Decimal?   @map("family_size") @db.Decimal(2, 0)
+  policyLimit Decimal?   @map("limit") @db.Decimal(10, 2)
+  premium     Decimal?   @db.Decimal(10, 2)
+  minAge      Decimal?   @map("min_age") @db.Decimal(3, 0)
+  maxAge      Decimal?   @map("max_age") @db.Decimal(3, 0)
+  reRate      Decimal?   @map("re_rate") @db.Decimal(10, 2)
+  individual  Decimal?   @db.Decimal(2, 0)
+  insurer     Decimal?   @db.Decimal(2, 0)
+  idx         Int        @id @default(autoincrement())
+  corpId      String?    @map("corp_id") @db.VarChar(10)
+  corporate   Corporate? @relation("ClientRateByCorpId", fields: [corpId], references: [corpId], onDelete: Cascade)
+  familyNo    String?    @map("family_no") @db.VarChar(15)
+  year        Decimal?   @db.Decimal(3, 0)
+  policyNo    String?    @map("policy_no") @db.VarChar(30)
+  familyTitle Decimal?   @map("family_title") @db.Decimal(2, 0)
+
+  @@index([corpId])
+  @@map("client_rates")
+}
+
+model PrincipalApplicant {
+  idx                 Int       @id @default(autoincrement())
+  familyNo            String    @map("family_no") @db.VarChar(20)
+  memberNo            String    @map("member_no") @db.VarChar(20)
+  surname             String?   @db.VarChar(40)
+  firstName           String?   @map("first_name") @db.VarChar(40)
+  otherNames          String?   @map("other_names") @db.VarChar(40)
+  agentId             String?   @map("agent_id") @db.VarChar(10)
+  corpId              String?   @map("corp_id") @db.VarChar(10)
+  employer            String?   @db.VarChar(10)
+  telNo               String?   @map("tel_no") @db.VarChar(20)
+  mobileNo            String?   @map("mobile_no") @db.VarChar(20)
+  postalAdd           String?   @map("postal_add") @db.VarChar(15)
+  town                Int?
+  email               String?   @db.VarChar(30)
+  phyLoc              String?   @map("phy_loc") @db.VarChar(100)
+  familySize          Int?      @map("family_size")
+  relationToFamily    Int?      @map("relation_to_family")
+  individual          Decimal?  @db.Decimal(1, 0)
+  dateFormReceived    DateTime? @map("date_form_received") @db.Date
+  witnessed           Int?
+  dateWitnessed       DateTime? @map("date_witnessed") @db.Date
+  userId              String?   @map("user_id") @db.VarChar(10)
+  dateEntered         DateTime? @map("date_entered") @db.Date
+  province            Int?
+  formFilled          Int?      @map("form_filled")
+  department          Int?
+  insurer             Int?
+  category            String?   @db.VarChar(10)
+  maritalStatus       Int?      @map("marital_status")
+  dateEmployed        DateTime? @map("date_employed") @db.Date
+  previousInsurer     String?   @map("previous_insurer") @db.VarChar(20)
+  periodInsured       String?   @map("period_insured") @db.VarChar(20)
+  beneficiary         String?   @db.VarChar(20)
+  beneficiaryId       String?   @map("beneficiary_id") @db.VarChar(10)
+  beneficiaryRelation String?   @map("beneficiary_relation") @db.VarChar(10)
+  policyNo            String?   @map("policy_no") @db.VarChar(30)
+  pinNo               String?   @map("pin_no") @db.VarChar(15)
+  branch              Int?
+  shareData           Int?      @map("share_data")
+
+  @@unique([memberNo])
+  @@index([corpId])
+  @@index([familyNo])
+  @@map("principal_applicant")
+}
+
+model MemberMedical {
+  memberNo                 String    @map("member_no") @db.VarChar(20)
+  anniv                    Decimal   @db.Decimal(2, 0)
+  asthma                   Decimal?  @db.Decimal(1, 0)
+  diabetes                 Decimal?  @db.Decimal(1, 0)
+  hypertension             Decimal?  @db.Decimal(1, 0)
+  convulsionEpilepsy       Decimal?  @map("convulsion_epilepsy") @db.Decimal(1, 0)
+  gastricDuodenalUlcers    Decimal?  @map("gastric_duodenal_ulcers") @db.Decimal(1, 0)
+  heartDisease             Decimal?  @map("heart_disease") @db.Decimal(1, 0)
+  neurologicalDisease      Decimal?  @map("neurological_disease") @db.Decimal(1, 0)
+  currentlyIll             Decimal?  @map("currently_ill") @db.Decimal(1, 0)
+  currentIllDetails        String?   @map("current_ill_details") @db.VarChar(30)
+  gallstones               Decimal?  @db.Decimal(1, 0)
+  recentConsultedDoc       Decimal?  @map("recent_consulted_doc") @db.Decimal(1, 0)
+  recentConsultedDetails   String?   @map("recent_consulted_details") @db.VarChar(30)
+  disabled                 Decimal?  @map("diabled") @db.Decimal(1, 0)
+  disabilityDetails        String?   @map("disability_details") @db.VarChar(30)
+  pastDeliveries           Decimal?  @map("past_deliveries") @db.Decimal(2, 0)
+  normal                   Decimal?  @db.Decimal(2, 0)
+  caesarian                Decimal?  @db.Decimal(2, 0)
+  expectant                Decimal?  @db.Decimal(1, 0)
+  expectedDeliveryDate     DateTime? @map("expected_delivery_date") @db.Date
+  psychiatricIllness       Decimal?  @map("psychiatric_illness") @db.Decimal(1, 0)
+  recurrentTonsillitis     Decimal?  @map("recurrent_tonsillitis") @db.Decimal(1, 0)
+  arthritisFibroids        Decimal?  @map("arthritis_fibroids") @db.Decimal(1, 0)
+  menstrualDisorder        Decimal?  @map("menstrual_disorder") @db.Decimal(1, 0)
+  cancer                   Decimal?  @db.Decimal(1, 0)
+  smokes                   Decimal?  @db.Decimal(1, 0)
+  takesAlcohol             Decimal?  @map("takes_alcohol") @db.Decimal(1, 0)
+  onRegularMedication      Decimal?  @map("on_regular_medication") @db.Decimal(1, 0)
+  regularMedicationDetails String?   @map("regular_medication_details") @db.VarChar(30)
+  futureHospitalization    String?   @map("future_hospitalization") @db.VarChar(30)
+  currentDoctor            String?   @map("current_doctor") @db.VarChar(30)
+
+  @@id([memberNo, anniv])
+  @@map("member_medical")
+}
+
+model MemberBenefit {
+  memberNo       String    @map("member_no") @db.VarChar(20)
+  benefit        Int
+  anniv          Int
+  policyLimit    Decimal?  @map("limit") @db.Decimal(10, 2)
+  sharing        Int?
+  reInsurer      Int?      @map("re_insurer")
+  subLimitOf     Int?      @map("sub_limit_of")
+  suspended      Int?
+  suspendedDate  DateTime? @map("suspended_date") @db.Date
+  suspendReason  Int?      @map("suspend_reason")
+  suspendUser    String?   @map("suspend_user") @db.VarChar(10)
+  suspendedEntry DateTime? @map("suspended_entry") @db.Date
+  expense        Decimal?  @db.Decimal(10, 2)
+  balance        Decimal?  @db.Decimal(10, 2)
+  percent        Decimal?  @db.Decimal(5, 2)
+  status         String?   @db.VarChar(20)
+  reserve        Decimal?  @db.Decimal(10, 2)
+  claims         Decimal?  @db.Decimal(10, 2)
+  fund           Int?
+  cap            Decimal?  @db.Decimal(15, 2)
+  copayAmount    Decimal?  @map("copay_amount") @db.Decimal(15, 2)
+  corpId         String?   @map("corp_id") @db.VarChar(15)
+  changeFactor   Decimal?  @map("change_factor") @db.Decimal(15, 2)
+  ceiling        Int?
+  changeLimit    Decimal?  @map("change_limit") @db.Decimal(15, 2)
+  statusUser     String?   @map("status_user") @db.VarChar(15)
+  verifyStatus   Int?      @map("verify_status")
+  waitingPeriod  Int?      @map("waiting_period")
+  bedLimit       Decimal?  @map("bed_limit") @db.Decimal(10, 2)
+  sync           Int?
+  allocateTo     Int?      @map("allocate_to")
+
+  @@id([memberNo, benefit, anniv])
+  @@index([corpId])
+  @@map("member_benefits")
+}
+
+model MemberAnniversary {
+  memberNo     String    @map("member_no") @db.VarChar(20)
+  anniv        Int
+  startDate    DateTime? @map("start_date") @db.Date
+  endDate      DateTime? @map("end_date") @db.Date
+  renewalDate  DateTime? @map("renewal_date") @db.Date
+  userId       String?   @map("user_id") @db.VarChar(10)
+  dateEntered  DateTime? @map("date_entered") @db.Date
+  sync         Int?
+  renewalNotes String?   @map("renewal_notes") @db.VarChar(100)
+  invoiceNo    String?   @map("invoice_no") @db.VarChar(15)
+  commisRate   Decimal?  @map("commis_rate") @db.Decimal(10, 2)
+  whtaxRate    Decimal?  @map("whtax_rate") @db.Decimal(10, 2)
+  sumInsured   Decimal?  @map("sum_insured") @db.Decimal(10, 2)
+  statusUser   String?   @map("status_user") @db.VarChar(15)
+  status       Int?
+  smartSync    Int?      @map("smart_sync")
+  branch       Int?
+  unitManager  Int?      @map("unit_manager")
+
+  @@id([memberNo, anniv])
+  @@map("member_anniversary")
+}
+
+model MemberInfo {
+  memberNo            String    @id @map("member_no") @db.VarChar(20)
+  familyNo            String    @map("family_no") @db.VarChar(20)
+  surname             String?   @db.VarChar(40)
+  firstName           String?   @map("first_name") @db.VarChar(40)
+  otherNames          String?   @map("other_names") @db.VarChar(40)
+  dob                 DateTime? @db.Date
+  occupation          Int?
+  idPpNo              String?   @map("id_pp_no") @db.VarChar(30)
+  bloodGroup          Int?      @map("blood_group")
+  relationToPrincipal Int?      @map("relation_to_principal")
+  userId              String?   @map("user_id") @db.VarChar(10)
+  dateEntered         DateTime? @map("date_entered") @db.Date
+  familyTitle         Int?      @map("family_title")
+  dealingUser         String?   @map("dealing_user") @db.VarChar(10)
+  cancelled           Int?
+  employmentNo        String?   @map("employment_no") @db.VarChar(15)
+  gender              Int?
+  cardToMember        DateTime? @map("card_to_member") @db.Date
+  passportNo          String?   @map("passport_no") @db.VarChar(15)
+  nhifCardNo          String?   @map("nhif_card_no") @db.VarChar(15)
+  height              String?   @db.VarChar(10)
+  weight              String?   @db.VarChar(10)
+  photoNForm          Int?      @map("photo_n_form")
+  photoNo             Int?      @map("photo_no")
+  infoToPrinter       DateTime? @map("info_to_printer") @db.Date
+  cardFromPrinter     DateTime? @map("card_from_printer") @db.Date
+  appFormDate         DateTime? @map("app_form_date") @db.Date
+  maritalStatus       Int?      @map("marital_status")
+  dateEmployed        DateTime? @map("date_employed") @db.Date
+  depPos              Int?      @map("dep_pos")
+  corpId              String?   @map("corp_id") @db.VarChar(14)
+  mobileNo            String?   @map("mobile_no") @db.VarChar(30)
+  emailAdd            String?   @map("email_add") @db.VarChar(30)
+
+  @@index([familyNo])
+  @@index([corpId])
+  @@map("member_info")
+}
+
+model MemberCancellation {
+  idx         Int       @id @default(autoincrement())
+  memberNo    String    @map("member_no") @db.VarChar(20)
+  cancelled   Int
+  dateCan     DateTime  @map("date_can") @db.Date
+  anniv       Int?
+  reason      Int?
+  userId      String?   @map("user_id") @db.VarChar(10)
+  dateEntered DateTime? @map("date_entered") @db.Date
+  sync        Int?
+
+  @@index([memberNo])
+  @@map("member_cancellation")
+}
+
+model MemberAcceptance {
+  memberNo    String    @id @map("member_no") @db.VarChar(20)
+  status      Decimal   @db.Decimal(1, 0)
+  statusDate  DateTime? @map("status_date") @db.Date
+  comments    String?   @db.VarChar(70)
+  userId      String?   @map("user_id") @db.VarChar(10)
+  dateEntered DateTime? @map("date_entered") @db.Date
+  defRej      Int?      @map("def_rej") @db.SmallInt
+
+  @@map("member_acceptance")
+}
+
+model ClaimsBatch {
+  idx                 Int       @id @default(autoincrement())
+  batchNo             String?   @map("batch_no") @db.VarChar(10)
+  batchDate           DateTime? @map("batch_date") @db.Date
+  batchUser           String?   @map("batch_user") @db.VarChar(100)
+  claimsCount         Decimal?  @map("claims_count") @db.Decimal(3, 0)
+  dataEntryUser       String?   @map("data_entry_user") @db.VarChar(100)
+  dateEntryDate       DateTime? @map("date_entry_date") @db.Date
+  vettingUser         String?   @map("vetting_user") @db.VarChar(100)
+  vettingUserDate     DateTime? @map("vetting_user_date") @db.Date
+  authorisingUser     String?   @map("authorising_user") @db.VarChar(100)
+  authorisingUserDate DateTime? @map("authorising_user_date") @db.Date
+  financeUser         String?   @map("finance_user") @db.VarChar(100)
+  financeUserDate     DateTime? @map("finance_user_date") @db.Date
+  provider            Decimal?  @db.Decimal(5, 0)
+  dateReceived        DateTime? @map("date_received") @db.Date
+
+  @@index([batchNo])
+  @@index([provider])
+  @@map("claims_batch")
+}
+
+model Claim {
+  id             String      @id @default(cuid())
+  claimNumber    String      @unique
+  memberId       String
+  providerName   String?
+  serviceDate    DateTime
+  amount         Decimal     @db.Decimal(12, 2)
+  approvedAmount Decimal?    @db.Decimal(12, 2)
+  status         ClaimStatus @default(SUBMITTED)
+  diagnosis      String?
+  description    String?
+  submittedAt    DateTime    @default(now())
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  @@index([memberId])
+  @@index([status])
+}
+
+model Preauthorization {
+  id              String        @id @default(cuid())
+  preauthNumber   String        @unique
+  memberId        String
+  providerName    String?
+  serviceDate     DateTime?
+  requestedAmount Decimal       @db.Decimal(12, 2)
+  approvedAmount  Decimal?      @db.Decimal(12, 2)
+  status          PreauthStatus @default(PENDING)
+  procedureCode   String?
+  diagnosis       String?
+  validUntil      DateTime?
+  notes           String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@index([memberId])
+  @@index([status])
+}
+
+model Premium {
+  id              String        @id @default(cuid())
+  referenceNumber String        @unique
+  corporateId     String
+  corporate       Corporate     @relation(fields: [corporateId], references: [id], onDelete: Cascade)
+  memberId        String?
+  amount          Decimal       @db.Decimal(12, 2)
+  periodStart     DateTime
+  periodEnd       DateTime
+  dueDate         DateTime
+  paidDate        DateTime?
+  status          PremiumStatus @default(PENDING)
+  paymentMethod   String?
+  notes           String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@index([corporateId])
+  @@index([memberId])
+  @@index([status])
+}
+
+model Commission {
+  id               String           @id @default(cuid())
+  referenceNumber  String           @unique
+  corporateId      String?
+  corporate        Corporate?       @relation(fields: [corporateId], references: [id], onDelete: SetNull)
+  agentName        String
+  agentCode        String?
+  premiumAmount    Decimal          @db.Decimal(12, 2)
+  commissionRate   Decimal          @db.Decimal(5, 2)
+  commissionAmount Decimal          @db.Decimal(12, 2)
+  periodStart      DateTime
+  periodEnd        DateTime
+  status           CommissionStatus @default(PENDING)
+  paidDate         DateTime?
+  notes            String?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  @@index([corporateId])
+  @@index([status])
+}
+
+model ReinsuranceTreaty {
+  id              String       @id @default(cuid())
+  treatyNumber    String       @unique
+  reinsurerName   String
+  corporateId     String?
+  corporate       Corporate?   @relation(fields: [corporateId], references: [id], onDelete: SetNull)
+  treatyType      TreatyType
+  sharePercentage Decimal?     @db.Decimal(5, 2)
+  limitAmount     Decimal?     @db.Decimal(14, 2)
+  effectiveFrom   DateTime
+  effectiveTo     DateTime?
+  status          TreatyStatus @default(ACTIVE)
+  premiumCeded    Decimal?     @db.Decimal(12, 2)
+  claimsRecovered Decimal?     @db.Decimal(12, 2)
+  notes           String?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@index([corporateId])
+  @@index([status])
+}
+
+enum AdminSystemAccess {
+  MEDICAL
+  GENERAL
+  AVIATION
+}
+
+model AdminUser {
+  id             String              @id @default(cuid())
+  email          String              @unique
+  name           String
+  passwordHash   String              @map("password_hash")
+  role           AdminRole           @default(OPERATOR)
+  status         AdminUserStatus     @default(ACTIVE)
+  allowedSystems AdminSystemAccess[] @default([]) @map("allowed_systems")
+  phone          String?
+  department     String?
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+}
+
+model SystemSetting {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  value       String
+  category    String   @default("general")
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([category])
+}
+
+model Agent {
+  agentId        Int       @id @default(autoincrement()) @map("agent_id")
+  agentName      String    @map("agent_name") @db.VarChar(70)
+  mobileNo       String?   @map("mobile_no") @db.VarChar(20)
+  email          String?   @db.VarChar(30)
+  contactPerson  String?   @map("contact_person") @db.VarChar(70)
+  telNo          String?   @map("tel_no") @db.VarChar(20)
+  branch         Int?
+  pinNumber      String?   @map("pin_number") @db.VarChar(15)
+
+  @@map("agent")
+}
+
+model Benefit {
+  code      Int     @id @default(autoincrement())
+  benefit   String  @db.VarChar(255)
+  beneClass Int?    @map("bene_class")
+
+  @@map("benefit")
+}
+
+model Provider {
+  code           Int       @id @default(autoincrement())
+  provider       String    @db.VarChar(255)
+  country        Int?
+  pinNo          String?   @map("pin_no") @db.VarChar(50)
+  phoneNo        String?   @map("phone_no") @db.VarChar(50)
+  mobileNo       String?   @map("mobile_no") @db.VarChar(50)
+  email          String?   @db.VarChar(255)
+  address        String?   @db.VarChar(255)
+  town           Int?
+  physicalLoc    String?   @map("physical_loc") @db.VarChar(255)
+  contactPerson  String?   @map("contact_person") @db.VarChar(255)
+  dateEntered    DateTime? @map("date_entered") @db.Date
+  createdBy      String?   @map("created_by") @db.VarChar(50)
+  approved       Boolean?
+  approvedBy     String?   @map("approved_by") @db.VarChar(50)
+  approvedDate   DateTime? @map("approved_date") @db.Date
+  telNo          String?   @map("tel_no") @db.VarChar(50)
+  bankAcct       String?   @map("bank_acct") @db.VarChar(50)
+  bank           String?   @db.VarChar(50)
+  mapped         String?   @db.VarChar(50)
+  bankBranch     String?   @map("bank_branch") @db.VarChar(50)
+  userId         String?   @map("user_id") @db.VarChar(50)
+  status         String?   @db.VarChar(50)
+
+  @@map("provider")
+}
+
+model TCategory {
+  category String @id @db.VarChar(10)
+
+  @@map("t_category")
+}

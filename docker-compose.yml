@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: promed-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: promed
+      POSTGRES_PASSWORD: promed
+      POSTGRES_DB: promed_admin
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

@@ -1,0 +1,41 @@
+export type MedicalDetailsFormData = {
+  memberNo: string;
+  anniv: string;
+  asthma: string;
+  diabetes: string;
+  hypertension: string;
+  convulsionEpilepsy: string;
+  gastricDuodenalUlcers: string;
+  heartDisease: string;
+  neurologicalDisease: string;
+  currentlyIll: string;
+  currentIllDetails: string;
+  gallstones: string;
+  recentConsultedDoc: string;
+  recentConsultedDetails: string;
+  disabled: string;
+  disabilityDetails: string;
+  pastDeliveries: string;
+  normal: string;
+  caesarian: string;
+  expectant: string;
+  expectedDeliveryDate: string;
+  psychiatricIllness: string;
+  recurrentTonsillitis: string;
+  arthritisFibroids: string;
+  menstrualDisorder: string;
+  cancer: string;
+  smokes: string;
+  takesAlcohol: string;
+  onRegularMedication: string;
+  regularMedicationDetails: string;
+  futureHospitalization: string;
+  currentDoctor: string;
+};
+
+export type MedicalDetailsField = {
+  name: keyof MedicalDetailsFormData;
+  label: string;
+  type?: React.HTMLInputTypeAttribute;
+  required?: boolean;
+};

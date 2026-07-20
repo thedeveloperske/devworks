@@ -1,0 +1,30 @@
+-- CreateTable
+CREATE TABLE "agent" (
+    "agent_id" SERIAL NOT NULL,
+    "agent_name" VARCHAR(70) NOT NULL,
+    "agent_type" NUMERIC(2),
+    "tell_no" VARCHAR(20),
+    "mobile_no" VARCHAR(20),
+    "fax_no" VARCHAR(20),
+    "postal_add" VARCHAR(15),
+    "town" NUMERIC(5),
+    "phy_loc" VARCHAR(100),
+    "email" VARCHAR(30),
+    "contact_person" VARCHAR(70),
+    "contact_mobile" VARCHAR(20),
+    "contacct_tel" VARCHAR(20),
+    "user_id" VARCHAR(10),
+    "date_entered" DATE,
+    "unit_manager" VARCHAR(10),
+    "branch" INTEGER,
+    "pin_number" VARCHAR(15),
+    "licensed" NUMERIC(1),
+    "expiry_date" DATE,
+    "account_code" VARCHAR(10),
+    "tel_no" VARCHAR(20),
+    "contact_tel" VARCHAR(20),
+    "sales_manager" VARCHAR(5),
+    "account_name" VARCHAR(60),
+
+    CONSTRAINT "agent_pkey" PRIMARY KEY ("agent_id")
+);

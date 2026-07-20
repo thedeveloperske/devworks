@@ -1,0 +1,48 @@
+export type PrincipalInformationFormData = {
+  familyNo: string;
+  memberNo: string;
+  surname: string;
+  firstName: string;
+  otherNames: string;
+  agentId: string;
+  corpId: string;
+  employer: string;
+  telNo: string;
+  mobileNo: string;
+  postalAdd: string;
+  town: string;
+  email: string;
+  phyLoc: string;
+  familySize: string;
+  relationToFamily: string;
+  individual: string;
+  businessClass: string;
+  dateFormReceived: string;
+  witnessed: string;
+  dateWitnessed: string;
+  userId: string;
+  dateEntered: string;
+  province: string;
+  formFilled: string;
+  department: string;
+  insurer: string;
+  category: string;
+  maritalStatus: string;
+  dateEmployed: string;
+  previousInsurer: string;
+  periodInsured: string;
+  beneficiary: string;
+  beneficiaryId: string;
+  beneficiaryRelation: string;
+  policyNo: string;
+  pinNo: string;
+  branch: string;
+  shareData: string;
+};
+
+export type PrincipalInformationField = {
+  name: keyof PrincipalInformationFormData;
+  label: string;
+  type?: React.HTMLInputTypeAttribute;
+  required?: boolean;
+};
