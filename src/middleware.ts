@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { verifySessionToken } from "@/lib/auth-session";
+import { resolveAppUrl } from "@/lib/app-url";
 import type { AdminSystemId } from "@/lib/admin-systems";
 
 const PUBLIC_PATHS = new Set(["/login"]);
@@ -33,7 +34,7 @@ export async function middleware(request: NextRequest) {
 
   if (PUBLIC_PATHS.has(pathname)) {
     if (session) {
-      return NextResponse.redirect(new URL("/applications", request.url));
+      return NextResponse.redirect(resolveAppUrl("/applications", request));
     }
     return NextResponse.next();
   }
@@ -42,18 +43,18 @@ export async function middleware(request: NextRequest) {
     if (pathname.startsWith("/api/")) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    const loginUrl = new URL("/login", request.url);
+    const loginUrl = resolveAppUrl("/login", request);
     loginUrl.searchParams.set("callbackUrl", pathname);
     return NextResponse.redirect(loginUrl);
   }
 
   const systemMatch = pathname.match(/^\/admin\/(medical)(\/|$)/);
   if (systemMatch && !hasSystemAccess(session.allowedSystems, systemMatch[1])) {
-    return NextResponse.redirect(new URL("/applications", request.url));
+    return NextResponse.redirect(resolveAppUrl("/applications", request));
   }
 
   if (pathname === "/" || pathname === "/admin") {
-    return NextResponse.redirect(new URL("/applications", request.url));
+    return NextResponse.redirect(resolveAppUrl("/applications", request));
   }
 
   return NextResponse.next();

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { authenticateUser } from "@/lib/auth";
+import { resolveAppUrl } from "@/lib/app-url";
 import {
   SESSION_COOKIE,
   sessionCookieOptions,
@@ -15,7 +16,7 @@ function isFormRequest(request: Request) {
 }
 
 function loginRedirect(request: Request, callbackUrl: string | undefined, error: string) {
-  const url = new URL("/login", request.url);
+  const url = resolveAppUrl("/login", request);
   if (callbackUrl?.startsWith("/")) {
     url.searchParams.set("callbackUrl", callbackUrl);
   }
@@ -66,7 +67,7 @@ export async function POST(request: Request) {
     const cookieOptions = sessionCookieOptions(undefined, request);
 
     if (isForm) {
-      const response = NextResponse.redirect(new URL(destination, request.url), 303);
+      const response = NextResponse.redirect(resolveAppUrl(destination, request), 303);
       response.cookies.set(SESSION_COOKIE, token, cookieOptions);
       return response;
     }

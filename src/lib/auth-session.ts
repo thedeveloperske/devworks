@@ -1,4 +1,5 @@
 import type { AdminSystemId } from "@/lib/admin-systems";
+import { isSecureRequest } from "@/lib/app-url";
 
 export const SESSION_COOKIE = "promed_session";
 const SESSION_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
@@ -92,14 +93,6 @@ function parseEnvFlag(value: string | undefined): boolean | undefined {
   return undefined;
 }
 
-function isHttpsRequest(request: Pick<Request, "url"> & { headers: Headers }) {
-  const forwarded = request.headers.get("x-forwarded-proto");
-  if (forwarded) {
-    return forwarded.split(",")[0]?.trim() === "https";
-  }
-  return new URL(request.url).protocol === "https:";
-}
-
 export function sessionCookieOptions(
   maxAgeSeconds = SESSION_MAX_AGE_MS / 1000,
   request?: Pick<Request, "url"> & { headers: Headers }
@@ -109,7 +102,7 @@ export function sessionCookieOptions(
   if (envFlag !== undefined) {
     secure = envFlag;
   } else if (request) {
-    secure = isHttpsRequest(request);
+    secure = isSecureRequest(request);
   } else {
     secure = process.env.NODE_ENV === "production";
   }
