@@ -33,7 +33,11 @@ type BioDataTabProps = {
   fieldLabelClass: string;
   fieldInputClass: string;
   memberNoDisabled?: boolean;
-  /** When true (principal create/edit), relationship fields stay locked to Principal. */
+  /**
+   * When true (principal create/edit), Family Title and Relationship stay locked
+   * to Principal. When false (dependant), Family Title stays locked to Dependant
+   * and Relationship to Principal is editable.
+   */
   lockPrincipalRelationship?: boolean;
   corporateName?: string;
 };
@@ -119,7 +123,10 @@ export function BioDataTab({
       placeholder: "Select family title",
     },
     relationToPrincipal: {
-      options: familyRelationshipOptions,
+      // Dependants choose Spouse/Son/Daughter/etc.; Principal is not a valid option.
+      options: lockPrincipalRelationship
+        ? familyRelationshipOptions
+        : familyRelationshipOptions.filter((option) => option.value !== "1"),
       placeholder: "Select relationship",
     },
     occupation: {
@@ -199,9 +206,10 @@ export function BioDataTab({
           const isRelationToPrincipal = field.name === "relationToPrincipal";
           const isFamilyTitle = field.name === "familyTitle";
           const disabled =
-            // Relationship to Principal is system-managed and never editable.
-            isRelationToPrincipal ||
-            (lockPrincipalRelationship && isFamilyTitle) ||
+            // Family Title is always system-managed (Principal or Dependant).
+            isFamilyTitle ||
+            // Relationship is locked for principals; editable for dependants.
+            (lockPrincipalRelationship && isRelationToPrincipal) ||
             isFamilyNo ||
             (isMemberNo && memberNoDisabled) ||
             (isCorpId && memberNoDisabled);

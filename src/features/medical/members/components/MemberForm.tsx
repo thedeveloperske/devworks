@@ -159,8 +159,10 @@ export function MemberForm({
     relationToPrincipal:
       initialBioData?.relationToPrincipal ||
       (isDependantMode ? "" : "1"),
-    familyTitle:
-      initialBioData?.familyTitle || (isDependantMode ? "" : "1"),
+    // Family Title is fixed: Principal (1) or Dependant (5).
+    familyTitle: isDependantMode
+      ? "5"
+      : initialBioData?.familyTitle || "1",
   });
   const [medicalDetails, setMedicalDetails] = useState<MedicalDetailsFormData>({
     ...defaultMedicalDetailsForm,
@@ -315,13 +317,11 @@ export function MemberForm({
   ) => {
     const { name, value } = e.target;
     setBioData((prev) => {
-      const next = { ...prev, [name]: value };
-      // Relationship to Principal is never edited directly; it follows the
-      // family title selection.
+      // Family Title is never user-edited; keep the mode default.
       if (name === "familyTitle") {
-        next.relationToPrincipal = value;
+        return prev;
       }
-      return next;
+      return { ...prev, [name]: value };
     });
   };
 
@@ -391,9 +391,6 @@ export function MemberForm({
       }
       if (!bioData.relationToPrincipal.trim()) {
         return "Relationship to principal is required (Bio Data)";
-      }
-      if (!bioData.familyTitle.trim()) {
-        return "Family title is required (Bio Data)";
       }
     } else {
       if (!principalInformation.surname.trim()) {
@@ -473,6 +470,7 @@ export function MemberForm({
           body: JSON.stringify({
             bioData: {
               ...bioData,
+              familyTitle: "5",
               familyNo,
               corpId: bioData.corpId || resolvedCorpId,
             },
@@ -682,9 +680,7 @@ export function MemberForm({
               relationToPrincipal: isDependantMode
                 ? bioData.relationToPrincipal
                 : bioData.relationToPrincipal || "1",
-              familyTitle: isDependantMode
-                ? bioData.familyTitle
-                : bioData.familyTitle || "1",
+              familyTitle: isDependantMode ? "5" : "1",
             }}
             onChange={handleBioDataChange}
             fieldLabelClass={fieldLabelClass}
