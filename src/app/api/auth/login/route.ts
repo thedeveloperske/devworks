@@ -1,5 +1,10 @@
 import { NextResponse } from "next/server";
-import { authenticateUser, createUserSession } from "@/lib/auth";
+import { authenticateUser } from "@/lib/auth";
+import {
+  SESSION_COOKIE,
+  sessionCookieOptions,
+  signSessionToken,
+} from "@/lib/auth-session";
 
 export async function POST(request: Request) {
   try {
@@ -16,9 +21,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Invalid email or password" }, { status: 401 });
     }
 
-    await createUserSession(user);
-
-    return NextResponse.json({
+    const token = await signSessionToken(user);
+    const response = NextResponse.json({
       user: {
         email: user.email,
         name: user.name,
@@ -26,6 +30,9 @@ export async function POST(request: Request) {
         allowedSystems: user.allowedSystems,
       },
     });
+    response.cookies.set(SESSION_COOKIE, token, sessionCookieOptions());
+
+    return response;
   } catch {
     return NextResponse.json({ error: "Login failed" }, { status: 500 });
   }

@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/admin/Button";
 import { FormError } from "@/components/admin/FormError";
@@ -9,7 +9,6 @@ import { FormField } from "@/components/admin/FormField";
 import { formCardClass } from "@/lib/form-styles";
 
 export function LoginForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -21,22 +20,28 @@ export function LoginForm() {
     setLoading(true);
     setError("");
 
-    const res = await fetch("/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
 
-    if (!res.ok) {
-      const data = await res.json();
-      setError(data.error ?? "Login failed");
+      if (!res.ok) {
+        const data = await res.json();
+        setError(data.error ?? "Login failed");
+        return;
+      }
+
+      const callbackUrl = searchParams.get("callbackUrl");
+      const destination =
+        callbackUrl && callbackUrl.startsWith("/") ? callbackUrl : "/applications";
+      window.location.assign(destination);
+    } catch {
+      setError("Login failed");
+    } finally {
       setLoading(false);
-      return;
     }
-
-    const callbackUrl = searchParams.get("callbackUrl");
-    router.push(callbackUrl && callbackUrl.startsWith("/") ? callbackUrl : "/applications");
-    router.refresh();
   };
 
   return (

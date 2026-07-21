@@ -1,0 +1,16 @@
+[Unit]
+Description=Promed Admin (Next.js)
+After=network.target
+
+[Service]
+Type=simple
+User=YOUR_LINUX_USER
+WorkingDirectory=/home/YOUR_LINUX_USER/devworks/promed
+Environment=NODE_ENV=production
+EnvironmentFile=/home/YOUR_LINUX_USER/devworks/promed/.env
+ExecStart=/usr/bin/npm start
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

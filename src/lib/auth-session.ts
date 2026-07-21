@@ -85,9 +85,16 @@ export async function verifySessionToken(
 }
 
 export function sessionCookieOptions(maxAgeSeconds = SESSION_MAX_AGE_MS / 1000) {
+  // Production defaults to secure cookies (HTTPS). For HTTP-only deployments
+  // (e.g. internal LAN), set AUTH_COOKIE_SECURE=false in .env.
+  const secure =
+    process.env.AUTH_COOKIE_SECURE === "true" ||
+    (process.env.NODE_ENV === "production" &&
+      process.env.AUTH_COOKIE_SECURE !== "false");
+
   return {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure,
     sameSite: "lax" as const,
     path: "/",
     maxAge: maxAgeSeconds,
