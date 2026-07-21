@@ -10,39 +10,15 @@ import { formCardClass } from "@/lib/form-styles";
 
 export function LoginForm() {
   const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl");
+  const errorFromUrl = searchParams.get("error");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [error, setError] = useState(errorFromUrl ?? "");
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
-
-    try {
-      const res = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-
-      if (!res.ok) {
-        const data = await res.json();
-        setError(data.error ?? "Login failed");
-        return;
-      }
-
-      const callbackUrl = searchParams.get("callbackUrl");
-      const destination =
-        callbackUrl && callbackUrl.startsWith("/") ? callbackUrl : "/applications";
-      window.location.assign(destination);
-    } catch {
-      setError("Login failed");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const safeCallbackUrl =
+    callbackUrl && callbackUrl.startsWith("/") ? callbackUrl : undefined;
 
   return (
     <div className="flex h-full flex-col items-center justify-center bg-slate-50 px-4">
@@ -57,13 +33,28 @@ export function LoginForm() {
         />
       </div>
 
-      <form onSubmit={handleSubmit} className={`${formCardClass} w-full max-w-md`}>
+      <form
+        action="/api/auth/login"
+        method="POST"
+        className={`${formCardClass} w-full max-w-md`}
+        onSubmit={() => {
+          setLoading(true);
+          setError("");
+        }}
+      >
+        {safeCallbackUrl ? (
+          <input type="hidden" name="callbackUrl" value={safeCallbackUrl} />
+        ) : null}
+
         <h1 className="mb-1 text-[12px] font-bold text-maroon">Sign in</h1>
         <p className="mb-6 text-[12px] text-slate-500">
           Access Promed applications for Medical, Aviation, and General insurance.
         </p>
 
-        <FormError message={error} className="mb-4 border border-red-200 bg-red-50 px-4 py-3 text-[12px] text-red-700" />
+        <FormError
+          message={error}
+          className="mb-4 border border-red-200 bg-red-50 px-4 py-3 text-[12px] text-red-700"
+        />
 
         <div className="space-y-4">
           <FormField

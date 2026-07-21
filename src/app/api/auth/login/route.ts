@@ -6,22 +6,71 @@ import {
   signSessionToken,
 } from "@/lib/auth-session";
 
+function isFormRequest(request: Request) {
+  const contentType = request.headers.get("content-type") ?? "";
+  return (
+    contentType.includes("application/x-www-form-urlencoded") ||
+    contentType.includes("multipart/form-data")
+  );
+}
+
+function loginRedirect(request: Request, callbackUrl: string | undefined, error: string) {
+  const url = new URL("/login", request.url);
+  if (callbackUrl?.startsWith("/")) {
+    url.searchParams.set("callbackUrl", callbackUrl);
+  }
+  url.searchParams.set("error", error);
+  return NextResponse.redirect(url, 303);
+}
+
 export async function POST(request: Request) {
+  const isForm = isFormRequest(request);
+
   try {
-    const body = await request.json();
-    const email = body.email?.trim();
-    const password = body.password;
+    let email: string | undefined;
+    let password: string | undefined;
+    let callbackUrl: string | undefined;
+
+    if (isForm) {
+      const form = await request.formData();
+      email = form.get("email")?.toString().trim();
+      password = form.get("password")?.toString();
+      callbackUrl = form.get("callbackUrl")?.toString();
+    } else {
+      const body = await request.json();
+      email = body.email?.trim();
+      password = body.password;
+      callbackUrl = body.callbackUrl;
+    }
 
     if (!email || !password) {
-      return NextResponse.json({ error: "Email and password are required" }, { status: 400 });
+      const message = "Email and password are required";
+      if (isForm) {
+        return loginRedirect(request, callbackUrl, message);
+      }
+      return NextResponse.json({ error: message }, { status: 400 });
     }
 
     const user = await authenticateUser(email, password);
     if (!user) {
-      return NextResponse.json({ error: "Invalid email or password" }, { status: 401 });
+      const message = "Invalid email or password";
+      if (isForm) {
+        return loginRedirect(request, callbackUrl, message);
+      }
+      return NextResponse.json({ error: message }, { status: 401 });
     }
 
     const token = await signSessionToken(user);
+    const destination =
+      callbackUrl && callbackUrl.startsWith("/") ? callbackUrl : "/applications";
+    const cookieOptions = sessionCookieOptions(undefined, request);
+
+    if (isForm) {
+      const response = NextResponse.redirect(new URL(destination, request.url), 303);
+      response.cookies.set(SESSION_COOKIE, token, cookieOptions);
+      return response;
+    }
+
     const response = NextResponse.json({
       user: {
         email: user.email,
@@ -30,10 +79,13 @@ export async function POST(request: Request) {
         allowedSystems: user.allowedSystems,
       },
     });
-    response.cookies.set(SESSION_COOKIE, token, sessionCookieOptions());
-
+    response.cookies.set(SESSION_COOKIE, token, cookieOptions);
     return response;
   } catch {
-    return NextResponse.json({ error: "Login failed" }, { status: 500 });
+    const message = "Login failed";
+    if (isForm) {
+      return loginRedirect(request, undefined, message);
+    }
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

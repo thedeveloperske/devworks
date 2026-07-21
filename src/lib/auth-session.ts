@@ -84,13 +84,35 @@ export async function verifySessionToken(
   }
 }
 
-export function sessionCookieOptions(maxAgeSeconds = SESSION_MAX_AGE_MS / 1000) {
-  // Production defaults to secure cookies (HTTPS). For HTTP-only deployments
-  // (e.g. internal LAN), set AUTH_COOKIE_SECURE=false in .env.
-  const secure =
-    process.env.AUTH_COOKIE_SECURE === "true" ||
-    (process.env.NODE_ENV === "production" &&
-      process.env.AUTH_COOKIE_SECURE !== "false");
+function parseEnvFlag(value: string | undefined): boolean | undefined {
+  if (!value) return undefined;
+  const normalized = value.trim().replace(/^["']|["']$/g, "").toLowerCase();
+  if (normalized === "true" || normalized === "1" || normalized === "yes") return true;
+  if (normalized === "false" || normalized === "0" || normalized === "no") return false;
+  return undefined;
+}
+
+function isHttpsRequest(request: Pick<Request, "url"> & { headers: Headers }) {
+  const forwarded = request.headers.get("x-forwarded-proto");
+  if (forwarded) {
+    return forwarded.split(",")[0]?.trim() === "https";
+  }
+  return new URL(request.url).protocol === "https:";
+}
+
+export function sessionCookieOptions(
+  maxAgeSeconds = SESSION_MAX_AGE_MS / 1000,
+  request?: Pick<Request, "url"> & { headers: Headers }
+) {
+  const envFlag = parseEnvFlag(process.env.AUTH_COOKIE_SECURE);
+  let secure: boolean;
+  if (envFlag !== undefined) {
+    secure = envFlag;
+  } else if (request) {
+    secure = isHttpsRequest(request);
+  } else {
+    secure = process.env.NODE_ENV === "production";
+  }
 
   return {
     httpOnly: true,
