@@ -1,0 +1,32 @@
+-- Use plain sequence numbers for corp_id (1, 2, 3…) instead of zero-padded values.
+ALTER TABLE "corporate"
+ALTER COLUMN "corp_id" SET DEFAULT nextval('corporate_corp_id_seq'::regclass)::text;
+
+-- Strip leading zeros from existing numeric corp_id values.
+-- FK children with ON UPDATE CASCADE follow the corporate.corp_id change.
+UPDATE "corporate"
+SET "corp_id" = ("corp_id"::bigint)::text
+WHERE "corp_id" ~ '^[0-9]+$'
+  AND "corp_id" <> ("corp_id"::bigint)::text;
+
+-- Tables that store corp_id without a FK to corporate.
+UPDATE "principal_applicant"
+SET "corp_id" = ("corp_id"::bigint)::text
+WHERE "corp_id" ~ '^[0-9]+$'
+  AND "corp_id" <> ("corp_id"::bigint)::text;
+
+UPDATE "member_info"
+SET "corp_id" = ("corp_id"::bigint)::text
+WHERE "corp_id" ~ '^[0-9]+$'
+  AND "corp_id" <> ("corp_id"::bigint)::text;
+
+UPDATE "member_benefits"
+SET "corp_id" = ("corp_id"::bigint)::text
+WHERE "corp_id" ~ '^[0-9]+$'
+  AND "corp_id" <> ("corp_id"::bigint)::text;
+
+-- Rebuild policy numbers that embedded the old padded corp_id.
+UPDATE "corporate"
+SET "policy_no" = 'POL-00' || "corp_id" || RIGHT("policy_no", 4)
+WHERE "policy_no" ~ '^POL-00[0-9]+[0-9]{4}$'
+  AND "corp_id" ~ '^[0-9]+$';

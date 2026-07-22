@@ -61,7 +61,7 @@ enum TreatyStatus {
 
 model Corporate {
   id                  String              @id @default(cuid())
-  corpId              String              @unique @default(dbgenerated("lpad(nextval('corporate_corp_id_seq'::regclass)::text, 10, '0')")) @map("corp_id") @db.VarChar(10)
+  corpId              String              @unique @default(dbgenerated("nextval('corporate_corp_id_seq'::regclass)::text")) @map("corp_id") @db.VarChar(10)
   corporate           String
   telNo               String?             @map("tel_no")
   mobileNo            String?             @map("mobile_no")
