@@ -2,6 +2,11 @@ import { NextResponse } from "next/server";
 import { authenticateUser } from "@/lib/auth";
 import { resolveAppUrl } from "@/lib/app-url";
 import {
+  hasSystemAccess,
+  systemIdFromPath,
+  type AdminSystemId,
+} from "@/lib/admin-systems";
+import {
   SESSION_COOKIE,
   sessionCookieOptions,
   signSessionToken,
@@ -26,6 +31,23 @@ function loginRedirect(request: Request, callbackUrl: string | undefined, error:
 
 function readLogin(value: FormDataEntryValue | null | undefined) {
   return value?.toString().trim();
+}
+
+/** Only allow post-login paths the user may open. */
+function resolveDestination(
+  callbackUrl: string | undefined,
+  allowedSystems: AdminSystemId[]
+) {
+  if (!callbackUrl?.startsWith("/")) {
+    return "/applications";
+  }
+
+  const system = systemIdFromPath(callbackUrl);
+  if (system && !hasSystemAccess(allowedSystems, system)) {
+    return "/applications";
+  }
+
+  return callbackUrl;
 }
 
 export async function POST(request: Request) {
@@ -66,9 +88,16 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: message }, { status: 401 });
     }
 
+    if (user.allowedSystems.length === 0) {
+      const message = "Your account has no application access";
+      if (isForm) {
+        return loginRedirect(request, callbackUrl, message);
+      }
+      return NextResponse.json({ error: message }, { status: 403 });
+    }
+
     const token = await signSessionToken(user);
-    const destination =
-      callbackUrl && callbackUrl.startsWith("/") ? callbackUrl : "/applications";
+    const destination = resolveDestination(callbackUrl, user.allowedSystems);
     const cookieOptions = sessionCookieOptions(undefined, request);
 
     if (isForm) {
@@ -84,6 +113,7 @@ export async function POST(request: Request) {
         role: user.role,
         allowedSystems: user.allowedSystems,
       },
+      destination,
     });
     response.cookies.set(SESSION_COOKIE, token, cookieOptions);
     return response;

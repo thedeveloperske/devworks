@@ -2,7 +2,7 @@ import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
-import type { AdminSystemId } from "@/lib/admin-systems";
+import { resolveAllowedSystems } from "@/lib/admin-systems";
 import {
   SESSION_COOKIE,
   sessionCookieOptions,
@@ -11,20 +11,12 @@ import {
   type SessionUser,
 } from "@/lib/auth-session";
 
+export { resolveAllowedSystems } from "@/lib/admin-systems";
+
 const scryptAsync = promisify(scrypt);
 
 /** Active status value in the `users` table. */
 export const USER_STATUS_ACTIVE = 1;
-
-const SYSTEM_ACCESS_TO_ID: Record<string, AdminSystemId> = {
-  MEDICAL: "medical",
-};
-
-export function resolveAllowedSystems(allowedSystems: string[]): AdminSystemId[] {
-  return allowedSystems
-    .map((system) => SYSTEM_ACCESS_TO_ID[system])
-    .filter((system): system is AdminSystemId => Boolean(system));
-}
 
 export async function hashPassword(password: string) {
   const salt = randomBytes(16).toString("hex");

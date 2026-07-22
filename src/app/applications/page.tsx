@@ -1,17 +1,27 @@
 import Link from "next/link";
 import Image from "next/image";
 import { redirect } from "next/navigation";
-import { Stethoscope } from "lucide-react";
+import { Plane, Shield, Stethoscope, type LucideIcon } from "lucide-react";
 import { LogoutButton } from "@/components/auth/LogoutButton";
-import { ADMIN_SYSTEMS } from "@/lib/admin-systems";
+import {
+  ADMIN_SYSTEMS,
+  type AdminSystemId,
+} from "@/lib/admin-systems";
 import { getSession } from "@/lib/auth";
+
+const SYSTEM_ICONS: Record<AdminSystemId, LucideIcon> = {
+  medical: Stethoscope,
+  general: Shield,
+  aviation: Plane,
+};
 
 export default async function ApplicationsPage() {
   const session = await getSession();
   if (!session) redirect("/login");
 
-  const hasMedical = session.allowedSystems.includes("medical");
-  const medical = ADMIN_SYSTEMS.medical;
+  const availableSystems = session.allowedSystems
+    .map((id) => ADMIN_SYSTEMS[id])
+    .filter(Boolean);
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -39,29 +49,35 @@ export default async function ApplicationsPage() {
         <div className="mb-8">
           <h1 className="text-[12px] font-bold text-slate-900">Choose an application</h1>
           <p className="mt-1 text-[12px] text-slate-500">
-            Select the insurance system you want to work in.
+            Only systems assigned to your account are shown.
           </p>
         </div>
 
-        {!hasMedical ? (
+        {availableSystems.length === 0 ? (
           <div className="border border-slate-200 bg-white p-6 text-[12px] text-slate-500">
             Your account does not have access to any applications. Contact an administrator.
           </div>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <Link
-              href={medical.basePath}
-              className="block border border-maroon/20 bg-white p-5 transition hover:border-maroon/40"
-            >
-              <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-maroon">
-                <Stethoscope className="h-5 w-5" />
-              </div>
-              <h2 className="text-[12px] font-bold text-slate-900">{medical.label}</h2>
-              <p className="mt-2 text-[12px] leading-relaxed text-slate-500">
-                Corporate management and renewals for medical insurance.
-              </p>
-              <p className="mt-4 text-[12px] font-semibold text-maroon">Open application →</p>
-            </Link>
+            {availableSystems.map((system) => {
+              const Icon = SYSTEM_ICONS[system.id];
+              return (
+                <Link
+                  key={system.id}
+                  href={system.basePath}
+                  className="block border border-maroon/20 bg-white p-5 transition hover:border-maroon/40"
+                >
+                  <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-maroon">
+                    <Icon className="h-5 w-5" />
+                  </div>
+                  <h2 className="text-[12px] font-bold text-slate-900">{system.label}</h2>
+                  <p className="mt-2 text-[12px] leading-relaxed text-slate-500">
+                    {system.description}
+                  </p>
+                  <p className="mt-4 text-[12px] font-semibold text-maroon">Open application →</p>
+                </Link>
+              );
+            })}
           </div>
         )}
       </main>

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { verifySessionToken } from "@/lib/auth-session";
 import { resolveAppUrl } from "@/lib/app-url";
-import type { AdminSystemId } from "@/lib/admin-systems";
+import { hasSystemAccess, systemIdFromPath } from "@/lib/admin-systems";
 
 const PUBLIC_PATHS = new Set(["/login"]);
 
@@ -13,10 +13,6 @@ function isStaticAsset(pathname: string) {
     pathname.startsWith("/logo-") ||
     /\.[a-zA-Z0-9]+$/.test(pathname)
   );
-}
-
-function hasSystemAccess(allowedSystems: AdminSystemId[], system: string) {
-  return allowedSystems.includes(system as AdminSystemId);
 }
 
 export async function middleware(request: NextRequest) {
@@ -48,8 +44,8 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  const systemMatch = pathname.match(/^\/admin\/(medical)(\/|$)/);
-  if (systemMatch && !hasSystemAccess(session.allowedSystems, systemMatch[1])) {
+  const system = systemIdFromPath(pathname);
+  if (system && !hasSystemAccess(session.allowedSystems, system)) {
     return NextResponse.redirect(resolveAppUrl("/applications", request));
   }
 
