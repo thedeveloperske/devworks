@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import { Button } from "@/components/admin/Button";
 import { FormError } from "@/components/admin/FormError";
 import { FormField } from "@/components/admin/FormField";
@@ -11,14 +11,50 @@ import { formCardClass } from "@/lib/form-styles";
 export function LoginForm() {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl");
-  const errorFromUrl = searchParams.get("error");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState(errorFromUrl ?? "");
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const safeCallbackUrl =
     callbackUrl && callbackUrl.startsWith("/") ? callbackUrl : undefined;
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (loading) return;
+
+    setLoading(true);
+    setError("");
+
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username,
+          password,
+          callbackUrl: safeCallbackUrl,
+        }),
+      });
+
+      const data = (await response.json().catch(() => null)) as {
+        error?: string;
+        destination?: string;
+      } | null;
+
+      if (!response.ok) {
+        setError(data?.error || "Invalid username or password");
+        setLoading(false);
+        return;
+      }
+
+      window.location.assign(data?.destination || "/applications");
+    } catch {
+      setError("Login failed");
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="flex h-full flex-col items-center justify-center bg-slate-50 px-4">
@@ -33,19 +69,7 @@ export function LoginForm() {
         />
       </div>
 
-      <form
-        action="/api/auth/login"
-        method="POST"
-        className={`${formCardClass} w-full max-w-md`}
-        onSubmit={() => {
-          setLoading(true);
-          setError("");
-        }}
-      >
-        {safeCallbackUrl ? (
-          <input type="hidden" name="callbackUrl" value={safeCallbackUrl} />
-        ) : null}
-
+      <form onSubmit={handleSubmit} className={`${formCardClass} w-full max-w-md`}>
         <h1 className="mb-1 text-[12px] font-bold text-maroon">Sign in</h1>
         <p className="mb-6 text-[12px] text-slate-500">
           Access Promed applications for Medical, Aviation, and General insurance.

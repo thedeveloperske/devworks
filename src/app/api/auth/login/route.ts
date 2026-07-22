@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { authenticateUser } from "@/lib/auth";
-import { resolveAppUrl } from "@/lib/app-url";
 import {
   hasSystemAccess,
   systemIdFromPath,
@@ -11,27 +10,6 @@ import {
   sessionCookieOptions,
   signSessionToken,
 } from "@/lib/auth-session";
-
-function isFormRequest(request: Request) {
-  const contentType = request.headers.get("content-type") ?? "";
-  return (
-    contentType.includes("application/x-www-form-urlencoded") ||
-    contentType.includes("multipart/form-data")
-  );
-}
-
-function loginRedirect(request: Request, callbackUrl: string | undefined, error: string) {
-  const url = resolveAppUrl("/login", request);
-  if (callbackUrl?.startsWith("/")) {
-    url.searchParams.set("callbackUrl", callbackUrl);
-  }
-  url.searchParams.set("error", error);
-  return NextResponse.redirect(url, 303);
-}
-
-function readLogin(value: FormDataEntryValue | null | undefined) {
-  return value?.toString().trim();
-}
 
 /** Only allow post-login paths the user may open. */
 function resolveDestination(
@@ -51,61 +29,36 @@ function resolveDestination(
 }
 
 export async function POST(request: Request) {
-  const isForm = isFormRequest(request);
-
   try {
-    let username: string | undefined;
-    let password: string | undefined;
-    let callbackUrl: string | undefined;
-
-    if (isForm) {
-      const form = await request.formData();
-      username =
-        readLogin(form.get("username")) || readLogin(form.get("email"));
-      password = form.get("password")?.toString();
-      callbackUrl = form.get("callbackUrl")?.toString();
-    } else {
-      const body = await request.json();
-      username = (body.username ?? body.email)?.trim();
-      password = body.password;
-      callbackUrl = body.callbackUrl;
-    }
+    const body = await request.json();
+    const username = (body.username ?? body.email)?.toString().trim();
+    const password = body.password?.toString();
+    const callbackUrl = body.callbackUrl?.toString();
 
     if (!username || !password) {
-      const message = "Username and password are required";
-      if (isForm) {
-        return loginRedirect(request, callbackUrl, message);
-      }
-      return NextResponse.json({ error: message }, { status: 400 });
+      return NextResponse.json(
+        { error: "Username and password are required" },
+        { status: 400 }
+      );
     }
 
     const user = await authenticateUser(username, password);
     if (!user) {
-      const message = "Invalid username or password";
-      if (isForm) {
-        return loginRedirect(request, callbackUrl, message);
-      }
-      return NextResponse.json({ error: message }, { status: 401 });
+      return NextResponse.json(
+        { error: "Invalid username or password" },
+        { status: 401 }
+      );
     }
 
     if (user.allowedSystems.length === 0) {
-      const message = "Your account has no application access";
-      if (isForm) {
-        return loginRedirect(request, callbackUrl, message);
-      }
-      return NextResponse.json({ error: message }, { status: 403 });
+      return NextResponse.json(
+        { error: "Your account has no application access" },
+        { status: 403 }
+      );
     }
 
     const token = await signSessionToken(user);
     const destination = resolveDestination(callbackUrl, user.allowedSystems);
-    const cookieOptions = sessionCookieOptions(undefined, request);
-
-    if (isForm) {
-      const response = NextResponse.redirect(resolveAppUrl(destination, request), 303);
-      response.cookies.set(SESSION_COOKIE, token, cookieOptions);
-      return response;
-    }
-
     const response = NextResponse.json({
       user: {
         username: user.email,
@@ -115,13 +68,9 @@ export async function POST(request: Request) {
       },
       destination,
     });
-    response.cookies.set(SESSION_COOKIE, token, cookieOptions);
+    response.cookies.set(SESSION_COOKIE, token, sessionCookieOptions(undefined, request));
     return response;
   } catch {
-    const message = "Login failed";
-    if (isForm) {
-      return loginRedirect(request, undefined, message);
-    }
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json({ error: "Login failed" }, { status: 500 });
   }
 }
