@@ -21,19 +21,6 @@ function parseRequiredDate(value: string | undefined, label: string) {
   return { date };
 }
 
-function parseOptionalDate(value: string | undefined) {
-  const trimmed = value?.trim();
-  if (!trimmed) return { date: null as Date | null };
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
-    return badRequest("Invalid date format");
-  }
-  const date = new Date(`${trimmed}T00:00:00.000Z`);
-  if (Number.isNaN(date.getTime())) {
-    return badRequest("Invalid date format");
-  }
-  return { date };
-}
-
 function parseOptionalString(value: string | undefined, maxLength: number) {
   const trimmed = value?.trim();
   if (!trimmed) return null;
@@ -129,30 +116,8 @@ export function buildClaimsBatchUpdateData(body: Partial<ClaimsBatchFormData>) {
   const batchUserResult = parseOptionalString(body.batchUser, 100);
   if (isBuildError(batchUserResult)) return batchUserResult;
 
-  const dataEntryUserResult = parseOptionalString(body.dataEntryUser, 100);
-  if (isBuildError(dataEntryUserResult)) return dataEntryUserResult;
-
-  const vettingUserResult = parseOptionalString(body.vettingUser, 100);
-  if (isBuildError(vettingUserResult)) return vettingUserResult;
-
-  const authorisingUserResult = parseOptionalString(body.authorisingUser, 100);
-  if (isBuildError(authorisingUserResult)) return authorisingUserResult;
-
-  const financeUserResult = parseOptionalString(body.financeUser, 100);
-  if (isBuildError(financeUserResult)) return financeUserResult;
-
-  const dateEntryDateResult = parseOptionalDate(body.dateEntryDate);
-  if (isBuildError(dateEntryDateResult)) return dateEntryDateResult;
-
-  const vettingUserDateResult = parseOptionalDate(body.vettingUserDate);
-  if (isBuildError(vettingUserDateResult)) return vettingUserDateResult;
-
-  const authorisingUserDateResult = parseOptionalDate(body.authorisingUserDate);
-  if (isBuildError(authorisingUserDateResult)) return authorisingUserDateResult;
-
-  const financeUserDateResult = parseOptionalDate(body.financeUserDate);
-  if (isBuildError(financeUserDateResult)) return financeUserDateResult;
-
+  // Workflow assignments are updated only via dedicated assign endpoints,
+  // which enforce entrant → vetter → authorizer order.
   const data: Prisma.ClaimsBatchUpdateInput = {
     batchNo: batchNoResult,
     batchDate: batchDateResult.date,
@@ -160,14 +125,6 @@ export function buildClaimsBatchUpdateData(body: Partial<ClaimsBatchFormData>) {
     claimsCount: claimsCountResult.count,
     provider: providerResult.provider,
     dateReceived: dateReceivedResult.date,
-    dataEntryUser: dataEntryUserResult,
-    dateEntryDate: dateEntryDateResult.date,
-    vettingUser: vettingUserResult,
-    vettingUserDate: vettingUserDateResult.date,
-    authorisingUser: authorisingUserResult,
-    authorisingUserDate: authorisingUserDateResult.date,
-    financeUser: financeUserResult,
-    financeUserDate: financeUserDateResult.date,
   };
 
   return { data };
