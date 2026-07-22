@@ -6,7 +6,9 @@ import { FormError } from "@/components/admin/FormError";
 import { FormField } from "@/components/admin/FormField";
 import {
   defaultUserForm,
+  SYSTEM_ACCESS_OPTIONS,
   USER_STATUS_OPTIONS,
+  type SystemAccessCode,
   type UserFormData,
 } from "@/features/medical/admin/users";
 import { labelClass } from "@/lib/form-styles";
@@ -34,6 +36,9 @@ export function UserForm({
   const [form, setForm] = useState<UserFormData>({
     ...defaultUserForm(),
     ...initial,
+    allowedSystems: initial?.allowedSystems?.length
+      ? initial.allowedSystems
+      : defaultUserForm().allowedSystems,
   });
 
   const isEdit = Boolean(userId);
@@ -43,6 +48,18 @@ export function UserForm({
   ) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const toggleSystem = (code: SystemAccessCode) => {
+    setForm((prev) => {
+      const has = prev.allowedSystems.includes(code);
+      return {
+        ...prev,
+        allowedSystems: has
+          ? prev.allowedSystems.filter((item) => item !== code)
+          : [...prev.allowedSystems, code],
+      };
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -135,6 +152,29 @@ export function UserForm({
             inputClassName={compactInputClass}
           />
         </div>
+
+        <fieldset className="space-y-2">
+          <legend className={labelClass}>Allowed systems</legend>
+          <div className="flex flex-wrap gap-3">
+            {SYSTEM_ACCESS_OPTIONS.map((option) => {
+              const checked = form.allowedSystems.includes(option.value);
+              return (
+                <label
+                  key={option.value}
+                  className="inline-flex items-center gap-1.5 text-[12px] text-slate-700"
+                >
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={() => toggleSystem(option.value)}
+                    className="border-slate-300 text-maroon focus:ring-maroon"
+                  />
+                  {option.label}
+                </label>
+              );
+            })}
+          </div>
+        </fieldset>
       </div>
 
       {error ? <FormError message={error} className="mt-3 shrink-0" /> : null}

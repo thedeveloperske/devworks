@@ -16,6 +16,16 @@ const scryptAsync = promisify(scrypt);
 /** Active status value in the `users` table. */
 export const USER_STATUS_ACTIVE = 1;
 
+const SYSTEM_ACCESS_TO_ID: Record<string, AdminSystemId> = {
+  MEDICAL: "medical",
+};
+
+export function resolveAllowedSystems(allowedSystems: string[]): AdminSystemId[] {
+  return allowedSystems
+    .map((system) => SYSTEM_ACCESS_TO_ID[system])
+    .filter((system): system is AdminSystemId => Boolean(system));
+}
+
 export async function hashPassword(password: string) {
   const salt = randomBytes(16).toString("hex");
   const derived = (await scryptAsync(password, salt, 64)) as Buffer;
@@ -59,7 +69,8 @@ export async function authenticateUser(username: string, password: string) {
   const valid = await verifyPassword(password, user.password);
   if (!valid) return null;
 
-  const allowedSystems: AdminSystemId[] = ["medical"];
+  const allowedSystems = resolveAllowedSystems(user.allowedSystems);
+  if (allowedSystems.length === 0) return null;
 
   return {
     userId: String(user.id),

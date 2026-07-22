@@ -21,6 +21,7 @@ async function main() {
         fullName: "Promed Administrator",
         password: passwordHash,
         status: USER_STATUS_ACTIVE,
+        allowedSystems: ["MEDICAL", "GENERAL", "AVIATION"],
       },
     });
   } else {
@@ -31,6 +32,7 @@ async function main() {
         password: passwordHash,
         status: USER_STATUS_ACTIVE,
         department: null,
+        allowedSystems: ["MEDICAL", "GENERAL", "AVIATION"],
       },
     });
   }

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import type { Prisma } from "@/generated/prisma/client";
 import { hashPassword } from "@/lib/auth";
 import type { UserFormData } from "./types";
+import { normalizeAllowedSystems } from "./user-helpers";
 
 type BuildError = { error: NextResponse };
 
@@ -36,6 +37,14 @@ function parseStatus(value: string | undefined) {
   return { value: Number(trimmed) };
 }
 
+function parseAllowedSystems(value: unknown) {
+  const systems = normalizeAllowedSystems(value);
+  if (systems.length === 0) {
+    return badRequest("Select at least one allowed system");
+  }
+  return { value: systems };
+}
+
 export async function buildUserCreateData(body: Partial<UserFormData>) {
   const usernameResult = parseRequiredString(body.username, "Username");
   if ("error" in usernameResult) return usernameResult;
@@ -53,12 +62,16 @@ export async function buildUserCreateData(body: Partial<UserFormData>) {
   const statusResult = parseStatus(body.status);
   if ("error" in statusResult) return statusResult;
 
+  const systemsResult = parseAllowedSystems(body.allowedSystems);
+  if ("error" in systemsResult) return systemsResult;
+
   const data: Prisma.UserCreateInput = {
     username: usernameResult.value,
     fullName: fullNameResult.value,
     password: await hashPassword(passwordRaw),
     department: departmentResult.value,
     status: statusResult.value,
+    allowedSystems: systemsResult.value,
   };
 
   return { data };
@@ -77,11 +90,15 @@ export async function buildUserUpdateData(body: Partial<UserFormData>) {
   const statusResult = parseStatus(body.status);
   if ("error" in statusResult) return statusResult;
 
+  const systemsResult = parseAllowedSystems(body.allowedSystems);
+  if ("error" in systemsResult) return systemsResult;
+
   const data: Prisma.UserUpdateInput = {
     username: usernameResult.value,
     fullName: fullNameResult.value,
     department: departmentResult.value,
     status: statusResult.value,
+    allowedSystems: systemsResult.value,
   };
 
   const passwordRaw = body.password?.trim();

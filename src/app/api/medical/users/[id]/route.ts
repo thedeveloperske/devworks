@@ -28,6 +28,7 @@ export async function GET(_request: Request, { params }: RouteParams) {
     fullName: user.fullName,
     department: user.department,
     status: user.status,
+    allowedSystems: user.allowedSystems,
   });
 }
 
@@ -67,6 +68,7 @@ export async function PUT(request: Request, { params }: RouteParams) {
       fullName: user.fullName,
       department: user.department,
       status: user.status,
+      allowedSystems: user.allowedSystems,
     });
   } catch (error: unknown) {
     if (

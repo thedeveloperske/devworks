@@ -59,18 +59,6 @@ enum TreatyStatus {
   CANCELLED
 }
 
-enum AdminRole {
-  SUPER_ADMIN
-  ADMIN
-  OPERATOR
-  VIEWER
-}
-
-enum AdminUserStatus {
-  ACTIVE
-  INACTIVE
-}
-
 model Corporate {
   id                  String              @id @default(cuid())
   corpId              String              @unique @default(dbgenerated("lpad(nextval('corporate_corp_id_seq'::regclass)::text, 10, '0')")) @map("corp_id") @db.VarChar(10)
@@ -566,28 +554,15 @@ enum AdminSystemAccess {
   AVIATION
 }
 
-model AdminUser {
-  id             String              @id @default(cuid())
-  email          String              @unique
-  name           String
-  passwordHash   String              @map("password_hash")
-  role           AdminRole           @default(OPERATOR)
-  status         AdminUserStatus     @default(ACTIVE)
-  allowedSystems AdminSystemAccess[] @default([]) @map("allowed_systems")
-  phone          String?
-  department     String?
-  createdAt      DateTime            @default(now())
-  updatedAt      DateTime            @updatedAt
-}
-
-/// Application login / user-management accounts (legacy `users` table).
+/// Application login / user-management accounts.
 model User {
-  id         Int     @id @default(autoincrement())
-  username   String? @db.VarChar
-  password   String? @db.Text
-  fullName   String? @map("full_name") @db.VarChar
-  department Int?
-  status     Int?    @default(1)
+  id             Int                 @id @default(autoincrement())
+  username       String?             @db.VarChar
+  password       String?             @db.Text
+  fullName       String?             @map("full_name") @db.VarChar
+  department     Int?
+  status         Int?                @default(1)
+  allowedSystems AdminSystemAccess[] @default([]) @map("allowed_systems")
 
   @@map("users")
 }

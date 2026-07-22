@@ -7,6 +7,7 @@ import { Modal } from "@/components/admin/Modal";
 import { PageHeader } from "@/components/admin/PageHeader";
 import {
   statusLabel,
+  systemsLabel,
   userToFormValues,
   type UserFormData,
   type UserListItem,
@@ -130,7 +131,13 @@ export function UsersPageClient({ users }: UsersPageClientProps) {
   const filteredUsers = users.filter((user) => {
     const query = searchQuery.trim().toLowerCase();
     if (!query) return true;
-    const haystack = [user.username, user.fullName, user.department, user.status]
+    const haystack = [
+      user.username,
+      user.fullName,
+      user.department,
+      user.status,
+      ...user.allowedSystems,
+    ]
       .filter(Boolean)
       .join(" ")
       .toLowerCase();
@@ -172,6 +179,7 @@ export function UsersPageClient({ users }: UsersPageClientProps) {
                   <th className={compactThClass}>Username</th>
                   <th className={compactThClass}>Full Name</th>
                   <th className={compactThClass}>Department</th>
+                  <th className={compactThClass}>Systems</th>
                   <th className={compactThClass}>Status</th>
                   <th className={`${compactThClass} w-20`} aria-label="Actions" />
                 </tr>
@@ -179,7 +187,7 @@ export function UsersPageClient({ users }: UsersPageClientProps) {
               <tbody>
                 {filteredUsers.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className={emptyCellClass}>
+                    <td colSpan={6} className={emptyCellClass}>
                       {users.length === 0 ? "No users yet." : "No users match your search."}
                     </td>
                   </tr>
@@ -193,6 +201,7 @@ export function UsersPageClient({ users }: UsersPageClientProps) {
                       </td>
                       <td className={compactTdClass}>{user.fullName ?? "—"}</td>
                       <td className={compactTdClass}>{user.department ?? "—"}</td>
+                      <td className={compactTdClass}>{systemsLabel(user.allowedSystems)}</td>
                       <td className={compactTdClass}>{statusLabel(user.status)}</td>
                       <td className={compactTdClass}>
                         <button
