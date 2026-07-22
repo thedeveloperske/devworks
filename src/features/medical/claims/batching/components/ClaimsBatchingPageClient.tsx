@@ -8,9 +8,13 @@ import { PageHeader } from "@/components/admin/PageHeader";
 import type { LookupOption } from "@/features/medical/lookups/types";
 import type { ClaimsBatchListItem } from "@/features/medical/claims/batching";
 import type { BatchManageTab } from "@/features/medical/claims/batching/batch-manage-types";
+import { canAssignAuthorizer, canAssignVetter } from "@/features/medical/claims/batching/batch-workflow";
+import { AssignAuthorizerForm } from "./AssignAuthorizerForm";
+import { AssignEntrantForm } from "./AssignEntrantForm";
+import { AssignVetterForm } from "./AssignVetterForm";
 import { BatchActionsMenu } from "./BatchActionsMenu";
-import { BatchManageModal } from "./BatchManageModal";
 import { ClaimsBatchForm } from "./ClaimsBatchForm";
+import { EditBatchModalContent } from "./EditBatchModalContent";
 import { ViewBatchDetails } from "./ViewBatchDetails";
 import { formatDate } from "@/lib/format";
 import {
@@ -36,11 +40,15 @@ const searchInputClass =
 
 const manageTabs: BatchManageTab[] = ["edit", "entrant", "vetter", "authorizer"];
 
-function parseManageTab(value: string | null): BatchManageTab {
+function parseManageTab(value: string | null): BatchManageTab | null {
   if (value && manageTabs.includes(value as BatchManageTab)) {
     return value as BatchManageTab;
   }
-  return "edit";
+  return null;
+}
+
+function todayIsoDate() {
+  return new Date().toISOString().slice(0, 10);
 }
 
 export function ClaimsBatchingPageClient({
@@ -57,9 +65,19 @@ export function ClaimsBatchingPageClient({
   const viewId = searchParams.get("view");
   const manageOpen = searchParams.get("manage") === "1";
   const newBatchModalOpen = isNew;
-  const manageBatchModalOpen = Boolean(batchId);
+  const editBatchModalOpen = Boolean(batchId && batchTab === "edit");
+  const assignEntrantOpen = Boolean(batchId && batchTab === "entrant");
+  const assignVetterOpen = Boolean(batchId && batchTab === "vetter");
+  const assignAuthorizerOpen = Boolean(batchId && batchTab === "authorizer");
   const viewModalOpen = Boolean(viewId);
-  const modalOpen = manageOpen || newBatchModalOpen || manageBatchModalOpen || viewModalOpen;
+  const modalOpen =
+    manageOpen ||
+    newBatchModalOpen ||
+    editBatchModalOpen ||
+    assignEntrantOpen ||
+    assignVetterOpen ||
+    assignAuthorizerOpen ||
+    viewModalOpen;
 
   const [searchQuery, setSearchQuery] = useState("");
   const [actionNotice, setActionNotice] = useState("");
@@ -77,7 +95,7 @@ export function ClaimsBatchingPageClient({
     router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
   }, [manageOpen, pathname, router, searchParams]);
 
-  const closeManageBatchModal = useCallback(() => {
+  const closeActionModal = useCallback(() => {
     const params = new URLSearchParams(searchParams.toString());
     params.delete("batch");
     params.delete("tab");
@@ -116,18 +134,6 @@ export function ClaimsBatchingPageClient({
     [pathname, router]
   );
 
-  const handleManageTabChange = useCallback(
-    (tab: BatchManageTab) => {
-      if (!batchId) return;
-      const params = new URLSearchParams(searchParams.toString());
-      params.set("manage", "1");
-      params.set("batch", batchId);
-      params.set("tab", tab);
-      router.replace(`${pathname}?${params.toString()}`, { scroll: false });
-    },
-    [batchId, pathname, router, searchParams]
-  );
-
   const handleNewBatchSaved = useCallback(() => {
     closeNewBatchModal();
     router.refresh();
@@ -136,9 +142,10 @@ export function ClaimsBatchingPageClient({
   const handleBatchUpdated = useCallback(
     (message: string) => {
       setActionNotice(message);
+      closeActionModal();
       router.refresh();
     },
-    [router]
+    [closeActionModal, router]
   );
 
   useEffect(() => {
@@ -166,8 +173,9 @@ export function ClaimsBatchingPageClient({
     });
   }, [batches, searchQuery]);
 
-  const manageBatch = batchId ? batches.find((batch) => batch.id === batchId) : undefined;
+  const actionBatch = batchId ? batches.find((batch) => batch.id === batchId) : undefined;
   const viewBatch = viewId ? batches.find((batch) => batch.id === viewId) : undefined;
+  const batchLabel = actionBatch?.batchNo ?? (batchId ? `#${batchId}` : "batch");
 
   const batchesTable = (
     <div className={`${tableWrapperClass} overflow-y-auto`}>
@@ -282,29 +290,120 @@ export function ClaimsBatchingPageClient({
       </Modal>
 
       <Modal
-        open={manageBatchModalOpen}
-        onClose={closeManageBatchModal}
+        open={editBatchModalOpen}
+        onClose={closeActionModal}
         variant="popup"
-        size="xl"
-        title="Manage Batch"
+        size="lg"
+        title="Edit Batch"
         description={
-          manageBatch?.batchNo
-            ? `Update ${manageBatch.batchNo} and workflow assignments`
-            : "Update batch details and assignments"
+          actionBatch?.batchNo
+            ? `Update details for ${actionBatch.batchNo}`
+            : "Update batch details"
         }
       >
-        {batchId && manageBatch ? (
-          <BatchManageModal
-            key={batchId}
+        {batchId && actionBatch ? (
+          <EditBatchModalContent
+            key={`edit-${batchId}`}
             batchId={batchId}
-            tab={batchTab}
-            batch={manageBatch}
             providers={providers}
             currentUserName={currentUserName}
-            onTabChange={handleManageTabChange}
-            onClose={closeManageBatchModal}
+            onClose={closeActionModal}
             onUpdated={handleBatchUpdated}
           />
+        ) : batchId ? (
+          <p className="text-[12px] text-red-600">Batch not found.</p>
+        ) : null}
+      </Modal>
+
+      <Modal
+        open={assignEntrantOpen}
+        onClose={closeActionModal}
+        variant="popup"
+        size="md"
+        title={actionBatch?.dataEntryUser ? "Reassign Entrant" : "Assign Entrant"}
+        description={`Assign data entry for ${batchLabel}`}
+      >
+        {batchId && actionBatch ? (
+          <AssignEntrantForm
+            key={`${batchId}-entrant-${actionBatch.dataEntryUser ?? ""}-${actionBatch.dateEntryDate ?? ""}`}
+            embedded
+            batchId={batchId}
+            batchNo={batchLabel}
+            initial={{
+              entrantUser: actionBatch.dataEntryUser ?? "",
+              assignedDate: actionBatch.dateEntryDate ?? todayIsoDate(),
+            }}
+            onSuccess={() => handleBatchUpdated("Batch assigned to entrant.")}
+            onCancel={closeActionModal}
+          />
+        ) : batchId ? (
+          <p className="text-[12px] text-red-600">Batch not found.</p>
+        ) : null}
+      </Modal>
+
+      <Modal
+        open={assignVetterOpen}
+        onClose={closeActionModal}
+        variant="popup"
+        size="md"
+        title={actionBatch?.vettingUser ? "Reassign Vetter" : "Assign Vetter"}
+        description={`Assign vetting for ${batchLabel}`}
+      >
+        {batchId && actionBatch ? (
+          canAssignVetter(actionBatch) ? (
+            <AssignVetterForm
+              key={`${batchId}-vetter-${actionBatch.vettingUser ?? ""}-${actionBatch.vettingUserDate ?? ""}`}
+              embedded
+              batchId={batchId}
+              batchNo={batchLabel}
+              entrantName={actionBatch.dataEntryUser ?? ""}
+              initial={{
+                vetterUser: actionBatch.vettingUser ?? "",
+                assignedDate: actionBatch.vettingUserDate ?? todayIsoDate(),
+              }}
+              onSuccess={() => handleBatchUpdated("Batch assigned to vetter.")}
+              onCancel={closeActionModal}
+            />
+          ) : (
+            <p className="text-[12px] text-red-600">
+              This batch must be assigned to an entrant before a vetter can be assigned.
+            </p>
+          )
+        ) : batchId ? (
+          <p className="text-[12px] text-red-600">Batch not found.</p>
+        ) : null}
+      </Modal>
+
+      <Modal
+        open={assignAuthorizerOpen}
+        onClose={closeActionModal}
+        variant="popup"
+        size="md"
+        title={
+          actionBatch?.authorisingUser ? "Reassign Authorizer" : "Assign Authorizer"
+        }
+        description={`Assign authorisation for ${batchLabel}`}
+      >
+        {batchId && actionBatch ? (
+          canAssignAuthorizer(actionBatch) ? (
+            <AssignAuthorizerForm
+              key={`${batchId}-authorizer-${actionBatch.authorisingUser ?? ""}-${actionBatch.authorisingUserDate ?? ""}`}
+              embedded
+              batchId={batchId}
+              batchNo={batchLabel}
+              vetterName={actionBatch.vettingUser ?? ""}
+              initial={{
+                authorizerUser: actionBatch.authorisingUser ?? "",
+                assignedDate: actionBatch.authorisingUserDate ?? todayIsoDate(),
+              }}
+              onSuccess={() => handleBatchUpdated("Batch assigned to authorizer.")}
+              onCancel={closeActionModal}
+            />
+          ) : (
+            <p className="text-[12px] text-red-600">
+              This batch must be assigned to a vetter before an authorizer can be assigned.
+            </p>
+          )
         ) : batchId ? (
           <p className="text-[12px] text-red-600">Batch not found.</p>
         ) : null}

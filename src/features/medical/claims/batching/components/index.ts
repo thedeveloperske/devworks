@@ -1,5 +1,5 @@
 export { BatchActionsMenu } from "./BatchActionsMenu";
-export { BatchManageModal } from "./BatchManageModal";
+export { EditBatchModalContent } from "./EditBatchModalContent";
 export { ClaimsBatchForm } from "./ClaimsBatchForm";
 export { AssignEntrantForm } from "./AssignEntrantForm";
 export { AssignAuthorizerForm } from "./AssignAuthorizerForm";
