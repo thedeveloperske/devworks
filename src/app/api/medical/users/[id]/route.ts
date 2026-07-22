@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { buildUserUpdateData } from "@/features/medical/admin/users";
+import { buildUserUpdateData } from "@/features/medical/admin/users/build-user-data";
 import { prisma } from "@/lib/prisma";
 
 type RouteParams = { params: Promise<{ id: string }> };

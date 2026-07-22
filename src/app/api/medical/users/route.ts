@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { buildUserCreateData, userToListItem } from "@/features/medical/admin/users";
+import { buildUserCreateData } from "@/features/medical/admin/users/build-user-data";
+import { userToListItem } from "@/features/medical/admin/users";
 import { prisma } from "@/lib/prisma";
 
 export async function GET() {
