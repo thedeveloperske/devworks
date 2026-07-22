@@ -13,9 +13,8 @@ import {
 
 const scryptAsync = promisify(scrypt);
 
-const SYSTEM_ACCESS_TO_ID: Record<string, AdminSystemId> = {
-  MEDICAL: "medical",
-};
+/** Active status value in the `users` table. */
+export const USER_STATUS_ACTIVE = 1;
 
 export async function hashPassword(password: string) {
   const salt = randomBytes(16).toString("hex");
@@ -24,52 +23,55 @@ export async function hashPassword(password: string) {
 }
 
 export async function verifyPassword(password: string, stored: string) {
-  const [salt, hash] = stored.split(":");
-  if (!salt || !hash) return false;
+  // Promed hashed format: salt:hex
+  if (stored.includes(":")) {
+    const [salt, hash] = stored.split(":");
+    if (!salt || !hash) return false;
 
-  const derived = (await scryptAsync(password, salt, 64)) as Buffer;
-  const hashBuf = Buffer.from(hash, "hex");
-  if (derived.length !== hashBuf.length) return false;
-  return timingSafeEqual(derived, hashBuf);
-}
-
-export function resolveAllowedSystems(
-  role: string,
-  allowedSystems: string[]
-): AdminSystemId[] {
-  if (role === "SUPER_ADMIN") {
-    return ["medical"];
+    const derived = (await scryptAsync(password, salt, 64)) as Buffer;
+    const hashBuf = Buffer.from(hash, "hex");
+    if (derived.length !== hashBuf.length) return false;
+    return timingSafeEqual(derived, hashBuf);
   }
 
-  return allowedSystems
-    .map((system) => SYSTEM_ACCESS_TO_ID[system])
-    .filter((system): system is AdminSystemId => Boolean(system));
+  // Legacy plain-text passwords in imported `users` rows.
+  const a = Buffer.from(password);
+  const b = Buffer.from(stored);
+  if (a.length !== b.length) return false;
+  return timingSafeEqual(a, b);
 }
 
-export async function authenticateUser(email: string, password: string) {
-  const user = await prisma.adminUser.findFirst({
-    where: { email: { equals: email.trim(), mode: "insensitive" } },
-  });
-  if (!user || user.status !== "ACTIVE" || !user.passwordHash) return null;
+export async function authenticateUser(username: string, password: string) {
+  const login = username.trim();
+  if (!login || !password) return null;
 
-  const valid = await verifyPassword(password, user.passwordHash);
+  const users = await prisma.user.findMany({
+    where: {
+      username: { equals: login, mode: "insensitive" },
+      status: USER_STATUS_ACTIVE,
+    },
+    take: 5,
+  });
+
+  const user = users.find((row) => row.username?.trim().toLowerCase() === login.toLowerCase());
+  if (!user || !user.password) return null;
+
+  const valid = await verifyPassword(password, user.password);
   if (!valid) return null;
 
-  const allowedSystems = resolveAllowedSystems(user.role, user.allowedSystems);
-  if (allowedSystems.length === 0) return null;
+  const allowedSystems: AdminSystemId[] = ["medical"];
 
   return {
-    userId: user.id,
-    email: user.email,
-    name: user.name,
-    role: user.role,
+    userId: String(user.id),
+    // Session still uses `email` for the login identifier (username here).
+    email: user.username?.trim() || login,
+    name: user.fullName?.trim() || user.username?.trim() || login,
+    role: "USER",
     allowedSystems,
   };
 }
 
-export async function createUserSession(
-  user: Omit<SessionUser, "exp">
-) {
+export async function createUserSession(user: Omit<SessionUser, "exp">) {
   const token = await signSessionToken(user);
   const cookieStore = await cookies();
   cookieStore.set(SESSION_COOKIE, token, sessionCookieOptions());
@@ -85,8 +87,11 @@ export async function clearSession() {
   cookieStore.set(SESSION_COOKIE, "", { ...sessionCookieOptions(0), maxAge: 0 });
 }
 
-export function stripPasswordHash<T extends { passwordHash?: string }>(user: T) {
+export function stripPasswordHash<T extends { password?: string | null; passwordHash?: string }>(
+  user: T
+) {
   const safe = { ...user };
+  delete safe.password;
   delete safe.passwordHash;
   return safe;
 }

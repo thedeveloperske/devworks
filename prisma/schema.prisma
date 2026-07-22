@@ -580,6 +580,18 @@ model AdminUser {
   updatedAt      DateTime            @updatedAt
 }
 
+/// Application login / user-management accounts (legacy `users` table).
+model User {
+  id         Int     @id @default(autoincrement())
+  username   String? @db.VarChar
+  password   String? @db.Text
+  fullName   String? @map("full_name") @db.VarChar
+  department Int?
+  status     Int?    @default(1)
+
+  @@map("users")
+}
+
 model SystemSetting {
   id          String   @id @default(cuid())
   key         String   @unique

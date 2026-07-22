@@ -12,7 +12,7 @@ export function LoginForm() {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl");
   const errorFromUrl = searchParams.get("error");
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(errorFromUrl ?? "");
   const [loading, setLoading] = useState(false);
@@ -58,14 +58,14 @@ export function LoginForm() {
 
         <div className="space-y-4">
           <FormField
-            id="email"
-            name="email"
-            label="Email"
-            type="email"
-            autoComplete="email"
+            id="username"
+            name="username"
+            label="Username"
+            type="text"
+            autoComplete="username"
             required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
           />
           <FormField
             id="password"

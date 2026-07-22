@@ -1,33 +1,39 @@
 import "dotenv/config";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../src/generated/prisma/client";
-import { hashPassword } from "../src/lib/auth";
+import { hashPassword, USER_STATUS_ACTIVE } from "../src/lib/auth";
 
 async function main() {
   const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
   const prisma = new PrismaClient({ adapter });
 
-  const email = "admin@promed.com";
+  const username = "admin";
   const passwordHash = await hashPassword("admin123");
 
-  await prisma.adminUser.upsert({
-    where: { email },
-    update: {
-      name: "Promed Administrator",
-      passwordHash,
-      role: "SUPER_ADMIN",
-      status: "ACTIVE",
-      allowedSystems: ["MEDICAL", "GENERAL", "AVIATION"],
-    },
-    create: {
-      email,
-      name: "Promed Administrator",
-      passwordHash,
-      role: "SUPER_ADMIN",
-      status: "ACTIVE",
-      allowedSystems: ["MEDICAL", "GENERAL", "AVIATION"],
-    },
+  const existing = await prisma.user.findFirst({
+    where: { username: { equals: username, mode: "insensitive" } },
   });
+
+  if (existing) {
+    await prisma.user.update({
+      where: { id: existing.id },
+      data: {
+        fullName: "Promed Administrator",
+        password: passwordHash,
+        status: USER_STATUS_ACTIVE,
+      },
+    });
+  } else {
+    await prisma.user.create({
+      data: {
+        username,
+        fullName: "Promed Administrator",
+        password: passwordHash,
+        status: USER_STATUS_ACTIVE,
+        department: null,
+      },
+    });
+  }
 
   const agentCount = await prisma.agent.count();
   if (agentCount === 0) {
@@ -41,8 +47,8 @@ async function main() {
     console.log("Seeded sample agents");
   }
 
-  console.log("Seeded default admin user:");
-  console.log(`  Email: ${email}`);
+  console.log("Seeded default login user:");
+  console.log(`  Username: ${username}`);
   console.log("  Password: admin123");
 }
 

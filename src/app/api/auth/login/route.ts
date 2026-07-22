@@ -24,37 +24,42 @@ function loginRedirect(request: Request, callbackUrl: string | undefined, error:
   return NextResponse.redirect(url, 303);
 }
 
+function readLogin(value: FormDataEntryValue | null | undefined) {
+  return value?.toString().trim();
+}
+
 export async function POST(request: Request) {
   const isForm = isFormRequest(request);
 
   try {
-    let email: string | undefined;
+    let username: string | undefined;
     let password: string | undefined;
     let callbackUrl: string | undefined;
 
     if (isForm) {
       const form = await request.formData();
-      email = form.get("email")?.toString().trim();
+      username =
+        readLogin(form.get("username")) || readLogin(form.get("email"));
       password = form.get("password")?.toString();
       callbackUrl = form.get("callbackUrl")?.toString();
     } else {
       const body = await request.json();
-      email = body.email?.trim();
+      username = (body.username ?? body.email)?.trim();
       password = body.password;
       callbackUrl = body.callbackUrl;
     }
 
-    if (!email || !password) {
-      const message = "Email and password are required";
+    if (!username || !password) {
+      const message = "Username and password are required";
       if (isForm) {
         return loginRedirect(request, callbackUrl, message);
       }
       return NextResponse.json({ error: message }, { status: 400 });
     }
 
-    const user = await authenticateUser(email, password);
+    const user = await authenticateUser(username, password);
     if (!user) {
-      const message = "Invalid email or password";
+      const message = "Invalid username or password";
       if (isForm) {
         return loginRedirect(request, callbackUrl, message);
       }
@@ -74,7 +79,7 @@ export async function POST(request: Request) {
 
     const response = NextResponse.json({
       user: {
-        email: user.email,
+        username: user.email,
         name: user.name,
         role: user.role,
         allowedSystems: user.allowedSystems,
