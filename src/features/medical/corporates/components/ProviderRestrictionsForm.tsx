@@ -22,15 +22,19 @@ type ProviderRestrictionsFormProps = {
   showHeader?: boolean;
 };
 
-const columnWidths: Record<(typeof providerRestrictionFields)[number]["name"], number> = {
-  anniv: 72,
-  provider: 420,
-};
+const annivColumnWidth = 72;
+const providerColumnMinWidth = 200;
 const removeColumnWidth = 88;
 const tableMinWidth =
-  Object.values(columnWidths).reduce((sum, width) => sum + width, 0) +
-  removeColumnWidth;
+  annivColumnWidth + providerColumnMinWidth + removeColumnWidth;
 const tableBodyMaxHeight = 280;
+
+function getColumnStyle(fieldName: (typeof providerRestrictionFields)[number]["name"]) {
+  if (fieldName === "anniv") {
+    return { width: annivColumnWidth, minWidth: annivColumnWidth };
+  }
+  return { minWidth: providerColumnMinWidth };
+}
 
 const thClass =
   "whitespace-nowrap border-b border-slate-200 px-2 py-1.5 text-left text-[12px] font-bold uppercase tracking-wider text-slate-500";
@@ -117,8 +121,8 @@ export function ProviderRestrictionsForm({
           style={{ height: tableBodyMaxHeight }}
         >
           <table
-            className="border-collapse"
-            style={{ width: tableMinWidth, minWidth: tableMinWidth }}
+            className="w-full border-collapse"
+            style={{ minWidth: tableMinWidth }}
           >
             <thead className="sticky top-0 z-10 bg-slate-50">
               <tr>
@@ -126,10 +130,7 @@ export function ProviderRestrictionsForm({
                   <th
                     key={field.name}
                     className={thClass}
-                    style={{
-                      width: columnWidths[field.name],
-                      minWidth: columnWidths[field.name],
-                    }}
+                    style={getColumnStyle(field.name)}
                   >
                     {field.label}
                   </th>
@@ -149,10 +150,7 @@ export function ProviderRestrictionsForm({
                     <td
                       key={field.name}
                       className={tdClass}
-                      style={{
-                        width: columnWidths[field.name],
-                        minWidth: columnWidths[field.name],
-                      }}
+                      style={getColumnStyle(field.name)}
                     >
                       {renderCell(
                         field,
