@@ -186,9 +186,9 @@ export const premiumRateFields = [
 ] satisfies PremiumRateField[];
 
 export const corporateTabs: { id: CorporateTabId; label: string }[] = [
-  { id: "corporate", label: "Corporate" },
+  { id: "corporate", label: "Corporate Information" },
   { id: "contact", label: "Contact Person" },
-  { id: "categories", label: "Categories" },
+  { id: "categories", label: "Benefit Categorization" },
   { id: "providerRestrictions", label: "Provider Restrictions" },
   { id: "premiumRates", label: "Premium Rates" },
 ];
@@ -196,7 +196,7 @@ export const corporateTabs: { id: CorporateTabId; label: string }[] = [
 export const renewCorporateTabs: { id: RenewCorporateTabId; label: string }[] = [
   { id: "corporates", label: "Ready to Renew" },
   { id: "coverDates", label: "Cover Dates" },
-  { id: "categories", label: "Categories" },
+  { id: "categories", label: "Benefit Categorization" },
   { id: "providerRestrictions", label: "Provider Restrictions" },
 ];
 

@@ -32,6 +32,8 @@ import {
   deriveRenewalDateFromEnd,
   validateCoverDateOrder,
   getCorporateFields,
+  hasPremiumRateRowInput,
+  hasProviderRestrictionRowInput,
   type CorporateField,
   type CorporateFormData,
   type CorporateTabId,
@@ -99,15 +101,9 @@ export function CorporateForm({
   );
   const [providerRestrictionRows, setProviderRestrictionRows] = useState<
     ProviderRestrictionFormData[]
-  >(
-    initialProviderRestrictions?.length
-      ? initialProviderRestrictions
-      : [createEmptyProviderRestrictionRow()]
-  );
+  >(initialProviderRestrictions?.length ? initialProviderRestrictions : []);
   const [premiumRateRows, setPremiumRateRows] = useState<PremiumRateFormData[]>(
-    initialPremiumRates?.length
-      ? initialPremiumRates
-      : [createEmptyPremiumRateRow()]
+    initialPremiumRates?.length ? initialPremiumRates : []
   );
   const [activeTab, setActiveTab] = useState<CorporateTabId>("corporate");
 
@@ -309,21 +305,25 @@ export function CorporateForm({
           copayAmount: row.copayAmount,
           waitingPeriod: row.waitingPeriod,
         })),
-        providerRestrictions: providerRestrictionRows.map((row) => ({
-          idx: row.idx,
-          provider: row.provider,
-          anniv: coverDateForm.anniv || "1",
-        })),
-        premiumRates: premiumRateRows.map((row) => ({
-          idx: row.idx,
-          benefit: row.benefit,
-          premiumType: form.businessClass,
-          familySize: row.familySize,
-          policyLimit: row.policyLimit,
-          premium: row.premium,
-          minAge: row.minAge,
-          maxAge: row.maxAge,
-        })),
+        providerRestrictions: providerRestrictionRows
+          .filter((row) => hasProviderRestrictionRowInput(row))
+          .map((row) => ({
+            idx: row.idx,
+            provider: row.provider,
+            anniv: coverDateForm.anniv || "1",
+          })),
+        premiumRates: premiumRateRows
+          .filter((row) => hasPremiumRateRowInput(row))
+          .map((row) => ({
+            idx: row.idx,
+            benefit: row.benefit,
+            premiumType: form.businessClass,
+            familySize: row.familySize,
+            policyLimit: row.policyLimit,
+            premium: row.premium,
+            minAge: row.minAge,
+            maxAge: row.maxAge,
+          })),
       }),
     });
 
@@ -419,7 +419,9 @@ export function CorporateForm({
   const corporateDetailsSection = (
     <section className="space-y-1.5">
       <div>
-        <h3 className="text-[12px] font-bold uppercase text-slate-700">Corporate Details</h3>
+        <h3 className="text-[12px] font-bold uppercase text-slate-700">
+          Corporate Information
+        </h3>
         <p className="text-[12px] text-slate-500">Capture corporate information.</p>
       </div>
       {renderFields(getCorporateFields(corporateFieldNames))}

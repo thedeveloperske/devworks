@@ -13,6 +13,7 @@ import {
   defaultCoverDateForm,
   deriveCoverDatesFromStart,
   deriveRenewalDateFromEnd,
+  hasProviderRestrictionRowInput,
   renewCorporateTabs,
   validateCoverDateOrder,
   type CategoryGroupFormData,
@@ -91,7 +92,7 @@ export function RenewCorporateModal({
   >([createEmptyCategoryGroupRow()]);
   const [providerRestrictionRows, setProviderRestrictionRows] = useState<
     ProviderRestrictionFormData[]
-  >([createEmptyProviderRestrictionRow()]);
+  >([]);
   const [searchQuery, setSearchQuery] = useState("");
 
   const filteredCorporates = useMemo(() => {
@@ -114,7 +115,7 @@ export function RenewCorporateModal({
     setAgentId("");
     setCoverDateForm(defaultCoverDateForm);
     setCategoryGroupRows([createEmptyCategoryGroupRow()]);
-    setProviderRestrictionRows([createEmptyProviderRestrictionRow()]);
+    setProviderRestrictionRows([]);
     setActiveTab(listOnPage ? "coverDates" : "corporates");
     setSearchQuery("");
     setError("");
@@ -127,7 +128,7 @@ export function RenewCorporateModal({
     setAgentId("");
     setCoverDateForm(defaultCoverDateForm);
     setCategoryGroupRows([createEmptyCategoryGroupRow()]);
-    setProviderRestrictionRows([createEmptyProviderRestrictionRow()]);
+    setProviderRestrictionRows([]);
     setActiveTab(nextId ? "coverDates" : "corporates");
     setSearchQuery("");
     setError("");
@@ -203,11 +204,7 @@ export function RenewCorporateModal({
                 anniv: nextAnniv,
               }))
           : [];
-        setProviderRestrictionRows(
-          providers.length > 0
-            ? providers
-            : [createEmptyProviderRestrictionRow()]
-        );
+        setProviderRestrictionRows(providers);
       })
       .catch((loadError: unknown) => {
         if (cancelled) return;
@@ -293,7 +290,7 @@ export function RenewCorporateModal({
       setAgentId("");
       setCoverDateForm(defaultCoverDateForm);
       setCategoryGroupRows([createEmptyCategoryGroupRow()]);
-      setProviderRestrictionRows([createEmptyProviderRestrictionRow()]);
+      setProviderRestrictionRows([]);
       setError("");
     }
   };
@@ -341,10 +338,12 @@ export function RenewCorporateModal({
           waitingPeriod: row.waitingPeriod,
           anniv: coverDateForm.anniv || "1",
         })),
-        providerRestrictions: providerRestrictionRows.map((row) => ({
-          provider: row.provider,
-          anniv: coverDateForm.anniv || "1",
-        })),
+        providerRestrictions: providerRestrictionRows
+          .filter((row) => hasProviderRestrictionRowInput(row))
+          .map((row) => ({
+            provider: row.provider,
+            anniv: coverDateForm.anniv || "1",
+          })),
       }),
     });
 

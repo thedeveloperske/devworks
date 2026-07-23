@@ -185,7 +185,9 @@ export function CategoriesForm({
       <div className="flex shrink-0 items-start justify-between gap-2">
         {showHeader ? (
           <div>
-            <h3 className="text-[12px] font-bold uppercase text-slate-700">Categories</h3>
+            <h3 className="text-[12px] font-bold uppercase text-slate-700">
+              Benefit Categorization
+            </h3>
             <p className="text-[12px] text-slate-500">
               Groups and Categorization
             </p>
