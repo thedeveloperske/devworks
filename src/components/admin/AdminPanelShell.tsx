@@ -507,8 +507,8 @@ export function AdminPanelShell({
   );
 
   return (
-    <div data-admin className="flex min-h-full flex-1 flex-col bg-slate-50">
-      <header className="sticky top-0 z-100 border-b border-slate-200 bg-white">
+    <div data-admin className="flex min-h-dvh flex-1 flex-col bg-slate-50">
+      <header className="sticky top-0 z-100 shrink-0 border-b border-slate-200 bg-white">
         <div className="flex items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
           <div className="flex min-w-0 items-center gap-3">
             <button
@@ -536,10 +536,8 @@ export function AdminPanelShell({
       </header>
 
       <div className="relative flex min-h-0 flex-1">
-        <aside className="hidden w-56 shrink-0 border-r border-slate-200 bg-white lg:block">
-          <div className="sticky top-[4.25rem] max-h-[calc(100dvh-4.25rem)] overflow-y-auto">
-            {navContent}
-          </div>
+        <aside className="hidden w-56 shrink-0 self-stretch border-r border-slate-200 bg-white lg:flex lg:flex-col">
+          <div className="min-h-0 flex-1 overflow-y-auto">{navContent}</div>
         </aside>
 
         {mobileNavOpen ? (
@@ -550,13 +548,25 @@ export function AdminPanelShell({
               className="fixed inset-0 z-40 bg-slate-900/30 lg:hidden"
               onClick={() => setMobileNavOpen(false)}
             />
-            <aside className="fixed bottom-0 left-0 top-[3.75rem] z-50 w-64 overflow-y-auto border-r border-slate-200 bg-white shadow-lg lg:hidden">
-              {navContent}
+            <aside className="fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-slate-200 bg-white shadow-lg lg:hidden">
+              <div className="flex items-center justify-between border-b border-slate-200 px-3 py-3">
+                <p className="text-[12px] font-semibold text-slate-700">Navigation</p>
+                <button
+                  type="button"
+                  className="text-[12px] font-semibold text-slate-500 hover:text-maroon"
+                  onClick={() => setMobileNavOpen(false)}
+                >
+                  Close
+                </button>
+              </div>
+              <div className="min-h-0 flex-1 overflow-y-auto">{navContent}</div>
             </aside>
           </>
         ) : null}
 
-        <main className="relative min-w-0 flex-1 p-4 sm:p-6 lg:p-8">{children}</main>
+        <main className="relative min-w-0 flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+          {children}
+        </main>
       </div>
     </div>
   );
