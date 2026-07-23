@@ -1,13 +1,21 @@
 import Link from "next/link";
 import {
+  Ban,
+  BedDouble,
   Building2,
   ClipboardList,
+  FileWarning,
   HeartPulse,
   Landmark,
+  MinusCircle,
   Percent,
+  Receipt,
   Shield,
+  Stethoscope,
+  UserRound,
   Users,
   Wallet,
+  XCircle,
   type LucideIcon,
 } from "lucide-react";
 import { PageHeader } from "@/components/admin/PageHeader";
@@ -70,6 +78,66 @@ const underwritingItems: SelectionItem[] = [
   },
 ];
 
+const claimsItems: SelectionItem[] = [
+  {
+    href: "/admin/medical/selection-items/service",
+    label: "Service",
+    description: "Manage claim services",
+    icon: Receipt,
+  },
+  {
+    href: "/admin/medical/selection-items/diagnosis",
+    label: "Diagnosis",
+    description: "Manage diagnoses",
+    icon: Stethoscope,
+  },
+  {
+    href: "/admin/medical/selection-items/doctor",
+    label: "Doctor",
+    description: "Manage doctors",
+    icon: UserRound,
+  },
+  {
+    href: "/admin/medical/selection-items/exgratia-reasons",
+    label: "Exgratia Reasons",
+    description: "Manage exgratia reasons",
+    icon: FileWarning,
+  },
+  {
+    href: "/admin/medical/selection-items/deduction-reason",
+    label: "Deduction Reason",
+    description: "Manage deduction reasons",
+    icon: MinusCircle,
+  },
+  {
+    href: "/admin/medical/selection-items/rejection-reason",
+    label: "Rejection Reason",
+    description: "Manage rejection reasons",
+    icon: XCircle,
+  },
+  {
+    href: "/admin/medical/selection-items/invalid-bill-reason",
+    label: "Invalid Bill Reason",
+    description: "Manage invalid bill reasons",
+    icon: Ban,
+  },
+];
+
+const careItems: SelectionItem[] = [
+  {
+    href: "/admin/medical/selection-items/hospital-ward",
+    label: "Hospital Ward",
+    description: "Manage hospital wards",
+    icon: BedDouble,
+  },
+  {
+    href: "/admin/medical/selection-items/decline-reason",
+    label: "Decline Reason",
+    description: "Manage decline reasons",
+    icon: Ban,
+  },
+];
+
 function SelectionItemCard({ item }: { item: SelectionItem }) {
   const Icon = item.icon;
   return (
@@ -90,12 +158,10 @@ function SelectionGroup({
   title,
   description,
   items,
-  emptyMessage,
 }: {
   title: string;
   description: string;
   items: SelectionItem[];
-  emptyMessage?: string;
 }) {
   return (
     <section className="min-w-0">
@@ -106,17 +172,11 @@ function SelectionGroup({
         <p className="mt-1 text-[12px] text-slate-500">{description}</p>
       </div>
 
-      {items.length > 0 ? (
-        <div className="grid gap-4">
-          {items.map((item) => (
-            <SelectionItemCard key={item.href} item={item} />
-          ))}
-        </div>
-      ) : (
-        <div className="border border-dashed border-slate-200 bg-white p-5 text-[12px] text-slate-400">
-          {emptyMessage ?? "Items coming soon."}
-        </div>
-      )}
+      <div className="grid gap-4">
+        {items.map((item) => (
+          <SelectionItemCard key={item.href} item={item} />
+        ))}
+      </div>
     </section>
   );
 }
@@ -138,14 +198,12 @@ export default function SelectionItemsPage() {
         <SelectionGroup
           title="Claims"
           description="Lookup values used in claims processing"
-          items={[]}
-          emptyMessage="Claims selection items will be added here."
+          items={claimsItems}
         />
         <SelectionGroup
           title="Care"
           description="Lookup values used in care management"
-          items={[]}
-          emptyMessage="Care selection items will be added here."
+          items={careItems}
         />
       </div>
     </div>
