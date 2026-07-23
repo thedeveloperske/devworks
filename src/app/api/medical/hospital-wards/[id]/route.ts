@@ -1,45 +1,41 @@
 import { NextResponse } from "next/server";
-import {
-  buildHospitalWardData,
-  formatHospitalWardCode,
-  hospitalWardToFormValues,
-} from "@/features/medical/admin/hospital-wards";
+import { buildHospitalWardData } from "@/features/medical/admin/hospital-wards";
 import { prisma } from "@/lib/prisma";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
-function parseWardId(id: string) {
-  const raw = decodeURIComponent(id).trim();
-  if (!/^\d{1,2}$/.test(raw)) return null;
-  const code = Number(raw);
-  if (!Number.isInteger(code) || code < 0 || code > 99) return null;
+function parseWardCode(id: string) {
+  const code = Number.parseInt(id, 10);
+  if (Number.isNaN(code)) {
+    return null;
+  }
   return code;
 }
 
 export async function GET(_request: Request, { params }: RouteParams) {
   const { id } = await params;
-  const code = parseWardId(id);
+  const code = parseWardCode(id);
 
-  if (code === null) {
+  if (code == null) {
     return NextResponse.json({ error: "Invalid hospital ward code" }, { status: 400 });
   }
 
-  const record = await prisma.tHospitalWard.findUnique({
+  const ward = await prisma.tHospitalWard.findUnique({
     where: { code },
   });
 
-  if (!record) {
+  if (!ward) {
     return NextResponse.json({ error: "Hospital ward not found" }, { status: 404 });
   }
 
-  return NextResponse.json(hospitalWardToFormValues(record));
+  return NextResponse.json(ward);
 }
 
 export async function PUT(request: Request, { params }: RouteParams) {
   const { id } = await params;
-  const code = parseWardId(id);
+  const code = parseWardCode(id);
 
-  if (code === null) {
+  if (code == null) {
     return NextResponse.json({ error: "Invalid hospital ward code" }, { status: 400 });
   }
 
@@ -51,22 +47,12 @@ export async function PUT(request: Request, { params }: RouteParams) {
       return result.error;
     }
 
-    if (result.data.code !== code) {
-      return NextResponse.json(
-        { error: "Hospital ward code cannot be changed" },
-        { status: 400 }
-      );
-    }
-
     const ward = await prisma.tHospitalWard.update({
       where: { code },
-      data: { ward: result.data.ward },
+      data: result.data,
     });
 
-    return NextResponse.json({
-      ...hospitalWardToFormValues(ward),
-      code: formatHospitalWardCode(ward.code),
-    });
+    return NextResponse.json(ward);
   } catch (error: unknown) {
     if (
       error &&

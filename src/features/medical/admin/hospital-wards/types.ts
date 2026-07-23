@@ -1,16 +1,14 @@
 export type HospitalWardFormData = {
-  code: string;
   ward: string;
 };
 
 export type HospitalWardInput = {
-  code?: string | number;
   ward?: string;
 };
 
 export type HospitalWardListItem = {
   id: string;
-  code: string;
+  code: number;
   ward: string;
 };
 

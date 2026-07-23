@@ -635,8 +635,8 @@ model TCategory {
 }
 
 model THospitalWard {
-  code Decimal @id @db.Decimal(2, 0)
-  ward String  @db.VarChar(50)
+  code Int    @id @default(autoincrement())
+  ward String @db.VarChar(50)
 
   @@map("t_hospital_ward")
 }

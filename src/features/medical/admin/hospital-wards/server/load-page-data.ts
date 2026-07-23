@@ -1,8 +1,5 @@
 import type { LookupOption } from "@/features/medical/lookups/types";
-import {
-  formatHospitalWardCode,
-  hospitalWardToListItem,
-} from "../hospital-ward-helpers";
+import { hospitalWardToListItem } from "../hospital-ward-helpers";
 import type { HospitalWardListItem } from "../types";
 import { prisma } from "@/lib/prisma";
 
@@ -12,13 +9,10 @@ export async function loadHospitalWardOptions(): Promise<LookupOption[]> {
     orderBy: { code: "asc" },
   });
 
-  return wards.map((item) => {
-    const code = formatHospitalWardCode(item.code);
-    return {
-      value: code,
-      label: `${code} — ${item.ward}`,
-    };
-  });
+  return wards.map((item) => ({
+    value: String(item.code),
+    label: `${item.code} — ${item.ward}`,
+  }));
 }
 
 export async function loadHospitalWardsPageData() {

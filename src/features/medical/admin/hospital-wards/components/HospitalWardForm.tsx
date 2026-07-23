@@ -49,7 +49,7 @@ export function HospitalWardForm({
     setError("");
 
     const url = wardId
-      ? `/api/medical/hospital-wards/${encodeURIComponent(wardId)}`
+      ? `/api/medical/hospital-wards/${wardId}`
       : "/api/medical/hospital-wards";
     const method = wardId ? "PUT" : "POST";
 
@@ -93,29 +93,21 @@ export function HospitalWardForm({
     <>
       <FormError message={error} />
       <div className={fieldGrid}>
-        {getHospitalWardFields(hospitalWardFieldNames).map((field) => {
-          const isCodeLocked = Boolean(wardId) && field.name === "code";
-          return (
-            <FormField
-              key={field.name}
-              id={field.name}
-              name={field.name}
-              label={field.label}
-              type={field.type ?? "text"}
-              required={field.required}
-              value={form[field.name]}
-              onChange={handleChange}
-              disabled={isCodeLocked}
-              placeholder={field.placeholder}
-              inputClassName={
-                isCodeLocked
-                  ? `${fieldInputClass} cursor-not-allowed bg-slate-50 text-slate-600`
-                  : fieldInputClass
-              }
-              labelClassName={fieldLabelClass}
-            />
-          );
-        })}
+        {getHospitalWardFields(hospitalWardFieldNames).map((field) => (
+          <FormField
+            key={field.name}
+            id={field.name}
+            name={field.name}
+            label={field.label}
+            type={field.type ?? "text"}
+            required={field.required}
+            value={form[field.name]}
+            onChange={handleChange}
+            placeholder={field.placeholder}
+            inputClassName={fieldInputClass}
+            labelClassName={fieldLabelClass}
+          />
+        ))}
       </div>
     </>
   );
