@@ -4,14 +4,14 @@ export const defaultHospitalWardForm: HospitalWardFormData = {
   ward: "",
 };
 
-export const hospitalWardFields = [
+export const hospitalWardFields: HospitalWardField[] = [
   {
     name: "ward",
     label: "Ward *",
     required: true,
     placeholder: "e.g. General Ward",
   },
-] satisfies HospitalWardField[];
+];
 
 export const hospitalWardFieldNames: (keyof HospitalWardFormData)[] = ["ward"];
 
