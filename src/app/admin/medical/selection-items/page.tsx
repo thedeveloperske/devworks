@@ -125,7 +125,7 @@ const claimsItems: SelectionItem[] = [
 
 const careItems: SelectionItem[] = [
   {
-    href: "/admin/medical/selection-items/hospital-ward",
+    href: "/admin/medical/selection-items/hospital-ward?manage=1",
     label: "Hospital Ward",
     description: "Manage hospital wards",
     icon: BedDouble,

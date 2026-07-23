@@ -633,3 +633,10 @@ model TCategory {
 
   @@map("t_category")
 }
+
+model THospitalWard {
+  code Decimal @id @db.Decimal(2, 0)
+  ward String  @db.VarChar(50)
+
+  @@map("t_hospital_ward")
+}
