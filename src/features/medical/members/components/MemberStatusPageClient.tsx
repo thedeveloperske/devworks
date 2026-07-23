@@ -7,7 +7,6 @@ import { Button } from "@/components/admin/Button";
 import { FormField } from "@/components/admin/FormField";
 import { Modal } from "@/components/admin/Modal";
 import { PageHeader } from "@/components/admin/PageHeader";
-import { RadioGroup } from "@/components/admin/RadioGroup";
 import {
   memberCancelReasonOptions,
   memberCoverStatusOptions,
@@ -25,6 +24,19 @@ type MemberStatusPageClientProps = {
 
 type StatusAction = "cancel" | "reinstate";
 type StatusScope = "member" | "family";
+
+type StatusModeOption = {
+  action: StatusAction;
+  scope: StatusScope;
+  label: string;
+};
+
+const statusModeOptions: StatusModeOption[] = [
+  { action: "cancel", scope: "member", label: "Cancel Member" },
+  { action: "cancel", scope: "family", label: "Cancel Family" },
+  { action: "reinstate", scope: "member", label: "Reinstate Member" },
+  { action: "reinstate", scope: "family", label: "Reinstate Family" },
+];
 
 const actionLabels: Record<StatusAction, string> = {
   cancel: "Cancelling",
@@ -49,6 +61,10 @@ const searchInputClass =
   "w-40 border border-slate-300 bg-white px-2 py-1 text-[12px] text-slate-900 placeholder:text-slate-400 focus:border-maroon focus:outline-none";
 const applyButtonClass =
   "border border-maroon bg-maroon px-2.5 py-1 text-[12px] font-semibold text-white hover:bg-maroon/90 disabled:cursor-not-allowed disabled:border-slate-300 disabled:bg-slate-200 disabled:text-slate-500";
+const modeButtonClass = (active: boolean) =>
+  active
+    ? "border border-maroon bg-maroon px-2.5 py-1 text-[12px] font-semibold text-white"
+    : "border border-slate-300 bg-white px-2.5 py-1 text-[12px] font-semibold text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60";
 const compactFieldClass =
   "w-full border border-slate-300 bg-white px-2 py-1 text-[12px] text-slate-900 placeholder:text-slate-400 focus:border-maroon focus:outline-none";
 
@@ -342,54 +358,42 @@ export function MemberStatusPageClient({
   const rowActionLabel =
     scope === "family" ? `${actionVerbs[action]} family` : actionVerbs[action];
 
-  const actionBar = (
-    <div className="flex shrink-0 flex-wrap items-end justify-center gap-x-6 gap-y-2 border border-slate-200 bg-slate-50 px-3 py-2">
-      <RadioGroup
-        name="status-action"
-        label="Action"
-        value={action}
-        options={[
-          { value: "cancel", label: "Cancelling" },
-          { value: "reinstate", label: "Reinstating" },
-        ]}
-        onChange={(e) => setAction(e.target.value as StatusAction)}
-        disabled={saving}
-      />
-      <RadioGroup
-        name="status-scope"
-        label="Apply to"
-        value={scope}
-        options={[
-          { value: "member", label: "Member" },
-          { value: "family", label: "Family" },
-        ]}
-        onChange={(e) => setScope(e.target.value as StatusScope)}
-        disabled={saving}
-      />
-      <p className="pb-1 text-[11px] text-slate-500">
-        {scope === "member"
-          ? "Use the button on a row to apply to that member."
-          : "Use the button on a row to apply to that member's family."}
-      </p>
-    </div>
-  );
-
   const membersTable = (
     <section className="flex min-h-0 flex-1 flex-col gap-1.5">
-      <div className="flex shrink-0 items-center justify-between gap-2">
+      <div className="flex shrink-0 flex-wrap items-center justify-between gap-2">
         <p className="min-w-0 truncate text-[12px] text-slate-600">
           {selectedCorporate?.corporate ?? "Members"}
         </p>
-        <input
-          type="text"
-          value={memberSearchQuery}
-          onChange={(e) => setMemberSearchQuery(e.target.value)}
-          placeholder="Search..."
-          aria-label="Search members"
-          className={searchInputClass}
-        />
+        <div className="flex flex-wrap items-center justify-end gap-1.5">
+          <input
+            type="text"
+            value={memberSearchQuery}
+            onChange={(e) => setMemberSearchQuery(e.target.value)}
+            placeholder="Search..."
+            aria-label="Search members"
+            className={searchInputClass}
+          />
+          {statusModeOptions.map((option) => {
+            const active =
+              action === option.action && scope === option.scope;
+            return (
+              <button
+                key={`${option.action}-${option.scope}`}
+                type="button"
+                aria-pressed={active}
+                disabled={saving}
+                onClick={() => {
+                  setAction(option.action);
+                  setScope(option.scope);
+                }}
+                className={modeButtonClass(active)}
+              >
+                {option.label}
+              </button>
+            );
+          })}
+        </div>
       </div>
-      {actionBar}
       {actionError ? (
         <p className="shrink-0 text-[12px] text-red-600">{actionError}</p>
       ) : null}
@@ -482,7 +486,7 @@ export function MemberStatusPageClient({
         open
         onClose={closeModal}
         title="Member Cancellation & Reinstate"
-        description="Select a corporate, pick an action, then apply it to a member or family"
+        description="Select a corporate, choose an action, then apply it from a member row"
       >
         <div className="flex min-h-0 flex-1 flex-col gap-3">
           {selectedCorporateId ? membersTable : corporatesTable}
