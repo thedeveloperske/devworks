@@ -12,6 +12,36 @@ const items = [
     label: "Category Management",
     description: "Manage Categories",
   },
+  {
+    href: "/admin/medical/selection-items/banks",
+    label: "Banks",
+    description: "Manage banks",
+  },
+  {
+    href: "/admin/medical/selection-items/levy",
+    label: "Levy",
+    description: "Manage levies",
+  },
+  {
+    href: "/admin/medical/selection-items/branch",
+    label: "Branch",
+    description: "Manage branches",
+  },
+  {
+    href: "/admin/medical/selection-items/card-rates",
+    label: "Card Rates",
+    description: "Manage card rates",
+  },
+  {
+    href: "/admin/medical/selection-items/re-insurer",
+    label: "Re-Insurer",
+    description: "Manage re-insurers",
+  },
+  {
+    href: "/admin/medical/selection-items/unit-managers",
+    label: "Unit Managers",
+    description: "Manage unit managers",
+  },
 ];
 
 export default function SelectionItemsPage() {
