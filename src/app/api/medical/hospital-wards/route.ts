@@ -9,6 +9,14 @@ export async function GET() {
   return NextResponse.json(wards);
 }
 
+async function allocateNextHospitalWardCode() {
+  const rows = await prisma.$queryRaw<Array<{ next: number | bigint | string }>>`
+    SELECT COALESCE(MAX(code), 0) + 1 AS next
+    FROM t_hospital_ward
+  `;
+  return Number(rows[0]?.next ?? 1);
+}
+
 export async function POST(request: Request) {
   try {
     const body = await request.json();
@@ -18,8 +26,12 @@ export async function POST(request: Request) {
       return result.error;
     }
 
+    const code = await allocateNextHospitalWardCode();
     const ward = await prisma.tHospitalWard.create({
-      data: result.data,
+      data: {
+        code,
+        ward: result.data.ward,
+      },
     });
 
     return NextResponse.json(ward, { status: 201 });
@@ -42,6 +54,13 @@ export async function POST(request: Request) {
             "Hospital ward table is missing. On the server run: npx prisma migrate deploy",
         },
         { status: 500 }
+      );
+    }
+
+    if (prismaCode === "P2002") {
+      return NextResponse.json(
+        { error: "A hospital ward with this code already exists. Try again." },
+        { status: 409 }
       );
     }
 
