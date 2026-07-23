@@ -50,7 +50,7 @@ export function BenefitsPageClient({ benefits }: BenefitsPageClientProps) {
   );
 
   const closeManageModal = useCallback(() => {
-    router.push("/admin/medical/selection-items");
+    router.push("/admin/medical/selection-items?manage=1");
   }, [router]);
 
   const closeBenefitModal = useCallback(() => {

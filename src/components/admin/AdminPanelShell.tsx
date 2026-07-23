@@ -252,10 +252,16 @@ function getMedicalNavItems(base: string): NavItem[] {
           },
         },
         {
-          href: selectionItems,
+          href: `${selectionItems}?manage=1`,
           label: "Selection Items",
-          match: (pathname) =>
-            pathname === selectionItems || pathname.startsWith(`${selectionItems}/`),
+          match: (pathname, searchParams) => {
+            if (searchParams.get("manage") !== "1" && pathname === selectionItems) {
+              return false;
+            }
+            return (
+              pathname === selectionItems || pathname.startsWith(`${selectionItems}/`)
+            );
+          },
         },
         {
           href: `${admin}/providers`,

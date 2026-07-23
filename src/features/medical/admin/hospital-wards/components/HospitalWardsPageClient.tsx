@@ -41,7 +41,7 @@ export function HospitalWardsPageClient({ wards }: HospitalWardsPageClientProps)
   const [editState, setEditState] = useState<EditHospitalWardState | null>(null);
 
   const closeManageModal = useCallback(() => {
-    router.push("/admin/medical/selection-items");
+    router.push("/admin/medical/selection-items?manage=1");
   }, [router]);
 
   const closeWardModal = useCallback(() => {

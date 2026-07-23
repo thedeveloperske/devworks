@@ -41,7 +41,7 @@ export function CategoryTypesPageClient({ categories }: CategoryTypesPageClientP
   const [editState, setEditState] = useState<EditCategoryTypeState | null>(null);
 
   const closeManageModal = useCallback(() => {
-    router.push("/admin/medical/selection-items");
+    router.push("/admin/medical/selection-items?manage=1");
   }, [router]);
 
   const closeCategoryModal = useCallback(() => {
