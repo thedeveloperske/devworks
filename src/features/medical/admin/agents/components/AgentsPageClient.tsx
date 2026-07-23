@@ -34,6 +34,7 @@ export function AgentsPageClient({ agents }: AgentsPageClientProps) {
   const manageOpen = searchParams.get("manage") === "1";
   const agentModalOpen = isNew || Boolean(editId);
   const modalOpen = manageOpen || agentModalOpen;
+  const [searchQuery, setSearchQuery] = useState("");
 
   const [editState, setEditState] = useState<EditAgentState | null>(null);
 
@@ -41,6 +42,29 @@ export function AgentsPageClient({ agents }: AgentsPageClientProps) {
     () => Object.fromEntries(branchOptions.map((option) => [option.value, option.label])),
     []
   );
+
+  const filteredAgents = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+    if (!query) return agents;
+
+    return agents.filter((agent) => {
+      const branch = agent.branch
+        ? (branchLabelById[agent.branch] ?? agent.branch)
+        : "";
+
+      return [
+        agent.agentName,
+        agent.mobileNo,
+        agent.email,
+        agent.contactPerson,
+        agent.telNo,
+        agent.pinNumber,
+        branch,
+      ]
+        .filter(Boolean)
+        .some((value) => String(value).toLowerCase().includes(query));
+    });
+  }, [agents, branchLabelById, searchQuery]);
 
   const closeManageModal = useCallback(() => {
     router.push("/admin/medical");
@@ -141,17 +165,27 @@ export function AgentsPageClient({ agents }: AgentsPageClientProps) {
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-200">
-          {agents.length === 0 ? (
+          {filteredAgents.length === 0 ? (
             <tr>
               <td colSpan={5} className={compactEmptyCellClass}>
-                No agents found.{" "}
-                <button type="button" onClick={openNewModal} className="text-maroon hover:underline">
-                  Create one
-                </button>
+                {agents.length === 0 ? (
+                  <>
+                    No agents found.{" "}
+                    <button
+                      type="button"
+                      onClick={openNewModal}
+                      className="text-maroon hover:underline"
+                    >
+                      Create one
+                    </button>
+                  </>
+                ) : (
+                  "No agents match your search."
+                )}
               </td>
             </tr>
           ) : (
-            agents.map((agent) => (
+            filteredAgents.map((agent) => (
               <tr key={agent.id} className="transition-colors hover:bg-slate-50">
                 <td className={compactTdClass}>
                   <button
@@ -192,7 +226,15 @@ export function AgentsPageClient({ agents }: AgentsPageClientProps) {
         description="Manage intermediaries and their contact details"
       >
         <div className="flex min-h-0 flex-1 flex-col gap-3">
-          <div className="flex shrink-0 justify-end">
+          <div className="flex shrink-0 items-center justify-end gap-2">
+            <input
+              type="search"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search..."
+              aria-label="Search agents"
+              className="w-40 border border-slate-300 bg-white px-2 py-1 text-[12px] text-slate-900 placeholder:text-slate-400 focus:border-maroon focus:outline-none"
+            />
             <Button type="button" size="sm" onClick={openNewModal}>
               Add Agent
             </Button>

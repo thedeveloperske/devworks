@@ -38,6 +38,7 @@ export function ProvidersPageClient({ providers }: ProvidersPageClientProps) {
   const manageOpen = searchParams.get("manage") === "1";
   const providerModalOpen = isNew || Boolean(editId);
   const modalOpen = manageOpen || providerModalOpen;
+  const [searchQuery, setSearchQuery] = useState("");
 
   const [editState, setEditState] = useState<EditProviderState | null>(null);
 
@@ -45,6 +46,28 @@ export function ProvidersPageClient({ providers }: ProvidersPageClientProps) {
     () => Object.fromEntries(townOptions.map((option) => [option.value, option.label])),
     []
   );
+
+  const filteredProviders = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+    if (!query) return providers;
+
+    return providers.filter((provider) => {
+      const town = provider.town
+        ? (townLabelById[provider.town] ?? provider.town)
+        : "";
+
+      return [
+        provider.provider,
+        provider.mobileNo,
+        provider.email,
+        provider.contactPerson,
+        provider.status,
+        town,
+      ]
+        .filter(Boolean)
+        .some((value) => String(value).toLowerCase().includes(query));
+    });
+  }, [providers, searchQuery, townLabelById]);
 
   const closeManageModal = useCallback(() => {
     router.push("/admin/medical");
@@ -148,17 +171,27 @@ export function ProvidersPageClient({ providers }: ProvidersPageClientProps) {
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-200">
-          {providers.length === 0 ? (
+          {filteredProviders.length === 0 ? (
             <tr>
               <td colSpan={6} className={compactEmptyCellClass}>
-                No providers found.{" "}
-                <button type="button" onClick={openNewModal} className="text-maroon hover:underline">
-                  Create one
-                </button>
+                {providers.length === 0 ? (
+                  <>
+                    No providers found.{" "}
+                    <button
+                      type="button"
+                      onClick={openNewModal}
+                      className="text-maroon hover:underline"
+                    >
+                      Create one
+                    </button>
+                  </>
+                ) : (
+                  "No providers match your search."
+                )}
               </td>
             </tr>
           ) : (
-            providers.map((provider) => (
+            filteredProviders.map((provider) => (
               <tr key={provider.id} className="transition-colors hover:bg-slate-50">
                 <td className={compactTdClass}>
                   <button
@@ -202,7 +235,15 @@ export function ProvidersPageClient({ providers }: ProvidersPageClientProps) {
         description="Manage healthcare providers and their contact details"
       >
         <div className="flex min-h-0 flex-1 flex-col gap-3">
-          <div className="flex shrink-0 justify-end">
+          <div className="flex shrink-0 items-center justify-end gap-2">
+            <input
+              type="search"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search..."
+              aria-label="Search providers"
+              className="w-40 border border-slate-300 bg-white px-2 py-1 text-[12px] text-slate-900 placeholder:text-slate-400 focus:border-maroon focus:outline-none"
+            />
             <Button type="button" size="sm" onClick={openNewModal}>
               Add Provider
             </Button>
