@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useSearchParams } from "next/navigation";
@@ -332,11 +332,13 @@ function AdminBrand({ homeHref }: { homeHref: string }) {
 function NavLink({
   href,
   label,
+  icon: Icon,
   exact,
   onNavigate,
 }: {
   href: string;
   label: string;
+  icon?: typeof Building2;
   exact?: boolean;
   onNavigate?: () => void;
 }) {
@@ -347,13 +349,14 @@ function NavLink({
     <Link
       href={href}
       onClick={onNavigate}
-      className={`inline-flex items-center border-b px-2.5 py-2 text-[12px] font-semibold transition ${
+      className={`flex items-center gap-2 rounded px-2.5 py-2 text-[12px] font-semibold transition ${
         active
-          ? "border-maroon text-maroon"
-          : "border-transparent text-slate-600 hover:text-slate-900"
+          ? "bg-maroon/10 text-maroon"
+          : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
       }`}
     >
-      {label}
+      {Icon ? <Icon className="h-3.5 w-3.5 shrink-0" /> : null}
+      <span>{label}</span>
     </Link>
   );
 }
@@ -384,21 +387,21 @@ function NavGroup({
   const Icon = item.icon;
 
   return (
-    <div className="relative">
+    <div>
       <button
         type="button"
         onClick={() => {
           if (!hasChildren) return;
           setOpenGroupHref(open ? null : item.href);
         }}
-        className={`inline-flex items-center gap-1 border-b px-2.5 py-2 text-[12px] font-semibold transition ${
+        className={`flex w-full items-center gap-2 rounded px-2.5 py-2 text-left text-[12px] font-semibold transition ${
           groupActive
-            ? "border-maroon text-maroon"
-            : "border-transparent text-slate-600 hover:text-slate-900"
-        } ${hasChildren ? "" : "cursor-default"}`}
+            ? "bg-maroon/10 text-maroon"
+            : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+        }`}
       >
         <Icon className="h-3.5 w-3.5 shrink-0" />
-        <span>{item.label}</span>
+        <span className="min-w-0 flex-1">{item.label}</span>
         {hasChildren ? (
           <ChevronDown
             className={`h-3.5 w-3.5 shrink-0 transition ${open ? "rotate-180" : ""}`}
@@ -406,7 +409,7 @@ function NavGroup({
         ) : null}
       </button>
       {open && hasChildren ? (
-        <div className="absolute left-0 top-full z-60 mt-0.5 min-w-40 rounded border border-slate-200 bg-white p-0.5 shadow-lg">
+        <div className="mt-0.5 space-y-0.5 border-l border-slate-200 py-0.5 pl-3 ml-3.5">
           {item.children!.map((child) => {
             const active = child.match
               ? child.match(pathname, searchParams)
@@ -416,7 +419,6 @@ function NavGroup({
                 key={child.href}
                 href={child.href}
                 onClick={() => {
-                  setOpenGroupHref(null);
                   onNavigate?.();
                 }}
                 className={`block rounded px-2.5 py-1.5 text-[12px] font-medium transition ${
@@ -462,35 +464,65 @@ export function AdminPanelShell({
   children: React.ReactNode;
   system?: AdminSystemId;
 }) {
+  const pathname = usePathname();
   const basePath = ADMIN_SYSTEMS[system].basePath;
   const navItems = getNavItems(basePath);
   const [openGroupHref, setOpenGroupHref] = useState<string | null>(null);
-  const navRef = useRef<HTMLDivElement>(null);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   useEffect(() => {
-    const onClickAway = (event: MouseEvent) => {
-      if (!navRef.current) return;
-      if (event.target instanceof Node && !navRef.current.contains(event.target)) {
-        setOpenGroupHref(null);
-      }
-    };
-    document.addEventListener("mousedown", onClickAway);
-    return () => document.removeEventListener("mousedown", onClickAway);
-  }, []);
+    const activeGroup =
+      navItems.find(
+        (item) =>
+          item.children &&
+          (pathname.startsWith(item.href) ||
+            item.children.some((child) => {
+              const childPath = child.href.split("?")[0];
+              return pathname === childPath || pathname.startsWith(`${childPath}/`);
+            }))
+      )?.href ?? null;
+    setOpenGroupHref(activeGroup);
+  }, [pathname, basePath]);
+
+  useEffect(() => {
+    setMobileNavOpen(false);
+  }, [pathname]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setOpenGroupHref(null);
+      if (e.key === "Escape") setMobileNavOpen(false);
     };
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
   }, []);
 
+  const navContent = (
+    <nav className="flex flex-col gap-0.5 p-3">
+      {navItems.map((item) =>
+        renderNavItem(item, openGroupHref, setOpenGroupHref, () =>
+          setMobileNavOpen(false)
+        )
+      )}
+    </nav>
+  );
+
   return (
     <div data-admin className="flex min-h-full flex-1 flex-col bg-slate-50">
       <header className="sticky top-0 z-100 border-b border-slate-200 bg-white">
-        <div className="flex items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
-          <AdminBrand homeHref={basePath} />
+        <div className="flex items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
+          <div className="flex min-w-0 items-center gap-3">
+            <button
+              type="button"
+              className="inline-flex items-center justify-center rounded border border-slate-200 p-1.5 text-slate-600 hover:bg-slate-50 lg:hidden"
+              aria-label={mobileNavOpen ? "Close navigation" : "Open navigation"}
+              onClick={() => setMobileNavOpen((open) => !open)}
+            >
+              <ChevronDown
+                className={`h-4 w-4 transition ${mobileNavOpen ? "rotate-180" : "-rotate-90"}`}
+              />
+            </button>
+            <AdminBrand homeHref={basePath} />
+          </div>
           <div className="flex items-center gap-4">
             <Link
               href="/applications"
@@ -501,19 +533,31 @@ export function AdminPanelShell({
             <LogoutButton />
           </div>
         </div>
-        <div ref={navRef} className="relative z-100 border-t border-slate-200">
-          <nav className="overflow-visible px-2 sm:px-4 lg:px-6">
-            <div className="flex flex-wrap items-stretch gap-0.5">
-              {navItems.map((item) =>
-                renderNavItem(item, openGroupHref, setOpenGroupHref, () =>
-                  setOpenGroupHref(null)
-                )
-              )}
-            </div>
-          </nav>
-        </div>
       </header>
-      <main className="relative flex-1 p-4 sm:p-6 lg:p-8">{children}</main>
+
+      <div className="relative flex min-h-0 flex-1">
+        <aside className="hidden w-56 shrink-0 border-r border-slate-200 bg-white lg:block">
+          <div className="sticky top-[4.25rem] max-h-[calc(100dvh-4.25rem)] overflow-y-auto">
+            {navContent}
+          </div>
+        </aside>
+
+        {mobileNavOpen ? (
+          <>
+            <button
+              type="button"
+              aria-label="Close navigation overlay"
+              className="fixed inset-0 z-40 bg-slate-900/30 lg:hidden"
+              onClick={() => setMobileNavOpen(false)}
+            />
+            <aside className="fixed bottom-0 left-0 top-[3.75rem] z-50 w-64 overflow-y-auto border-r border-slate-200 bg-white shadow-lg lg:hidden">
+              {navContent}
+            </aside>
+          </>
+        ) : null}
+
+        <main className="relative min-w-0 flex-1 p-4 sm:p-6 lg:p-8">{children}</main>
+      </div>
     </div>
   );
 }
