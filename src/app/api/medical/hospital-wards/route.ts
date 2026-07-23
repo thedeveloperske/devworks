@@ -23,7 +23,22 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json(ward, { status: 201 });
-  } catch {
+  } catch (error: unknown) {
+    console.error("Failed to create hospital ward", error);
+    if (
+      error &&
+      typeof error === "object" &&
+      "code" in error &&
+      error.code === "P2021"
+    ) {
+      return NextResponse.json(
+        {
+          error:
+            "Hospital ward table is missing. Run database migrations (npx prisma migrate deploy).",
+        },
+        { status: 500 }
+      );
+    }
     return NextResponse.json(
       { error: "Failed to create hospital ward" },
       { status: 500 }

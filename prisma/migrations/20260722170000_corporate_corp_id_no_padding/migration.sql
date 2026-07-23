@@ -2,12 +2,17 @@
 ALTER TABLE "corporate"
 ALTER COLUMN "corp_id" SET DEFAULT nextval('corporate_corp_id_seq'::regclass)::text;
 
--- Strip leading zeros from existing numeric corp_id values.
--- FK children with ON UPDATE CASCADE follow the corporate.corp_id change.
-UPDATE "corporate"
-SET "corp_id" = ("corp_id"::bigint)::text
-WHERE "corp_id" ~ '^[0-9]+$'
-  AND "corp_id" <> ("corp_id"::bigint)::text;
+-- Strip leading zeros only when the unpadded value is not already taken.
+UPDATE "corporate" AS c
+SET "corp_id" = (c."corp_id"::bigint)::text
+WHERE c."corp_id" ~ '^[0-9]+$'
+  AND c."corp_id" <> (c."corp_id"::bigint)::text
+  AND NOT EXISTS (
+    SELECT 1
+    FROM "corporate" AS other
+    WHERE other."corp_id" = (c."corp_id"::bigint)::text
+      AND other."id" <> c."id"
+  );
 
 -- Tables that store corp_id without a FK to corporate.
 UPDATE "principal_applicant"
