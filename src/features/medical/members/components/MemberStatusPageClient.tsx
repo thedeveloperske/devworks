@@ -3,6 +3,13 @@
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  UserCheck,
+  UserRoundCheck,
+  UserRoundX,
+  UserX,
+  type LucideIcon,
+} from "lucide-react";
 import { Button } from "@/components/admin/Button";
 import { FormField } from "@/components/admin/FormField";
 import { Modal } from "@/components/admin/Modal";
@@ -29,13 +36,34 @@ type StatusModeOption = {
   action: StatusAction;
   scope: StatusScope;
   label: string;
+  icon: LucideIcon;
 };
 
 const statusModeOptions: StatusModeOption[] = [
-  { action: "cancel", scope: "member", label: "Cancel Member" },
-  { action: "cancel", scope: "family", label: "Cancel Family" },
-  { action: "reinstate", scope: "member", label: "Reinstate Member" },
-  { action: "reinstate", scope: "family", label: "Reinstate Family" },
+  {
+    action: "cancel",
+    scope: "member",
+    label: "Cancel Member",
+    icon: UserX,
+  },
+  {
+    action: "cancel",
+    scope: "family",
+    label: "Cancel Family",
+    icon: UserRoundX,
+  },
+  {
+    action: "reinstate",
+    scope: "member",
+    label: "Reinstate Member",
+    icon: UserCheck,
+  },
+  {
+    action: "reinstate",
+    scope: "family",
+    label: "Reinstate Family",
+    icon: UserRoundCheck,
+  },
 ];
 
 const actionLabels: Record<StatusAction, string> = {
@@ -63,8 +91,8 @@ const applyButtonClass =
   "border border-maroon bg-maroon px-2.5 py-1 text-[12px] font-semibold text-white hover:bg-maroon/90 disabled:cursor-not-allowed disabled:border-slate-300 disabled:bg-slate-200 disabled:text-slate-500";
 const modeButtonClass = (active: boolean) =>
   active
-    ? "border border-maroon bg-maroon px-2.5 py-1 text-[12px] font-semibold text-white"
-    : "border border-slate-300 bg-white px-2.5 py-1 text-[12px] font-semibold text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60";
+    ? "inline-flex size-7 items-center justify-center border border-maroon bg-maroon text-white"
+    : "inline-flex size-7 items-center justify-center border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60";
 const compactFieldClass =
   "w-full border border-slate-300 bg-white px-2 py-1 text-[12px] text-slate-900 placeholder:text-slate-400 focus:border-maroon focus:outline-none";
 
@@ -365,6 +393,28 @@ export function MemberStatusPageClient({
           {selectedCorporate?.corporate ?? "Members"}
         </p>
         <div className="flex flex-wrap items-center justify-end gap-1.5">
+          {statusModeOptions.map((option) => {
+            const active =
+              action === option.action && scope === option.scope;
+            const Icon = option.icon;
+            return (
+              <button
+                key={`${option.action}-${option.scope}`}
+                type="button"
+                aria-label={option.label}
+                aria-pressed={active}
+                title={option.label}
+                disabled={saving}
+                onClick={() => {
+                  setAction(option.action);
+                  setScope(option.scope);
+                }}
+                className={modeButtonClass(active)}
+              >
+                <Icon aria-hidden className="size-3.5" strokeWidth={2} />
+              </button>
+            );
+          })}
           <input
             type="text"
             value={memberSearchQuery}
@@ -373,25 +423,6 @@ export function MemberStatusPageClient({
             aria-label="Search members"
             className={searchInputClass}
           />
-          {statusModeOptions.map((option) => {
-            const active =
-              action === option.action && scope === option.scope;
-            return (
-              <button
-                key={`${option.action}-${option.scope}`}
-                type="button"
-                aria-pressed={active}
-                disabled={saving}
-                onClick={() => {
-                  setAction(option.action);
-                  setScope(option.scope);
-                }}
-                className={modeButtonClass(active)}
-              >
-                {option.label}
-              </button>
-            );
-          })}
         </div>
       </div>
       {actionError ? (
