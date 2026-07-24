@@ -16,7 +16,7 @@ import {
   type PreAuthorizationMemberCoverPeriod,
 } from "@/features/medical/care/pre-authorization";
 import type { LookupOption } from "@/features/medical/lookups/types";
-import { formatDate, formatThousands } from "@/lib/format";
+import { formatThousands } from "@/lib/format";
 import { inputClass, labelClass } from "@/lib/form-styles";
 
 type PreAuthorizationFormProps = {
@@ -77,20 +77,6 @@ export function PreAuthorizationForm({
       getDateReportedCoverPeriodError(form.dateReported, activeCoverPeriod),
     [activeCoverPeriod, form.dateReported]
   );
-
-  const dateReportedHint = useMemo(() => {
-    if (!activeCoverPeriod) return undefined;
-    const start = activeCoverPeriod.startDate
-      ? formatDate(activeCoverPeriod.startDate)
-      : null;
-    const end = activeCoverPeriod.endDate
-      ? formatDate(activeCoverPeriod.endDate)
-      : null;
-    if (start && end) return `Cover period: ${start} – ${end}`;
-    if (start) return `Cover starts: ${start}`;
-    if (end) return `Cover ends: ${end}`;
-    return "No cover dates set for this anniversary";
-  }, [activeCoverPeriod]);
 
   const authorityTypeOptions = useMemo(
     () =>
@@ -260,11 +246,7 @@ export function PreAuthorizationForm({
               : undefined
           }
           hint={
-            field.name === "dateReported"
-              ? dateReportedCoverError
-                ? dateReportedCoverError
-                : dateReportedHint
-              : undefined
+            field.name === "dateReported" ? dateReportedCoverError ?? undefined : undefined
           }
           hintClassName={
             field.name === "dateReported" && dateReportedCoverError
