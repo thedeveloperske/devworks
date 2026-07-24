@@ -3,11 +3,18 @@ import { PreAuthorizationPageClient } from "@/features/medical/care/pre-authoriz
 import { loadPreAuthorizationPageData } from "@/features/medical/care/pre-authorization/server/load-page-data";
 
 async function PreAuthorizationContent() {
-  const { preAuthorizations, providerOptions, hospitalWardOptions } =
-    await loadPreAuthorizationPageData();
+  const {
+    preAuthorizations,
+    corporates,
+    members,
+    providerOptions,
+    hospitalWardOptions,
+  } = await loadPreAuthorizationPageData();
   return (
     <PreAuthorizationPageClient
       preAuthorizations={preAuthorizations}
+      corporates={corporates}
+      members={members}
       providerOptions={providerOptions}
       hospitalWardOptions={hospitalWardOptions}
     />

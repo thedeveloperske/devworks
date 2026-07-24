@@ -20,6 +20,7 @@ type PreAuthorizationFormProps = {
   preAuthorizationId?: string;
   providerOptions: LookupOption[];
   hospitalWardOptions: LookupOption[];
+  lockMemberNo?: boolean;
   embedded?: boolean;
   onSuccess?: () => void;
   onCancel?: () => void;
@@ -36,6 +37,7 @@ export function PreAuthorizationForm({
   preAuthorizationId,
   providerOptions,
   hospitalWardOptions,
+  lockMemberNo = false,
   embedded = false,
   onSuccess,
   onCancel,
@@ -140,10 +142,13 @@ export function PreAuthorizationForm({
               required={field.required}
               value={form[field.name]}
               onChange={handleChange}
+              disabled={lockMemberNo && field.name === "memberNo"}
               inputClassName={
                 amountFields.has(field.name)
                   ? `${fieldInputClass} text-right`
-                  : fieldInputClass
+                  : lockMemberNo && field.name === "memberNo"
+                    ? `${fieldInputClass} cursor-not-allowed bg-slate-50 text-slate-600`
+                    : fieldInputClass
               }
               selectClassName={`${fieldInputClass} h-[30px]`}
               labelClassName={fieldLabelClass}

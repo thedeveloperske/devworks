@@ -7,8 +7,10 @@ import { Modal } from "@/components/admin/Modal";
 import { PageHeader } from "@/components/admin/PageHeader";
 import {
   preAuthorizationToFormValues,
+  type PreAuthorizationCorporateOption,
   type PreAuthorizationFormData,
   type PreAuthorizationListItem,
+  type PreAuthorizationMemberOption,
 } from "@/features/medical/care/pre-authorization";
 import type { LookupOption } from "@/features/medical/lookups/types";
 import { formatDate } from "@/lib/format";
@@ -21,6 +23,8 @@ import { PreAuthorizationForm } from "./PreAuthorizationForm";
 
 type PreAuthorizationPageClientProps = {
   preAuthorizations: PreAuthorizationListItem[];
+  corporates: PreAuthorizationCorporateOption[];
+  members: PreAuthorizationMemberOption[];
   providerOptions: LookupOption[];
   hospitalWardOptions: LookupOption[];
 };
@@ -32,8 +36,19 @@ type EditState = {
   error: string;
 };
 
+const compactThClass =
+  "whitespace-nowrap px-2.5 py-1.5 text-[12px] font-bold uppercase tracking-wide text-slate-500";
+const compactTdClass =
+  "whitespace-nowrap px-2.5 py-1.5 text-[12px] text-slate-600";
+const compactEmptyCellClass =
+  "px-2.5 py-4 text-center text-[12px] text-slate-500";
+const searchInputClass =
+  "w-40 border border-slate-300 bg-white px-2 py-1 text-[12px] text-slate-900 placeholder:text-slate-400 focus:border-maroon focus:outline-none";
+
 export function PreAuthorizationPageClient({
   preAuthorizations,
+  corporates,
+  members,
   providerOptions,
   hospitalWardOptions,
 }: PreAuthorizationPageClientProps) {
@@ -43,10 +58,34 @@ export function PreAuthorizationPageClient({
   const isNew = searchParams.get("new") === "1";
   const editId = searchParams.get("edit");
   const manageOpen = searchParams.get("manage") === "1";
+  const selectedCorporateId = searchParams.get("corporate") ?? "";
+  const selectedMemberNo = searchParams.get("member") ?? "";
   const formModalOpen = isNew || Boolean(editId);
   const modalOpen = manageOpen || formModalOpen;
+
   const [searchQuery, setSearchQuery] = useState("");
+  const [corporateSearchQuery, setCorporateSearchQuery] = useState("");
+  const [memberSearchQuery, setMemberSearchQuery] = useState("");
   const [editState, setEditState] = useState<EditState | null>(null);
+
+  const selectedCorporate = useMemo(
+    () => corporates.find((corporate) => corporate.id === selectedCorporateId),
+    [corporates, selectedCorporateId]
+  );
+
+  const selectedMember = useMemo(
+    () => members.find((member) => member.memberNo === selectedMemberNo),
+    [members, selectedMemberNo]
+  );
+
+  const memberCountByCorporateId = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const member of members) {
+      if (!member.corporateId) continue;
+      counts[member.corporateId] = (counts[member.corporateId] ?? 0) + 1;
+    }
+    return counts;
+  }, [members]);
 
   const filteredRows = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
@@ -67,6 +106,42 @@ export function PreAuthorizationPageClient({
     );
   }, [preAuthorizations, searchQuery]);
 
+  const filteredCorporates = useMemo(() => {
+    const query = corporateSearchQuery.trim().toLowerCase();
+    if (!query) return corporates;
+    return corporates.filter((corporate) =>
+      [corporate.corporate, corporate.corpId, corporate.policyNo]
+        .filter(Boolean)
+        .some((value) => String(value).toLowerCase().includes(query))
+    );
+  }, [corporateSearchQuery, corporates]);
+
+  const corporateMembers = useMemo(() => {
+    if (!selectedCorporateId) return [];
+    return members.filter(
+      (member) =>
+        member.corporateId === selectedCorporateId && member.cancelled !== 1
+    );
+  }, [members, selectedCorporateId]);
+
+  const filteredMembers = useMemo(() => {
+    const query = memberSearchQuery.trim().toLowerCase();
+    if (!query) return corporateMembers;
+    return corporateMembers.filter((member) =>
+      [member.memberNo, member.name, member.familyNo, member.memberType]
+        .filter(Boolean)
+        .some((value) => String(value).toLowerCase().includes(query))
+    );
+  }, [corporateMembers, memberSearchQuery]);
+
+  const newFlowStep = !isNew
+    ? null
+    : selectedMemberNo
+      ? "form"
+      : selectedCorporateId
+        ? "members"
+        : "corporates";
+
   const closeManageModal = useCallback(() => {
     router.push("/admin/medical");
   }, [router]);
@@ -75,6 +150,8 @@ export function PreAuthorizationPageClient({
     const params = new URLSearchParams(searchParams.toString());
     params.delete("new");
     params.delete("edit");
+    params.delete("corporate");
+    params.delete("member");
     if (manageOpen) params.set("manage", "1");
     else params.delete("manage");
     const query = params.toString();
@@ -82,8 +159,36 @@ export function PreAuthorizationPageClient({
   }, [manageOpen, pathname, router, searchParams]);
 
   const openNewModal = useCallback(() => {
+    setCorporateSearchQuery("");
+    setMemberSearchQuery("");
     router.push(`${pathname}?manage=1&new=1`, { scroll: false });
   }, [pathname, router]);
+
+  const openCorporateStep = useCallback(() => {
+    setMemberSearchQuery("");
+    router.push(`${pathname}?manage=1&new=1`, { scroll: false });
+  }, [pathname, router]);
+
+  const openMembersStep = useCallback(
+    (corporateId: string) => {
+      setMemberSearchQuery("");
+      router.push(
+        `${pathname}?manage=1&new=1&corporate=${encodeURIComponent(corporateId)}`,
+        { scroll: false }
+      );
+    },
+    [pathname, router]
+  );
+
+  const openFormStep = useCallback(
+    (corporateId: string, memberNo: string) => {
+      router.push(
+        `${pathname}?manage=1&new=1&corporate=${encodeURIComponent(corporateId)}&member=${encodeURIComponent(memberNo)}`,
+        { scroll: false }
+      );
+    },
+    [pathname, router]
+  );
 
   const openEditModal = useCallback(
     (id: string) => {
@@ -149,13 +254,6 @@ export function PreAuthorizationPageClient({
   const editingRow = editId
     ? preAuthorizations.find((row) => row.id === editId)
     : undefined;
-
-  const compactThClass =
-    "whitespace-nowrap px-2.5 py-1.5 text-[12px] font-bold uppercase tracking-wide text-slate-500";
-  const compactTdClass =
-    "whitespace-nowrap px-2.5 py-1.5 text-[12px] text-slate-600";
-  const compactEmptyCellClass =
-    "px-2.5 py-4 text-center text-[12px] text-slate-500";
 
   const rowsTable = (
     <div className={`${tableWrapperClass} overflow-y-auto`}>
@@ -225,6 +323,200 @@ export function PreAuthorizationPageClient({
     </div>
   );
 
+  const corporatesStep = (
+    <div className="flex min-h-0 flex-1 flex-col gap-3">
+      <div className="flex shrink-0 items-center justify-between gap-2">
+        <p className="text-[12px] text-slate-600">
+          Select a corporate to continue
+        </p>
+        <input
+          type="search"
+          value={corporateSearchQuery}
+          onChange={(e) => setCorporateSearchQuery(e.target.value)}
+          placeholder="Search corporates..."
+          aria-label="Search corporates"
+          className={searchInputClass}
+        />
+      </div>
+      <div className={`${tableWrapperClass} min-h-0 flex-1 overflow-y-auto`}>
+        <table className={tableClass}>
+          <thead className={tableHeadClass}>
+            <tr>
+              <th className={compactThClass}>Corporate</th>
+              <th className={compactThClass}>Corp ID</th>
+              <th className={compactThClass}>Policy No</th>
+              <th className={compactThClass}>Members</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-200">
+            {filteredCorporates.length === 0 ? (
+              <tr>
+                <td colSpan={4} className={compactEmptyCellClass}>
+                  {corporates.length === 0
+                    ? "No corporates found."
+                    : "No corporates match your search."}
+                </td>
+              </tr>
+            ) : (
+              filteredCorporates.map((corporate) => (
+                <tr
+                  key={corporate.id}
+                  className="transition-colors hover:bg-slate-50"
+                >
+                  <td className={compactTdClass}>
+                    <button
+                      type="button"
+                      onClick={() => openMembersStep(corporate.id)}
+                      className="text-left font-semibold text-maroon hover:underline"
+                    >
+                      {corporate.corporate}
+                    </button>
+                  </td>
+                  <td className={compactTdClass}>{corporate.corpId ?? "—"}</td>
+                  <td className={compactTdClass}>
+                    {corporate.policyNo ?? "—"}
+                  </td>
+                  <td className={compactTdClass}>
+                    {memberCountByCorporateId[corporate.id] ?? 0}
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+
+  const membersStep = (
+    <div className="flex min-h-0 flex-1 flex-col gap-3">
+      <div className="flex shrink-0 items-center justify-between gap-2">
+        <div className="flex min-w-0 items-center gap-2">
+          <Button type="button" variant="secondary" size="sm" onClick={openCorporateStep}>
+            Back
+          </Button>
+          <p className="min-w-0 truncate text-[12px] text-slate-600">
+            {selectedCorporate?.corporate ?? "Members"}
+          </p>
+        </div>
+        <input
+          type="search"
+          value={memberSearchQuery}
+          onChange={(e) => setMemberSearchQuery(e.target.value)}
+          placeholder="Search members..."
+          aria-label="Search members"
+          className={searchInputClass}
+        />
+      </div>
+      <div className={`${tableWrapperClass} min-h-0 flex-1 overflow-y-auto`}>
+        <table className={tableClass}>
+          <thead className={tableHeadClass}>
+            <tr>
+              <th className={compactThClass}>Member No</th>
+              <th className={compactThClass}>Name</th>
+              <th className={compactThClass}>Type</th>
+              <th className={compactThClass}>Family No</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-200">
+            {filteredMembers.length === 0 ? (
+              <tr>
+                <td colSpan={4} className={compactEmptyCellClass}>
+                  {corporateMembers.length === 0
+                    ? "No members found for this corporate."
+                    : "No members match your search."}
+                </td>
+              </tr>
+            ) : (
+              filteredMembers.map((member) => (
+                <tr
+                  key={member.memberNo}
+                  className="transition-colors hover:bg-slate-50"
+                >
+                  <td className={compactTdClass}>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        openFormStep(selectedCorporateId, member.memberNo)
+                      }
+                      className="text-left font-semibold text-maroon hover:underline"
+                    >
+                      {member.memberNo}
+                    </button>
+                  </td>
+                  <td className={compactTdClass}>{member.name}</td>
+                  <td className={compactTdClass}>{member.memberType}</td>
+                  <td className={compactTdClass}>{member.familyNo || "—"}</td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+
+  const formStep = selectedMember ? (
+    <div className="flex min-h-0 flex-1 flex-col gap-3">
+      <div className="flex shrink-0 items-center gap-2">
+        <Button
+          type="button"
+          variant="secondary"
+          size="sm"
+          onClick={() => openMembersStep(selectedCorporateId)}
+        >
+          Back
+        </Button>
+        <p className="min-w-0 truncate text-[12px] text-slate-600">
+          {selectedMember.name} ({selectedMember.memberNo})
+          {selectedCorporate?.corporate
+            ? ` · ${selectedCorporate.corporate}`
+            : ""}
+        </p>
+      </div>
+      <PreAuthorizationForm
+        key={selectedMember.memberNo}
+        embedded
+        lockMemberNo
+        initial={{
+          memberNo: selectedMember.memberNo,
+          anniv: selectedMember.anniv,
+        }}
+        providerOptions={providerOptions}
+        hospitalWardOptions={hospitalWardOptions}
+        onSuccess={handleSaved}
+        onCancel={closeFormModal}
+      />
+    </div>
+  ) : (
+    <div className="flex min-h-0 flex-1 flex-col gap-3">
+      <div className="flex shrink-0 items-center gap-2">
+        <Button type="button" variant="secondary" size="sm" onClick={openCorporateStep}>
+          Back
+        </Button>
+      </div>
+      <p className="text-[12px] text-red-600">Selected member was not found.</p>
+    </div>
+  );
+
+  const newModalTitle =
+    newFlowStep === "corporates"
+      ? "Select Corporate"
+      : newFlowStep === "members"
+        ? "Select Member"
+        : "New Pre-authorization";
+
+  const newModalDescription =
+    newFlowStep === "corporates"
+      ? "Choose the corporate whose member needs pre-authorization"
+      : newFlowStep === "members"
+        ? selectedCorporate?.corporate
+          ? `Choose a member under ${selectedCorporate.corporate}`
+          : "Choose a member"
+        : selectedMember
+          ? `${selectedMember.name} (${selectedMember.memberNo})`
+          : "Create a new care pre-authorization";
+
   return (
     <div className={`relative ${modalOpen ? "min-h-[calc(100dvh-13rem)]" : ""}`}>
       <div className={modalOpen ? "pointer-events-none opacity-40" : undefined}>
@@ -248,7 +540,7 @@ export function PreAuthorizationPageClient({
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search..."
               aria-label="Search pre-authorizations"
-              className="w-40 border border-slate-300 bg-white px-2 py-1 text-[12px] text-slate-900 placeholder:text-slate-400 focus:border-maroon focus:outline-none"
+              className={searchInputClass}
             />
             <Button type="button" size="sm" onClick={openNewModal}>
               Add Pre-authorization
@@ -261,10 +553,14 @@ export function PreAuthorizationPageClient({
       <Modal
         open={formModalOpen}
         onClose={closeFormModal}
-        title={isNew ? "New Pre-authorization" : "Edit Pre-authorization"}
+        title={
+          isNew
+            ? newModalTitle
+            : "Edit Pre-authorization"
+        }
         description={
           isNew
-            ? "Create a new care pre-authorization"
+            ? newModalDescription
             : editLabel ||
               (editingRow
                 ? `Code ${editingRow.code} · ${editingRow.memberNo}`
@@ -273,13 +569,13 @@ export function PreAuthorizationPageClient({
         size="xl"
       >
         {isNew ? (
-          <PreAuthorizationForm
-            embedded
-            providerOptions={providerOptions}
-            hospitalWardOptions={hospitalWardOptions}
-            onSuccess={handleSaved}
-            onCancel={closeFormModal}
-          />
+          newFlowStep === "corporates" ? (
+            corporatesStep
+          ) : newFlowStep === "members" ? (
+            membersStep
+          ) : (
+            formStep
+          )
         ) : editLoading ? (
           <p className="text-[12px] text-slate-500">Loading pre-authorization...</p>
         ) : editError ? (

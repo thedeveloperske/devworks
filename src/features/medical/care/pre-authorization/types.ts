@@ -39,6 +39,24 @@ export type PreAuthorizationListItem = {
   validityDate: string | null;
 };
 
+export type PreAuthorizationCorporateOption = {
+  id: string;
+  corporate: string;
+  corpId: string | null;
+  policyNo: string | null;
+};
+
+export type PreAuthorizationMemberOption = {
+  memberNo: string;
+  familyNo: string;
+  name: string;
+  corporateId: string;
+  corpId: string;
+  memberType: "Principal" | "Dependant";
+  anniv: string;
+  cancelled: number | null;
+};
+
 export type PreAuthorizationField = {
   name: keyof PreAuthorizationFormData;
   label: string;
