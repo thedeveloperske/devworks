@@ -8,6 +8,7 @@ import {
 } from "@/features/medical/members";
 import { benefitSharingOptions } from "@/features/medical/lookups";
 import type { LookupOption } from "@/features/medical/lookups/types";
+import { formatThousands } from "@/lib/format";
 
 type BenefitsTabProps = {
   rows: MemberBenefitFormData[];
@@ -102,6 +103,22 @@ function renderCell(
       benefitSharingOptions,
       "Select sharing",
       disabledClass
+    );
+  }
+
+  if (field.name === "policyLimit" || field.name === "bedLimit") {
+    return (
+      <input
+        id={fieldId}
+        name={field.name}
+        aria-label={field.label}
+        type="text"
+        inputMode="decimal"
+        value={formatThousands(row[field.name])}
+        onChange={() => undefined}
+        disabled
+        className={`${fieldInputClass} min-w-[120px] cursor-not-allowed bg-slate-50 text-right text-slate-600`}
+      />
     );
   }
 

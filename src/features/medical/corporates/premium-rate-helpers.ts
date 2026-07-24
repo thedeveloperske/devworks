@@ -3,7 +3,7 @@ import type { Prisma } from "@/generated/prisma/client";
 import type { PremiumRateFormData, PremiumRateInput } from "./types";
 
 function parseRequiredNumber(value: string | undefined, label: string) {
-  const trimmed = value?.trim();
+  const trimmed = value?.replace(/,/g, "").trim();
   if (!trimmed) {
     return { error: `${label} is required` };
   }
@@ -15,7 +15,7 @@ function parseRequiredNumber(value: string | undefined, label: string) {
 }
 
 function parseOptionalNumber(value: string | undefined, label: string) {
-  const trimmed = value?.trim();
+  const trimmed = value?.replace(/,/g, "").trim();
   if (!trimmed) return { value: null };
   const parsed = Number(trimmed);
   if (Number.isNaN(parsed)) {
@@ -27,6 +27,14 @@ function parseOptionalNumber(value: string | undefined, label: string) {
 function decimalToString(value: Prisma.Decimal | number | null | undefined) {
   if (value == null) return "";
   return String(value);
+}
+
+function formatAmountString(value: Prisma.Decimal | number | null | undefined) {
+  if (value == null) return "";
+  const raw = String(value);
+  const [intPart, fracPart] = raw.split(".");
+  const formattedInt = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  return fracPart != null ? `${formattedInt}.${fracPart}` : formattedInt;
 }
 
 export function hasPremiumRateRowInput(row?: PremiumRateInput) {
@@ -169,8 +177,8 @@ export function clientRateToFormValues(row: {
     benefit: decimalToString(row.benefit),
     premiumType: decimalToString(row.premiumType),
     familySize: decimalToString(row.familySize),
-    policyLimit: decimalToString(row.policyLimit),
-    premium: decimalToString(row.premium),
+    policyLimit: formatAmountString(row.policyLimit),
+    premium: formatAmountString(row.premium),
     minAge: decimalToString(row.minAge),
     maxAge: decimalToString(row.maxAge),
   };

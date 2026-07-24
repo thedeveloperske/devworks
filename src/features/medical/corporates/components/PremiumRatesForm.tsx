@@ -2,9 +2,13 @@
 
 import { Button } from "@/components/admin/Button";
 import { premiumRateFields } from "@/features/medical/corporates";
-import type { PremiumRateFormData } from "@/features/medical/corporates";
+import type {
+  PremiumRateField,
+  PremiumRateFormData,
+} from "@/features/medical/corporates";
 import { businessClassOptions, familySizeOptions } from "@/features/medical/lookups";
 import type { LookupOption } from "@/features/medical/lookups/types";
+import { formatThousands } from "@/lib/format";
 
 type PremiumRatesFormProps = {
   rows: PremiumRateFormData[];
@@ -65,7 +69,7 @@ function renderSelect(
 }
 
 function renderCell(
-  field: (typeof premiumRateFields)[number],
+  field: PremiumRateField,
   row: PremiumRateFormData,
   rowIndex: number,
   benefitOptions: LookupOption[],
@@ -114,6 +118,27 @@ function renderCell(
       "Select family size",
       selectClass,
       (e) => onRowChange(rowIndex, e)
+    );
+  }
+
+  if (field.name === "policyLimit" || field.name === "premium") {
+    return (
+      <input
+        id={fieldId}
+        name={field.name}
+        aria-label={field.label}
+        type="text"
+        inputMode="decimal"
+        required={field.required}
+        value={row[field.name]}
+        onChange={(e) => {
+          const formatted = formatThousands(e.target.value);
+          onRowChange(rowIndex, {
+            target: { name: field.name, value: formatted },
+          } as React.ChangeEvent<HTMLInputElement>);
+        }}
+        className={`${fieldInputClass} min-w-[120px] text-right`}
+      />
     );
   }
 

@@ -2,6 +2,7 @@ import { loadAgentOptions } from "@/features/medical/admin/agents/server/load-pa
 import { loadBenefitOptions } from "@/features/medical/admin/benefits/server/load-page-data";
 import { branchOptions } from "@/features/medical/lookups";
 import type { LookupOption } from "@/features/medical/lookups/types";
+import { formatThousands } from "@/lib/format";
 import type {
   MemberListItem,
   MembersCorporateOption,
@@ -14,9 +15,11 @@ function formatAnniversaryDate(value: Date) {
   return value.toISOString().slice(0, 10);
 }
 
-function decimalToString(value: { toString(): string } | number | null | undefined) {
+function formatAmountString(
+  value: { toString(): string } | number | null | undefined
+) {
   if (value == null) return "";
-  return String(value);
+  return formatThousands(String(value));
 }
 
 /** Map corporate.branch (key or label) to principal form branch key. */
@@ -110,7 +113,7 @@ function buildCorpGroupBenefitsByCorpId(
       category,
       anniv: String(group.anniv),
       benefit: String(group.benefit),
-      policyLimit: decimalToString(group.policyLimit),
+      policyLimit: formatAmountString(group.policyLimit),
       sharing: group.sharing != null ? String(group.sharing) : "",
       subLimitOf: group.subLimitOf != null ? String(group.subLimitOf) : "",
       waitingPeriod:

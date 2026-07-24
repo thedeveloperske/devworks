@@ -181,10 +181,10 @@ export const premiumRateFields = [
   { name: "benefit", label: "Benefit", required: true },
   { name: "premiumType", label: "Premium Type", type: "number" },
   { name: "familySize", label: "Family Size" },
-  { name: "policyLimit", label: "Limit", type: "number" },
+  { name: "policyLimit", label: "Limit" },
   { name: "minAge", label: "Min Age", type: "number" },
   { name: "maxAge", label: "Max Age", type: "number" },
-  { name: "premium", label: "Premium", type: "number" },
+  { name: "premium", label: "Premium" },
 ] satisfies PremiumRateField[];
 
 export const corporateTabs: { id: CorporateTabId; label: string }[] = [

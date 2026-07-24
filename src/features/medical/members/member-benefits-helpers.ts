@@ -57,13 +57,24 @@ function parseRequiredInt(value: string | undefined, label: string) {
 }
 
 function parseOptionalDecimal(value: string | undefined, label: string) {
-  const trimmed = value?.trim();
+  const trimmed = value?.replace(/,/g, "").trim();
   if (!trimmed) return { value: null as string | null };
   const parsed = Number(trimmed);
   if (!Number.isFinite(parsed)) {
     return { error: `${label} must be a number` };
   }
   return { value: String(parsed) };
+}
+
+function formatAmountString(
+  value: { toString(): string } | string | null | undefined
+) {
+  if (value == null) return "";
+  const raw = String(value).trim();
+  if (!raw) return "";
+  const [intPart, fracPart] = raw.split(".");
+  const formattedInt = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  return fracPart != null ? `${formattedInt}.${fracPart}` : formattedInt;
 }
 
 function parseOptionalDate(value: string | undefined, label: string) {
@@ -361,7 +372,7 @@ export function memberBenefitToFormValues(row: {
     memberNo: row.memberNo,
     benefit: intToString(row.benefit),
     anniv: intToString(row.anniv) || "1",
-    policyLimit: decimalToString(row.policyLimit),
+    policyLimit: formatAmountString(row.policyLimit),
     sharing: intToString(row.sharing),
     reInsurer: intToString(row.reInsurer),
     subLimitOf: intToString(row.subLimitOf),
@@ -386,7 +397,7 @@ export function memberBenefitToFormValues(row: {
     statusUser: row.statusUser ?? "",
     verifyStatus: intToString(row.verifyStatus),
     waitingPeriod: intToString(row.waitingPeriod),
-    bedLimit: decimalToString(row.bedLimit),
+    bedLimit: formatAmountString(row.bedLimit),
     sync: intToString(row.sync),
     allocateTo: intToString(row.allocateTo),
   };
