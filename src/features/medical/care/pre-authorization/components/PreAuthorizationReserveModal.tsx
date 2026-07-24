@@ -37,8 +37,8 @@ export function PreAuthorizationReserveModal({
     subjectName?.trim() || row?.memberName?.trim() || null;
   const description = row
     ? resolvedSubject
-      ? `Preauth Number #${row.code} for ${resolvedSubject}`
-      : `Preauth Number #${row.code}`
+      ? `Preauth Ref #${row.code} for ${resolvedSubject}`
+      : `Preauth Ref #${row.code}`
     : undefined;
   const currentReserve = row?.reserve ?? "0";
 

@@ -72,7 +72,7 @@ function formatPreauthNumberLabel(
   code: number | string,
   subjectName: string | null | undefined
 ) {
-  const base = `Preauth Number #${code}`;
+  const base = `Preauth Ref #${code}`;
   const subject = subjectName?.trim();
   return subject ? `${base} for ${subject}` : base;
 }
@@ -337,7 +337,7 @@ export function PreAuthorizationPageClient({
       <table className={tableClass}>
         <thead className={tableHeadClass}>
           <tr>
-            <th className={compactThClass}>Preauth Number</th>
+            <th className={compactThClass}>Preauth Ref</th>
             <th className={compactThClass}>Member No</th>
             <th className={compactThClass}>Member Name</th>
             <th className={compactThClass}>Provider</th>
