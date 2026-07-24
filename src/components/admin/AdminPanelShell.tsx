@@ -109,7 +109,7 @@ function getMedicalNavItems(base: string): NavItem[] {
           match: (pathname) => pathname.startsWith(`${members}/upload`),
         },
         {
-          href: `${members}/reports`,
+          href: `${members}/reports?manage=1`,
           label: "Reports",
           match: (pathname) => pathname.startsWith(`${members}/reports`),
         },

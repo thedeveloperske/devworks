@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useCallback, useEffect } from "react";
 import {
   Ban,
   Building2,
@@ -10,6 +12,7 @@ import {
   UserCheck,
   type LucideIcon,
 } from "lucide-react";
+import { Modal } from "@/components/admin/Modal";
 import { PageHeader } from "@/components/admin/PageHeader";
 
 type MemberReportItem = {
@@ -75,17 +78,43 @@ function ReportCard({ item }: { item: MemberReportItem }) {
 }
 
 export function MemberReportsPageClient() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const manageOpen = searchParams.get("manage") === "1";
+
+  const closeManageModal = useCallback(() => {
+    router.push("/admin/medical");
+  }, [router]);
+
+  useEffect(() => {
+    if (searchParams.get("manage") === "1") return;
+    router.replace(`${pathname}?manage=1`, { scroll: false });
+  }, [pathname, router, searchParams]);
+
   return (
-    <div className="flex flex-col gap-4">
-      <PageHeader
-        title="Reports"
-        description="Member management reports"
-      />
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {reportItems.map((item) => (
-          <ReportCard key={item.href} item={item} />
-        ))}
+    <div className={`relative ${manageOpen ? "min-h-[calc(100dvh-13rem)]" : ""}`}>
+      <div className={manageOpen ? "pointer-events-none opacity-40" : undefined}>
+        <PageHeader
+          title="Reports"
+          description="Open Reports from Members to view member management reports"
+        />
       </div>
+
+      <Modal
+        open={manageOpen}
+        onClose={closeManageModal}
+        title="Member Reports"
+        description="Select a report to open"
+      >
+        <div className="min-h-0 flex-1 overflow-y-auto py-2">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {reportItems.map((item) => (
+              <ReportCard key={item.href} item={item} />
+            ))}
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }
