@@ -16,6 +16,7 @@ type RenewCorporatePageClientProps = {
   agentOptions: LookupOption[];
   benefitOptions: LookupOption[];
   categoryOptions: LookupOption[];
+  hospitalWardOptions: LookupOption[];
   providerOptions: LookupOption[];
 };
 
@@ -35,6 +36,7 @@ export function RenewCorporatePageClient({
   agentOptions,
   benefitOptions,
   categoryOptions,
+  hospitalWardOptions,
   providerOptions,
 }: RenewCorporatePageClientProps) {
   const router = useRouter();
@@ -163,6 +165,7 @@ export function RenewCorporatePageClient({
         agentOptions={agentOptions}
         benefitOptions={benefitOptions}
         categoryOptions={categoryOptions}
+        hospitalWardOptions={hospitalWardOptions}
         providerOptions={providerOptions}
         onClose={closeRenewModal}
         onSuccess={handleRenewSaved}

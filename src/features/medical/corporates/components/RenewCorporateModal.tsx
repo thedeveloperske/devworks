@@ -32,6 +32,7 @@ type RenewCorporateModalProps = {
   agentOptions: LookupOption[];
   benefitOptions: LookupOption[];
   categoryOptions: LookupOption[];
+  hospitalWardOptions: LookupOption[];
   providerOptions: LookupOption[];
   onClose: () => void;
   onSuccess: () => void;
@@ -68,6 +69,7 @@ export function RenewCorporateModal({
   agentOptions,
   benefitOptions,
   categoryOptions,
+  hospitalWardOptions,
   providerOptions,
   onClose,
   onSuccess,
@@ -336,6 +338,7 @@ export function RenewCorporateModal({
           sharing: row.sharing,
           copayAmount: row.copayAmount,
           waitingPeriod: row.waitingPeriod,
+          hospitalWard: row.hospitalWard,
           anniv: coverDateForm.anniv || "1",
         })),
         providerRestrictions: providerRestrictionRows
@@ -469,6 +472,7 @@ export function RenewCorporateModal({
             rows={categoryGroupRows}
             benefitOptions={benefitOptions}
             categoryOptions={categoryOptions}
+            hospitalWardOptions={hospitalWardOptions}
             coverDateAnniv={coverDateForm.anniv || "1"}
             onRowChange={handleCategoryGroupRowChange}
             onAddRow={() =>

@@ -90,6 +90,7 @@ export type CategoryGroupInput = {
   sharing?: string;
   copayAmount?: string;
   waitingPeriod?: string;
+  hospitalWard?: string;
 };
 
 export type CategoryGroupFormData = {
@@ -103,6 +104,7 @@ export type CategoryGroupFormData = {
   sharing: string;
   copayAmount: string;
   waitingPeriod: string;
+  hospitalWard: string;
 };
 
 export type ProviderRestrictionInput = {

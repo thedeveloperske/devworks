@@ -55,7 +55,8 @@ export function hasCategoryGroupRowInput(group?: CategoryGroupInput) {
       group.subLimitOf?.trim() ||
       group.sharing?.trim() ||
       group.copayAmount?.trim() ||
-      group.waitingPeriod?.trim()
+      group.waitingPeriod?.trim() ||
+      group.hospitalWard?.trim()
   );
 }
 
@@ -71,6 +72,7 @@ type CategoryGroupSyncRow = {
   sharing: number | null;
   copayAmount: number | null;
   waitingPeriod: number | null;
+  hospitalWard: number | null;
 };
 
 type BuildCategoryGroupsResult =
@@ -110,6 +112,7 @@ function buildCategoryGroupRowData(
     { key: "subLimitOf", label: "Sub limit of" },
     { key: "sharing", label: "Sharing" },
     { key: "waitingPeriod", label: "Waiting period" },
+    { key: "hospitalWard", label: "Hospital ward" },
   ];
 
   const ints: Record<string, number | null> = {};
@@ -161,6 +164,7 @@ function buildCategoryGroupRowData(
       sharing: ints.sharing,
       copayAmount: decimals.copayAmount,
       waitingPeriod: ints.waitingPeriod,
+      hospitalWard: ints.hospitalWard,
     },
   };
 }
@@ -215,8 +219,9 @@ export function corpGroupToFormValues(group: {
   sharing: number | null;
   copayAmount: Prisma.Decimal | null;
   waitingPeriod: number | null;
+  hospitalWard?: number | null;
 }): CategoryGroupFormData {
-  const intToString = (value: number | null) =>
+  const intToString = (value: number | null | undefined) =>
     value != null ? String(value) : "";
 
   return {
@@ -230,6 +235,7 @@ export function corpGroupToFormValues(group: {
     sharing: intToString(group.sharing),
     copayAmount: decimalToString(group.copayAmount),
     waitingPeriod: intToString(group.waitingPeriod),
+    hospitalWard: intToString(group.hospitalWard),
   };
 }
 
@@ -245,6 +251,7 @@ const managedCategoryGroupFields = {
   sharing: true,
   copayAmount: true,
   waitingPeriod: true,
+  hospitalWard: true,
 } as const;
 
 export async function syncCorpGroups(

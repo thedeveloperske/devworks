@@ -66,6 +66,7 @@ export const defaultCategoryGroupForm: CategoryGroupFormData = {
   sharing: "",
   copayAmount: "",
   waitingPeriod: "",
+  hospitalWard: "",
 };
 
 export function createEmptyCategoryGroupRow(): CategoryGroupFormData {
@@ -168,6 +169,7 @@ export const categoryGroupFields = [
   { name: "sharing", label: "Sharing" },
   { name: "copayAmount", label: "Copay Amount", type: "number" },
   { name: "waitingPeriod", label: "Waiting Period" },
+  { name: "hospitalWard", label: "Hospital Ward" },
 ] satisfies CategoryGroupField[];
 
 export const providerRestrictionFields = [

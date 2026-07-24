@@ -11,6 +11,7 @@ type CategoriesFormProps = {
   rows: CategoryGroupFormData[];
   benefitOptions: LookupOption[];
   categoryOptions: LookupOption[];
+  hospitalWardOptions: LookupOption[];
   coverDateAnniv: string;
   onRowChange: (
     index: number,
@@ -79,6 +80,7 @@ function renderCell(
   rowIndex: number,
   benefitOptions: LookupOption[],
   categoryOptions: LookupOption[],
+  hospitalWardOptions: LookupOption[],
   coverDateAnniv: string,
   onRowChange: CategoriesFormProps["onRowChange"],
   fieldInputClass: string
@@ -123,6 +125,19 @@ function renderCell(
       row[field.name],
       benefitOptions,
       field.name === "benefit" ? "Select benefit" : "Select sub limit of",
+      selectClass,
+      (e) => onRowChange(rowIndex, e)
+    );
+  }
+
+  if (field.name === "hospitalWard") {
+    return renderSelect(
+      fieldId,
+      field.name,
+      field.label,
+      row.hospitalWard,
+      hospitalWardOptions,
+      "Select hospital ward",
       selectClass,
       (e) => onRowChange(rowIndex, e)
     );
@@ -173,6 +188,7 @@ export function CategoriesForm({
   rows,
   benefitOptions,
   categoryOptions,
+  hospitalWardOptions,
   coverDateAnniv,
   onRowChange,
   onAddRow,
@@ -248,6 +264,7 @@ export function CategoriesForm({
                         rowIndex,
                         benefitOptions,
                         categoryOptions,
+                        hospitalWardOptions,
                         coverDateAnniv,
                         onRowChange,
                         fieldInputClass

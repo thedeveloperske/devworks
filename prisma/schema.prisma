@@ -159,6 +159,7 @@ model CorpGroup {
   status           Int?
   statusUser       String?    @map("status_user") @db.VarChar(15)
   waitingPeriod    Int?       @map("waiting_period")
+  hospitalWard     Int?       @map("hospital_ward")
   sync             Int?
   deactivate       Int?
   activationSync   Int?       @map("activation_sync")

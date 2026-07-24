@@ -8,6 +8,7 @@ async function CorporatesContent() {
     agentOptions,
     benefitOptions,
     categoryOptions,
+    hospitalWardOptions,
     providerOptions,
   } = await loadCorporatesPageData();
   return (
@@ -16,6 +17,7 @@ async function CorporatesContent() {
       agentOptions={agentOptions}
       benefitOptions={benefitOptions}
       categoryOptions={categoryOptions}
+      hospitalWardOptions={hospitalWardOptions}
       providerOptions={providerOptions}
     />
   );

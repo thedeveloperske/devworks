@@ -3,6 +3,7 @@ import { corpAnniversaryToRenewalListItem } from "../cover-date-helpers";
 import { loadAgentOptions } from "@/features/medical/admin/agents/server/load-page-data";
 import { loadBenefitOptions } from "@/features/medical/admin/benefits/server/load-page-data";
 import { loadCategoryTypeOptions } from "@/features/medical/admin/categories/server/load-page-data";
+import { loadHospitalWardOptions } from "@/features/medical/admin/hospital-wards/server/load-page-data";
 import { loadProviderOptions } from "@/features/medical/admin/providers/server/load-page-data";
 import { prisma } from "@/lib/prisma";
 
@@ -17,6 +18,7 @@ export async function loadCorporatesPageData() {
     agentOptions,
     benefitOptions,
     categoryOptions,
+    hospitalWardOptions,
     providerOptions,
   ] = await Promise.all([
     prisma.corporate.findMany({
@@ -45,6 +47,7 @@ export async function loadCorporatesPageData() {
     loadAgentOptions(),
     loadBenefitOptions(),
     loadCategoryTypeOptions(),
+    loadHospitalWardOptions(),
     loadProviderOptions(),
   ]);
 
@@ -87,6 +90,7 @@ export async function loadCorporatesPageData() {
     agentOptions,
     benefitOptions,
     categoryOptions,
+    hospitalWardOptions,
     providerOptions,
   };
 }

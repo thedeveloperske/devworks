@@ -56,6 +56,7 @@ type CorporateFormProps = {
   agentOptions: LookupOption[];
   benefitOptions: LookupOption[];
   categoryOptions: LookupOption[];
+  hospitalWardOptions: LookupOption[];
   providerOptions: LookupOption[];
   onSuccess?: () => void;
   onCancel?: () => void;
@@ -73,6 +74,7 @@ export function CorporateForm({
   agentOptions,
   benefitOptions,
   categoryOptions,
+  hospitalWardOptions,
   providerOptions,
   onSuccess,
   onCancel,
@@ -304,6 +306,7 @@ export function CorporateForm({
           sharing: row.sharing,
           copayAmount: row.copayAmount,
           waitingPeriod: row.waitingPeriod,
+          hospitalWard: row.hospitalWard,
         })),
         providerRestrictions: providerRestrictionRows
           .filter((row) => hasProviderRestrictionRowInput(row))
@@ -462,6 +465,7 @@ export function CorporateForm({
             rows={categoryGroupRows}
             benefitOptions={benefitOptions}
             categoryOptions={categoryOptions}
+            hospitalWardOptions={hospitalWardOptions}
             coverDateAnniv={coverDateForm.anniv || "1"}
             onRowChange={handleCategoryGroupRowChange}
             onAddRow={handleAddCategoryGroupRow}

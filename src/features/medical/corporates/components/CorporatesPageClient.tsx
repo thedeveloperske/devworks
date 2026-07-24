@@ -34,6 +34,7 @@ type CorporatesPageClientProps = {
   agentOptions: LookupOption[];
   benefitOptions: LookupOption[];
   categoryOptions: LookupOption[];
+  hospitalWardOptions: LookupOption[];
   providerOptions: LookupOption[];
 };
 
@@ -54,6 +55,7 @@ export function CorporatesPageClient({
   agentOptions,
   benefitOptions,
   categoryOptions,
+  hospitalWardOptions,
   providerOptions,
 }: CorporatesPageClientProps) {
   const router = useRouter();
@@ -352,6 +354,7 @@ export function CorporatesPageClient({
             agentOptions={agentOptions}
             benefitOptions={benefitOptions}
             categoryOptions={categoryOptions}
+            hospitalWardOptions={hospitalWardOptions}
             providerOptions={providerOptions}
             onSuccess={handleSaved}
             onCancel={closeCorporateModal}
@@ -374,6 +377,7 @@ export function CorporatesPageClient({
             agentOptions={agentOptions}
             benefitOptions={benefitOptions}
             categoryOptions={categoryOptions}
+            hospitalWardOptions={hospitalWardOptions}
             providerOptions={providerOptions}
             onSuccess={handleSaved}
             onCancel={closeCorporateModal}

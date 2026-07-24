@@ -11,7 +11,7 @@ export async function loadHospitalWardOptions(): Promise<LookupOption[]> {
 
   return wards.map((item) => ({
     value: String(item.code),
-    label: `${item.code} — ${item.ward}`,
+    label: item.ward,
   }));
 }
 

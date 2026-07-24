@@ -8,6 +8,7 @@ async function RenewCorporateContent() {
     agentOptions,
     benefitOptions,
     categoryOptions,
+    hospitalWardOptions,
     providerOptions,
   } = await loadCorporatesPageData();
 
@@ -17,6 +18,7 @@ async function RenewCorporateContent() {
       agentOptions={agentOptions}
       benefitOptions={benefitOptions}
       categoryOptions={categoryOptions}
+      hospitalWardOptions={hospitalWardOptions}
       providerOptions={providerOptions}
     />
   );
