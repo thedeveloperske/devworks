@@ -203,7 +203,7 @@ export function PreAuthorizationForm({
     : "w-full space-y-6 border border-slate-200 bg-white p-6";
 
   const fieldGrid = embedded
-    ? "grid grid-cols-1 gap-x-3 gap-y-1.5 sm:grid-cols-2 lg:grid-cols-4"
+    ? "grid grid-cols-1 gap-x-3 gap-y-1.5 sm:grid-cols-2 lg:grid-cols-12"
     : "grid grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-2 lg:grid-cols-3";
 
   const fieldLabelClass = embedded
