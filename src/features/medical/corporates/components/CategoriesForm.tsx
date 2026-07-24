@@ -3,7 +3,10 @@
 import { Button } from "@/components/admin/Button";
 import { Switch } from "@/components/admin/Switch";
 import { categoryGroupFields } from "@/features/medical/corporates";
-import type { CategoryGroupFormData } from "@/features/medical/corporates";
+import type {
+  CategoryGroupField,
+  CategoryGroupFormData,
+} from "@/features/medical/corporates";
 import { benefitSharingOptions, fundOn } from "@/features/medical/lookups";
 import type { LookupOption } from "@/features/medical/lookups/types";
 import { formatThousands } from "@/lib/format";
@@ -40,7 +43,7 @@ const thClass =
   "whitespace-nowrap border-b border-slate-200 px-2 py-1.5 text-left text-[12px] font-bold uppercase tracking-wider text-slate-500";
 const tdClass = "border-b border-slate-200 px-1 py-1.5 align-middle";
 
-function getColumnWidth(fieldName: (typeof categoryGroupFields)[number]["name"]) {
+function getColumnWidth(fieldName: CategoryGroupField["name"]) {
   return fieldName === "anniv" ? annivColumnWidth : columnMinWidth;
 }
 
@@ -76,7 +79,7 @@ function renderSelect(
 }
 
 function renderCell(
-  field: (typeof categoryGroupFields)[number],
+  field: CategoryGroupField,
   row: CategoryGroupFormData,
   rowIndex: number,
   benefitOptions: LookupOption[],
