@@ -7,14 +7,16 @@ import { FormError } from "@/components/admin/FormError";
 import { FormField } from "@/components/admin/FormField";
 import {
   defaultPreAuthorizationForm,
+  getDateReportedCoverPeriodError,
   getPreAuthorizationFields,
   preAuthorizationFormSections,
   type PreAuthorizationField,
   type PreAuthorizationFormData,
   type PreAuthorizationMemberBenefitOption,
+  type PreAuthorizationMemberCoverPeriod,
 } from "@/features/medical/care/pre-authorization";
 import type { LookupOption } from "@/features/medical/lookups/types";
-import { formatThousands } from "@/lib/format";
+import { formatDate, formatThousands } from "@/lib/format";
 import { inputClass, labelClass } from "@/lib/form-styles";
 
 type PreAuthorizationFormProps = {
@@ -24,6 +26,8 @@ type PreAuthorizationFormProps = {
   hospitalWardOptions: LookupOption[];
   /** Member benefits for the selected member (all anniversaries). */
   memberBenefits?: PreAuthorizationMemberBenefitOption[];
+  /** Cover periods from member_anniversary for the selected member. */
+  coverPeriods?: PreAuthorizationMemberCoverPeriod[];
   lockMemberNo?: boolean;
   embedded?: boolean;
   onSuccess?: () => void;
@@ -42,6 +46,7 @@ export function PreAuthorizationForm({
   providerOptions,
   hospitalWardOptions,
   memberBenefits = [],
+  coverPeriods = [],
   lockMemberNo = false,
   embedded = false,
   onSuccess,
@@ -60,6 +65,32 @@ export function PreAuthorizationForm({
     if (!anniv) return memberBenefits;
     return memberBenefits.filter((benefit) => benefit.anniv === anniv);
   }, [form.anniv, memberBenefits]);
+
+  const activeCoverPeriod = useMemo(() => {
+    const anniv = form.anniv.trim();
+    if (!anniv) return null;
+    return coverPeriods.find((period) => period.anniv === anniv) ?? null;
+  }, [coverPeriods, form.anniv]);
+
+  const dateReportedCoverError = useMemo(
+    () =>
+      getDateReportedCoverPeriodError(form.dateReported, activeCoverPeriod),
+    [activeCoverPeriod, form.dateReported]
+  );
+
+  const dateReportedHint = useMemo(() => {
+    if (!activeCoverPeriod) return undefined;
+    const start = activeCoverPeriod.startDate
+      ? formatDate(activeCoverPeriod.startDate)
+      : null;
+    const end = activeCoverPeriod.endDate
+      ? formatDate(activeCoverPeriod.endDate)
+      : null;
+    if (start && end) return `Cover period: ${start} – ${end}`;
+    if (start) return `Cover starts: ${start}`;
+    if (end) return `Cover ends: ${end}`;
+    return "No cover dates set for this anniversary";
+  }, [activeCoverPeriod]);
 
   const authorityTypeOptions = useMemo(
     () =>
@@ -130,6 +161,16 @@ export function PreAuthorizationForm({
     e.preventDefault();
     setLoading(true);
     setError("");
+
+    const coverError = getDateReportedCoverPeriodError(
+      form.dateReported,
+      activeCoverPeriod
+    );
+    if (coverError) {
+      setError(coverError);
+      setLoading(false);
+      return;
+    }
 
     const url = preAuthorizationId
       ? `/api/medical/care/pre-authorization/${preAuthorizationId}`
@@ -208,12 +249,36 @@ export function PreAuthorizationForm({
             (lockMemberNo && field.name === "memberNo") ||
             (isAuthorityType && authorityTypeOptions.length === 0)
           }
+          min={
+            field.name === "dateReported"
+              ? activeCoverPeriod?.startDate || undefined
+              : undefined
+          }
+          max={
+            field.name === "dateReported"
+              ? activeCoverPeriod?.endDate || undefined
+              : undefined
+          }
+          hint={
+            field.name === "dateReported"
+              ? dateReportedCoverError
+                ? dateReportedCoverError
+                : dateReportedHint
+              : undefined
+          }
+          hintClassName={
+            field.name === "dateReported" && dateReportedCoverError
+              ? "mt-0.5 text-[11px] text-red-600"
+              : undefined
+          }
           inputClassName={
             amountFields.has(field.name)
               ? `${fieldInputClass} text-right`
               : lockMemberNo && field.name === "memberNo"
                 ? `${fieldInputClass} cursor-not-allowed bg-slate-50 text-slate-600`
-                : fieldInputClass
+                : field.name === "dateReported" && dateReportedCoverError
+                  ? `${fieldInputClass} border-red-400`
+                  : fieldInputClass
           }
           selectClassName={`${fieldInputClass} h-[30px]${
             isAuthorityType && authorityTypeOptions.length === 0

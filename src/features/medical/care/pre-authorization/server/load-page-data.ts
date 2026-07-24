@@ -7,6 +7,7 @@ import type {
   PreAuthorizationCorporateOption,
   PreAuthorizationListItem,
   PreAuthorizationMemberBenefitOption,
+  PreAuthorizationMemberCoverPeriod,
   PreAuthorizationMemberOption,
 } from "../types";
 
@@ -56,7 +57,12 @@ export async function loadPreAuthorizationPageData() {
       orderBy: [{ familyNo: "asc" }, { memberNo: "asc" }],
     }),
     prisma.memberAnniversary.findMany({
-      select: { memberNo: true, anniv: true },
+      select: {
+        memberNo: true,
+        anniv: true,
+        startDate: true,
+        endDate: true,
+      },
       orderBy: { anniv: "desc" },
     }),
     prisma.memberBenefit.findMany({
@@ -112,9 +118,22 @@ export async function loadPreAuthorizationPageData() {
   );
 
   const latestAnnivByMemberNo = new Map<string, string>();
+  const coverPeriodsByMemberNo = new Map<
+    string,
+    PreAuthorizationMemberCoverPeriod[]
+  >();
   for (const row of anniversaries) {
-    if (latestAnnivByMemberNo.has(row.memberNo)) continue;
-    latestAnnivByMemberNo.set(row.memberNo, String(row.anniv));
+    const anniv = String(row.anniv);
+    if (!latestAnnivByMemberNo.has(row.memberNo)) {
+      latestAnnivByMemberNo.set(row.memberNo, anniv);
+    }
+    const periods = coverPeriodsByMemberNo.get(row.memberNo) ?? [];
+    periods.push({
+      anniv,
+      startDate: formatDateIso(row.startDate) ?? "",
+      endDate: formatDateIso(row.endDate) ?? "",
+    });
+    coverPeriodsByMemberNo.set(row.memberNo, periods);
   }
 
   const benefitsByMemberNo = new Map<
@@ -167,6 +186,7 @@ export async function loadPreAuthorizationPageData() {
       anniv: latestAnnivByMemberNo.get(info.memberNo) ?? "",
       cancelled: info.cancelled,
       benefits: benefitsByMemberNo.get(info.memberNo) ?? [],
+      coverPeriods: coverPeriodsByMemberNo.get(info.memberNo) ?? [],
     };
   });
 

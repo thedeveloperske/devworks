@@ -26,6 +26,10 @@ type FormFieldProps = {
   inputClassName?: string;
   selectClassName?: string;
   disabled?: boolean;
+  min?: string;
+  max?: string;
+  hint?: string;
+  hintClassName?: string;
 };
 
 export function FormField({
@@ -45,6 +49,10 @@ export function FormField({
   inputClassName = "w-full border border-slate-300 bg-white px-3 py-2 text-[12px] text-slate-900 placeholder:text-slate-400 focus:border-maroon focus:outline-none",
   selectClassName,
   disabled = false,
+  min,
+  max,
+  hint,
+  hintClassName = "mt-0.5 text-[11px] text-slate-500",
 }: FormFieldProps) {
   return (
     <div>
@@ -89,9 +97,12 @@ export function FormField({
           onChange={onChange}
           placeholder={placeholder}
           disabled={disabled}
+          min={min}
+          max={max}
           className={inputClassName}
         />
       )}
+      {hint ? <p className={hintClassName}>{hint}</p> : null}
     </div>
   );
 }

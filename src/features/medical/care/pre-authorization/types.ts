@@ -55,6 +55,12 @@ export type PreAuthorizationMemberBenefitOption = {
   hospitalWard: string;
 };
 
+export type PreAuthorizationMemberCoverPeriod = {
+  anniv: string;
+  startDate: string;
+  endDate: string;
+};
+
 export type PreAuthorizationMemberOption = {
   memberNo: string;
   familyNo: string;
@@ -65,6 +71,7 @@ export type PreAuthorizationMemberOption = {
   anniv: string;
   cancelled: number | null;
   benefits: PreAuthorizationMemberBenefitOption[];
+  coverPeriods: PreAuthorizationMemberCoverPeriod[];
 };
 
 export type PreAuthorizationField = {
