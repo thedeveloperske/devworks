@@ -53,6 +53,7 @@ type CorporateContext = {
       sharing: string;
       fund: string;
       waitingPeriod: string;
+      hospitalWard: string;
       subLimitOf: string;
     }>
   >;
