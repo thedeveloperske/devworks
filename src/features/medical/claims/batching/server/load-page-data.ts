@@ -18,9 +18,21 @@ export async function loadClaimsBatchingPageData(): Promise<{
 }> {
   const cookieStore = await cookies();
   const session = await verifySessionToken(cookieStore.get(SESSION_COOKIE)?.value);
-  // Session `email` holds the login username.
-  const currentUsername = session?.email ?? "";
-
+  let currentUsername = "";
+  if (session?.userId) {
+    const userId = Number.parseInt(session.userId, 10);
+    if (!Number.isNaN(userId)) {
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { username: true },
+      });
+      currentUsername = user?.username?.trim() ?? "";
+    }
+  }
+  if (!currentUsername) {
+    // Session `email` holds the login username as a fallback.
+    currentUsername = session?.email ?? "";
+  }
   const [rows, providers, userOptions] = await Promise.all([
     prisma.claimsBatch.findMany({
       orderBy: [{ batchDate: "desc" }, { idx: "desc" }],

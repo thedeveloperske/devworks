@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { buildAssignVetterData } from "@/features/medical/claims/batching/build-assign-vetter-data";
 import { hasEntrantAssigned } from "@/features/medical/claims/batching/batch-workflow";
+import { resolveSystemUsername } from "@/features/medical/claims/batching/resolve-system-username";
 import { prisma } from "@/lib/prisma";
 
 type RouteParams = { params: Promise<{ id: string }> };
@@ -45,9 +46,20 @@ export async function PATCH(request: Request, { params }: RouteParams) {
       return result.error;
     }
 
+    const username = await resolveSystemUsername(result.data.vettingUser);
+    if (!username) {
+      return NextResponse.json(
+        { error: "Select a valid system username for the vetter" },
+        { status: 400 }
+      );
+    }
+
     const batch = await prisma.claimsBatch.update({
       where: { idx: batchId },
-      data: result.data,
+      data: {
+        vettingUser: username,
+        vettingUserDate: result.data.vettingUserDate,
+      },
     });
 
     return NextResponse.json(batch);

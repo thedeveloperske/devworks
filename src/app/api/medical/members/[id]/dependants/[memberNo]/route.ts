@@ -8,6 +8,7 @@ import {
   memberAcceptanceToFormValues,
   memberAnniversaryToFormValues,
   memberBenefitToFormValues,
+  memberCancellationToHistoryRow,
   memberInfoToFormValues,
   memberMedicalToFormValues,
   syncMemberAnniversaries,
@@ -67,8 +68,13 @@ export async function GET(_request: Request, { params }: RouteParams) {
 
   const { principal, memberInfo } = context;
 
-  const [memberMedical, memberBenefits, memberAnniversaries, memberAcceptance] =
-    await Promise.all([
+  const [
+    memberMedical,
+    memberBenefits,
+    memberAnniversaries,
+    memberAcceptance,
+    memberCancellations,
+  ] = await Promise.all([
       prisma.memberMedical.findFirst({
         where: { memberNo: memberInfo.memberNo },
         orderBy: { anniv: "desc" },
@@ -84,6 +90,10 @@ export async function GET(_request: Request, { params }: RouteParams) {
       prisma.memberAcceptance.findUnique({
         where: { memberNo: memberInfo.memberNo },
       }),
+      prisma.memberCancellation.findMany({
+        where: { memberNo: memberInfo.memberNo },
+        orderBy: [{ dateCan: "desc" }, { idx: "desc" }],
+      }),
     ]);
 
   return NextResponse.json({
@@ -97,6 +107,7 @@ export async function GET(_request: Request, { params }: RouteParams) {
       : null,
     benefits: memberBenefits.map(memberBenefitToFormValues),
     coverHistory: memberAnniversaries.map(memberAnniversaryToFormValues),
+    cancellationHistory: memberCancellations.map(memberCancellationToHistoryRow),
     acceptance: memberAcceptance
       ? memberAcceptanceToFormValues(memberAcceptance)
       : null,

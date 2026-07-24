@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { buildAssignAuthorizerData } from "@/features/medical/claims/batching/build-assign-authorizer-data";
 import { hasVetterAssigned } from "@/features/medical/claims/batching/batch-workflow";
+import { resolveSystemUsername } from "@/features/medical/claims/batching/resolve-system-username";
 import { prisma } from "@/lib/prisma";
 
 type RouteParams = { params: Promise<{ id: string }> };
@@ -45,9 +46,20 @@ export async function PATCH(request: Request, { params }: RouteParams) {
       return result.error;
     }
 
+    const username = await resolveSystemUsername(result.data.authorisingUser);
+    if (!username) {
+      return NextResponse.json(
+        { error: "Select a valid system username for the authorizer" },
+        { status: 400 }
+      );
+    }
+
     const batch = await prisma.claimsBatch.update({
       where: { idx: batchId },
-      data: result.data,
+      data: {
+        authorisingUser: username,
+        authorisingUserDate: result.data.authorisingUserDate,
+      },
     });
 
     return NextResponse.json(batch);

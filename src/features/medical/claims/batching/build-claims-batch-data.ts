@@ -113,15 +113,11 @@ export function buildClaimsBatchUpdateData(body: Partial<ClaimsBatchFormData>) {
   const batchNoResult = parseOptionalString(body.batchNo, 10);
   if (isBuildError(batchNoResult)) return batchNoResult;
 
-  const batchUserResult = parseOptionalString(body.batchUser, 100);
-  if (isBuildError(batchUserResult)) return batchUserResult;
-
-  // Workflow assignments are updated only via dedicated assign endpoints,
-  // which enforce entrant → vetter → authorizer order.
+  // Workflow assignments are updated only via dedicated assign endpoints.
+  // Batch user is set on create from the signed-in username and is not editable here.
   const data: Prisma.ClaimsBatchUpdateInput = {
     batchNo: batchNoResult,
     batchDate: batchDateResult.date,
-    batchUser: batchUserResult,
     claimsCount: claimsCountResult.count,
     provider: providerResult.provider,
     dateReceived: dateReceivedResult.date,

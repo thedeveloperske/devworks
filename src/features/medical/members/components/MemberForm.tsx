@@ -29,6 +29,7 @@ import {
   type MemberAcceptanceFormData,
   type MemberAnniversaryFormData,
   type MemberBenefitFormData,
+  type MemberCancellationHistoryRow,
   type MembersCorpGroupBenefit,
   type MemberPrincipalTabId,
   type PrincipalInformationFormData,
@@ -48,6 +49,7 @@ type MemberFormProps = {
   initialMedicalDetails?: Partial<MedicalDetailsFormData>;
   initialBenefits?: MemberBenefitFormData[];
   initialCoverHistory?: MemberAnniversaryFormData[];
+  initialCancellationHistory?: MemberCancellationHistoryRow[];
   initialAcceptance?: Partial<MemberAcceptanceFormData>;
   initialDependants?: FamilyDependantRow[];
   memberId?: string;
@@ -87,6 +89,7 @@ export function MemberForm({
   initialMedicalDetails,
   initialBenefits,
   initialCoverHistory,
+  initialCancellationHistory = [],
   initialAcceptance,
   initialDependants = [],
   memberId,
@@ -739,7 +742,12 @@ export function MemberForm({
           />
         );
       case "miscellaneous":
-        return <MiscellaneousTab />;
+        return (
+          <MiscellaneousTab
+            rows={initialCancellationHistory}
+            showCancellationHistory={Boolean(memberId)}
+          />
+        );
     }
   })();
 

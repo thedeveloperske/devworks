@@ -10,18 +10,17 @@ export async function loadUserOptions(): Promise<LookupOption[]> {
       status: USER_STATUS_ACTIVE,
       username: { not: null },
     },
-    select: { username: true, fullName: true },
-    orderBy: [{ username: "asc" }, { fullName: "asc" }],
+    select: { username: true },
+    orderBy: [{ username: "asc" }],
   });
 
   return users
     .map((row) => {
       const username = row.username?.trim() ?? "";
       if (!username) return null;
-      const fullName = row.fullName?.trim() ?? "";
       return {
         value: username,
-        label: fullName ? `${fullName} (${username})` : username,
+        label: username,
       };
     })
     .filter((option): option is LookupOption => option != null);

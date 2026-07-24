@@ -1,15 +1,31 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { buildClaimsBatchCreateData, nextBatchNo } from "@/features/medical/claims/batching";
+import { resolveSystemUsername } from "@/features/medical/claims/batching/resolve-system-username";
 import { SESSION_COOKIE, verifySessionToken } from "@/lib/auth-session";
 import { prisma } from "@/lib/prisma";
 
 async function resolveBatchUserDefault() {
   const cookieStore = await cookies();
   const session = await verifySessionToken(cookieStore.get(SESSION_COOKIE)?.value);
-  // Session `email` holds the login username.
-  return session?.email ?? undefined;
+  if (!session) return undefined;
+
+  if (session.userId) {
+    const userId = Number.parseInt(session.userId, 10);
+    if (!Number.isNaN(userId)) {
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { username: true },
+      });
+      const username = user?.username?.trim();
+      if (username) return username;
+    }
+  }
+
+  // Session `email` holds the login username as a fallback.
+  return (await resolveSystemUsername(session.email)) ?? session.email ?? undefined;
 }
+
 export async function GET() {
   const batches = await prisma.claimsBatch.findMany({
     orderBy: [{ batchDate: "desc" }, { idx: "desc" }],
@@ -31,7 +47,8 @@ export async function POST(request: Request) {
     if (!createData.batchNo) {
       createData.batchNo = await nextBatchNo(() => prisma.claimsBatch.count());
     }
-    if (!createData.batchUser && batchUserDefault) {
+    // Always persist the signed-in username, never a display/full name from the client.
+    if (batchUserDefault) {
       createData.batchUser = batchUserDefault;
     }
 

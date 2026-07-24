@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { buildAssignFinanceData } from "@/features/medical/claims/batching/build-assign-finance-data";
 import { hasAuthorizerAssigned } from "@/features/medical/claims/batching/batch-workflow";
+import { resolveSystemUsername } from "@/features/medical/claims/batching/resolve-system-username";
 import { prisma } from "@/lib/prisma";
 
 type RouteParams = { params: Promise<{ id: string }> };
@@ -45,9 +46,20 @@ export async function PATCH(request: Request, { params }: RouteParams) {
       return result.error;
     }
 
+    const username = await resolveSystemUsername(result.data.financeUser);
+    if (!username) {
+      return NextResponse.json(
+        { error: "Select a valid system username for finance" },
+        { status: 400 }
+      );
+    }
+
     const batch = await prisma.claimsBatch.update({
       where: { idx: batchId },
-      data: result.data,
+      data: {
+        financeUser: username,
+        financeUserDate: result.data.financeUserDate,
+      },
     });
 
     return NextResponse.json(batch);

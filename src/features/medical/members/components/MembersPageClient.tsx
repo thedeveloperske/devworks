@@ -20,6 +20,7 @@ import {
   type MemberAcceptanceFormData,
   type MemberAnniversaryFormData,
   type MemberBenefitFormData,
+  type MemberCancellationHistoryRow,
   type MemberListItem,
   type MembersCorporateOption,
   type PrincipalInformationFormData,
@@ -45,6 +46,7 @@ type EditMemberState = {
   medicalDetails: MedicalDetailsFormData | null;
   benefits: MemberBenefitFormData[];
   coverHistory: MemberAnniversaryFormData[];
+  cancellationHistory: MemberCancellationHistoryRow[];
   acceptance: MemberAcceptanceFormData | null;
   dependants: FamilyDependantRow[];
   name: string;
@@ -59,6 +61,7 @@ type DependantEditState = {
   medicalDetails: MedicalDetailsFormData | null;
   benefits: MemberBenefitFormData[];
   coverHistory: MemberAnniversaryFormData[];
+  cancellationHistory: MemberCancellationHistoryRow[];
   acceptance: MemberAcceptanceFormData | null;
 };
 
@@ -327,6 +330,7 @@ export function MembersPageClient({
         medicalDetails: null,
         benefits: [],
         coverHistory: [],
+        cancellationHistory: [],
         acceptance: null,
       });
 
@@ -355,6 +359,9 @@ export function MembersPageClient({
                 : [],
               coverHistory: Array.isArray(dependant.coverHistory)
                 ? dependant.coverHistory
+                : [],
+              cancellationHistory: Array.isArray(dependant.cancellationHistory)
+                ? dependant.cancellationHistory
                 : [],
               acceptance: dependant.acceptance ?? null,
             };
@@ -460,6 +467,9 @@ export function MembersPageClient({
           coverHistory: Array.isArray(member.coverHistory)
             ? member.coverHistory
             : [],
+          cancellationHistory: Array.isArray(member.cancellationHistory)
+            ? member.cancellationHistory
+            : [],
           acceptance:
             member.acceptance ??
             ({
@@ -480,6 +490,7 @@ export function MembersPageClient({
           medicalDetails: null,
           benefits: [],
           coverHistory: [],
+          cancellationHistory: [],
           acceptance: null,
           dependants: [],
           name: "",
@@ -502,6 +513,8 @@ export function MembersPageClient({
   const editBenefits = editState?.id === editId ? editState.benefits : [];
   const editCoverHistory =
     editState?.id === editId ? editState.coverHistory : [];
+  const editCancellationHistory =
+    editState?.id === editId ? editState.cancellationHistory : [];
   const editAcceptance =
     editState?.id === editId ? editState.acceptance : null;
   const editDependants =
@@ -791,6 +804,7 @@ export function MembersPageClient({
               }
               initialBenefits={editingDependant.benefits}
               initialCoverHistory={editingDependant.coverHistory}
+              initialCancellationHistory={editingDependant.cancellationHistory}
               initialAcceptance={
                 editingDependant.acceptance ?? {
                   ...defaultMemberAcceptanceForm,
@@ -992,6 +1006,7 @@ export function MembersPageClient({
             }
             initialBenefits={editBenefits}
             initialCoverHistory={editCoverHistory}
+            initialCancellationHistory={editCancellationHistory}
             initialAcceptance={
               editAcceptance ?? {
                 ...defaultMemberAcceptanceForm,

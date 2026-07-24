@@ -14,6 +14,8 @@ export * from "./member-anniversary-types";
 export * from "./member-benefits-constants";
 export * from "./member-benefits-helpers";
 export * from "./member-benefits-types";
+export * from "./member-cancellation-helpers";
+export * from "./member-cancellation-types";
 export * from "./family-dependant-helpers";
 export * from "./family-dependant-types";
 export * from "./family-no-helpers";
