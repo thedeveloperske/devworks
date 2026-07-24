@@ -164,11 +164,6 @@ export function PreAuthorizationPageClient({
     router.push(`${pathname}?manage=1&new=1`, { scroll: false });
   }, [pathname, router]);
 
-  const openCorporateStep = useCallback(() => {
-    setMemberSearchQuery("");
-    router.push(`${pathname}?manage=1&new=1`, { scroll: false });
-  }, [pathname, router]);
-
   const openMembersStep = useCallback(
     (corporateId: string) => {
       setMemberSearchQuery("");
@@ -390,21 +385,7 @@ export function PreAuthorizationPageClient({
 
   const membersStep = (
     <div className="flex min-h-0 flex-1 flex-col gap-3">
-      <div className="flex shrink-0 flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center">
-          <Button
-            type="button"
-            variant="secondary"
-            size="sm"
-            onClick={openCorporateStep}
-            className="w-full shrink-0 sm:w-auto"
-          >
-            Back
-          </Button>
-          <p className="min-w-0 wrap-break-word text-[12px] text-slate-600 sm:truncate">
-            {selectedCorporate?.corporate ?? "Members"}
-          </p>
-        </div>
+      <div className="flex shrink-0 items-center justify-end gap-2">
         <input
           type="search"
           value={memberSearchQuery}
@@ -463,51 +444,25 @@ export function PreAuthorizationPageClient({
   );
 
   const formStep = selectedMember ? (
-    <div className="flex min-h-0 flex-1 flex-col gap-3">
-      <div className="flex shrink-0 flex-col gap-2 sm:flex-row sm:items-center">
-        <Button
-          type="button"
-          variant="secondary"
-          size="sm"
-          onClick={() => openMembersStep(selectedCorporateId)}
-          className="w-full shrink-0 sm:w-auto"
-        >
-          Back
-        </Button>
-        <p className="min-w-0 wrap-break-word text-[12px] text-slate-600 sm:truncate">
-          {selectedMember.name} ({selectedMember.memberNo})
-          {selectedCorporate?.corporate
-            ? ` · ${selectedCorporate.corporate}`
-            : ""}
-        </p>
-      </div>
-      <div className="flex min-h-0 min-w-0 flex-1 flex-col">
-        <PreAuthorizationForm
-          key={selectedMember.memberNo}
-          embedded
-          lockMemberNo
-          initial={{
-            memberNo: selectedMember.memberNo,
-            anniv: selectedMember.anniv,
-          }}
-          memberBenefits={selectedMember.benefits}
-          coverPeriods={selectedMember.coverPeriods}
-          providerOptions={providerOptions}
-          hospitalWardOptions={hospitalWardOptions}
-          onSuccess={handleSaved}
-          onCancel={closeFormModal}
-        />
-      </div>
+    <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+      <PreAuthorizationForm
+        key={selectedMember.memberNo}
+        embedded
+        lockMemberNo
+        initial={{
+          memberNo: selectedMember.memberNo,
+          anniv: selectedMember.anniv,
+        }}
+        memberBenefits={selectedMember.benefits}
+        coverPeriods={selectedMember.coverPeriods}
+        providerOptions={providerOptions}
+        hospitalWardOptions={hospitalWardOptions}
+        onSuccess={handleSaved}
+        onCancel={closeFormModal}
+      />
     </div>
   ) : (
-    <div className="flex min-h-0 flex-1 flex-col gap-3">
-      <div className="flex shrink-0 items-center gap-2">
-        <Button type="button" variant="secondary" size="sm" onClick={openCorporateStep}>
-          Back
-        </Button>
-      </div>
-      <p className="text-[12px] text-red-600">Selected member was not found.</p>
-    </div>
+    <p className="text-[12px] text-red-600">Selected member was not found.</p>
   );
 
   const newModalTitle =
