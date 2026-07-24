@@ -1,7 +1,5 @@
-import { PageHeader } from "@/components/admin/PageHeader";
+import { MemberReportsPageClient } from "@/features/medical/members/components";
 
 export default function MemberReportsPage() {
-  return (
-    <PageHeader title="Reports" description="Member reports" />
-  );
+  return <MemberReportsPageClient />;
 }
