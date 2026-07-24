@@ -490,6 +490,7 @@ export function PreAuthorizationPageClient({
             memberNo: selectedMember.memberNo,
             anniv: selectedMember.anniv,
           }}
+          memberBenefits={selectedMember.benefits}
           providerOptions={providerOptions}
           hospitalWardOptions={hospitalWardOptions}
           onSuccess={handleSaved}
@@ -595,6 +596,10 @@ export function PreAuthorizationPageClient({
             embedded
             preAuthorizationId={editId}
             initial={editForm}
+            memberBenefits={
+              members.find((member) => member.memberNo === editForm.memberNo)
+                ?.benefits ?? []
+            }
             providerOptions={providerOptions}
             hospitalWardOptions={hospitalWardOptions}
             onSuccess={handleSaved}

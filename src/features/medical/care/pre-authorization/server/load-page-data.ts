@@ -1,9 +1,12 @@
+import { loadBenefitOptions } from "@/features/medical/admin/benefits/server/load-page-data";
 import { loadHospitalWardOptions } from "@/features/medical/admin/hospital-wards/server/load-page-data";
 import { loadProviderOptions } from "@/features/medical/admin/providers/server/load-page-data";
+import { formatThousands } from "@/lib/format";
 import { prisma } from "@/lib/prisma";
 import type {
   PreAuthorizationCorporateOption,
   PreAuthorizationListItem,
+  PreAuthorizationMemberBenefitOption,
   PreAuthorizationMemberOption,
 } from "../types";
 
@@ -12,20 +15,30 @@ function formatDateIso(value: Date | null | undefined) {
   return value.toISOString().slice(0, 10);
 }
 
+function formatAmountString(
+  value: { toString(): string } | number | null | undefined
+) {
+  if (value == null) return "";
+  return formatThousands(String(value));
+}
+
 export async function loadPreAuthorizationPageData() {
   const [
     rows,
     providerOptions,
     hospitalWardOptions,
+    benefitOptions,
     corporates,
     memberInfos,
     anniversaries,
+    memberBenefits,
   ] = await Promise.all([
     prisma.preAuthorization.findMany({
       orderBy: { code: "desc" },
     }),
     loadProviderOptions(),
     loadHospitalWardOptions(),
+    loadBenefitOptions(),
     prisma.corporate.findMany({
       select: { id: true, corporate: true, corpId: true, policyNo: true },
       orderBy: { corporate: "asc" },
@@ -46,10 +59,24 @@ export async function loadPreAuthorizationPageData() {
       select: { memberNo: true, anniv: true },
       orderBy: { anniv: "desc" },
     }),
+    prisma.memberBenefit.findMany({
+      select: {
+        memberNo: true,
+        benefit: true,
+        anniv: true,
+        policyLimit: true,
+        bedLimit: true,
+        hospitalWard: true,
+      },
+      orderBy: [{ memberNo: "asc" }, { benefit: "asc" }],
+    }),
   ]);
 
   const providerNameByCode = new Map(
     providerOptions.map((option) => [option.value, option.label])
+  );
+  const benefitLabelByCode = new Map(
+    benefitOptions.map((option) => [option.value, option.label])
   );
 
   const preAuthorizations: PreAuthorizationListItem[] = rows.map((row) => {
@@ -90,6 +117,25 @@ export async function loadPreAuthorizationPageData() {
     latestAnnivByMemberNo.set(row.memberNo, String(row.anniv));
   }
 
+  const benefitsByMemberNo = new Map<
+    string,
+    PreAuthorizationMemberBenefitOption[]
+  >();
+  for (const row of memberBenefits) {
+    const benefitCode = String(row.benefit);
+    const option: PreAuthorizationMemberBenefitOption = {
+      benefit: benefitCode,
+      label: benefitLabelByCode.get(benefitCode) ?? `Benefit ${benefitCode}`,
+      anniv: String(row.anniv),
+      policyLimit: formatAmountString(row.policyLimit),
+      bedLimit: formatAmountString(row.bedLimit),
+      hospitalWard: row.hospitalWard != null ? String(row.hospitalWard) : "",
+    };
+    const list = benefitsByMemberNo.get(row.memberNo) ?? [];
+    list.push(option);
+    benefitsByMemberNo.set(row.memberNo, list);
+  }
+
   // Dependants may miss corp_id; fall back to the family's principal corp.
   const corpIdByFamilyNo = new Map<string, string>();
   for (const info of memberInfos) {
@@ -120,6 +166,7 @@ export async function loadPreAuthorizationPageData() {
       memberType: isPrincipal ? "Principal" : "Dependant",
       anniv: latestAnnivByMemberNo.get(info.memberNo) ?? "",
       cancelled: info.cancelled,
+      benefits: benefitsByMemberNo.get(info.memberNo) ?? [],
     };
   });
 

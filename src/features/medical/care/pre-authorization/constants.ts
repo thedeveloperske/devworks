@@ -39,7 +39,7 @@ export const preAuthorizationFields: PreAuthorizationField[] = [
     label: "Pre Diagnosis",
     className: "sm:col-span-2 lg:col-span-2",
   },
-  { name: "authorityType", label: "Authority Type", type: "number" },
+  { name: "authorityType", label: "Authority Type", as: "select" },
   { name: "ward", label: "Ward", as: "select" },
   {
     name: "clinicalProcedure",

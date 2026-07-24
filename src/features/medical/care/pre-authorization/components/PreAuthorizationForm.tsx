@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Button, ButtonLink } from "@/components/admin/Button";
 import { FormError } from "@/components/admin/FormError";
 import { FormField } from "@/components/admin/FormField";
@@ -11,6 +11,7 @@ import {
   preAuthorizationFormSections,
   type PreAuthorizationField,
   type PreAuthorizationFormData,
+  type PreAuthorizationMemberBenefitOption,
 } from "@/features/medical/care/pre-authorization";
 import type { LookupOption } from "@/features/medical/lookups/types";
 import { formatThousands } from "@/lib/format";
@@ -21,6 +22,8 @@ type PreAuthorizationFormProps = {
   preAuthorizationId?: string;
   providerOptions: LookupOption[];
   hospitalWardOptions: LookupOption[];
+  /** Member benefits for the selected member (all anniversaries). */
+  memberBenefits?: PreAuthorizationMemberBenefitOption[];
   lockMemberNo?: boolean;
   embedded?: boolean;
   onSuccess?: () => void;
@@ -38,6 +41,7 @@ export function PreAuthorizationForm({
   preAuthorizationId,
   providerOptions,
   hospitalWardOptions,
+  memberBenefits = [],
   lockMemberNo = false,
   embedded = false,
   onSuccess,
@@ -51,6 +55,21 @@ export function PreAuthorizationForm({
     ...initial,
   });
 
+  const anniversaryBenefits = useMemo(() => {
+    const anniv = form.anniv.trim();
+    if (!anniv) return memberBenefits;
+    return memberBenefits.filter((benefit) => benefit.anniv === anniv);
+  }, [form.anniv, memberBenefits]);
+
+  const authorityTypeOptions = useMemo(
+    () =>
+      anniversaryBenefits.map((benefit) => ({
+        value: benefit.benefit,
+        label: benefit.label,
+      })),
+    [anniversaryBenefits]
+  );
+
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
@@ -58,6 +77,47 @@ export function PreAuthorizationForm({
   ) => {
     const { name, value } = e.target;
     const fieldName = name as keyof PreAuthorizationFormData;
+
+    if (fieldName === "anniv") {
+      setForm((prev) => {
+        const nextAnnivBenefits = memberBenefits.filter(
+          (benefit) => benefit.anniv === value.trim()
+        );
+        const authorityStillValid = nextAnnivBenefits.some(
+          (benefit) => benefit.benefit === prev.authorityType
+        );
+        return {
+          ...prev,
+          anniv: value,
+          authorityType: authorityStillValid ? prev.authorityType : "",
+          ...(authorityStillValid
+            ? {}
+            : {
+                availableLimit: "",
+                bedLimit: "",
+                ward: "",
+              }),
+        };
+      });
+      return;
+    }
+
+    if (fieldName === "authorityType") {
+      const selected = anniversaryBenefits.find(
+        (benefit) => benefit.benefit === value
+      );
+      setForm((prev) => ({
+        ...prev,
+        authorityType: value,
+        availableLimit: selected
+          ? formatThousands(selected.policyLimit)
+          : "",
+        bedLimit: selected ? formatThousands(selected.bedLimit) : "",
+        ward: selected?.hospitalWard ?? "",
+      }));
+      return;
+    }
+
     setForm((prev) => ({
       ...prev,
       [fieldName]: amountFields.has(fieldName)
@@ -113,10 +173,21 @@ export function PreAuthorizationForm({
     : inputClass;
 
   const renderField = (field: PreAuthorizationField) => {
-    const isSelect = field.as === "select";
+    const isAuthorityType = field.name === "authorityType";
+    const isSelect = field.as === "select" || isAuthorityType;
     const isTextarea = field.as === "textarea";
-    const options =
-      field.name === "provider"
+    const options = isAuthorityType
+      ? [
+          {
+            value: "",
+            label:
+              authorityTypeOptions.length > 0
+                ? "Select benefit"
+                : "No benefits for this anniversary",
+          },
+          ...authorityTypeOptions,
+        ]
+      : field.name === "provider"
         ? [{ value: "", label: "Select provider" }, ...providerOptions]
         : field.name === "ward"
           ? [{ value: "", label: "Select ward" }, ...hospitalWardOptions]
@@ -133,7 +204,10 @@ export function PreAuthorizationForm({
           required={field.required}
           value={form[field.name]}
           onChange={handleChange}
-          disabled={lockMemberNo && field.name === "memberNo"}
+          disabled={
+            (lockMemberNo && field.name === "memberNo") ||
+            (isAuthorityType && authorityTypeOptions.length === 0)
+          }
           inputClassName={
             amountFields.has(field.name)
               ? `${fieldInputClass} text-right`
@@ -141,7 +215,11 @@ export function PreAuthorizationForm({
                 ? `${fieldInputClass} cursor-not-allowed bg-slate-50 text-slate-600`
                 : fieldInputClass
           }
-          selectClassName={`${fieldInputClass} h-[30px]`}
+          selectClassName={`${fieldInputClass} h-[30px]${
+            isAuthorityType && authorityTypeOptions.length === 0
+              ? " cursor-not-allowed bg-slate-50 text-slate-600"
+              : ""
+          }`}
           labelClassName={fieldLabelClass}
           rows={isTextarea ? 3 : undefined}
           options={options}

@@ -46,6 +46,15 @@ export type PreAuthorizationCorporateOption = {
   policyNo: string | null;
 };
 
+export type PreAuthorizationMemberBenefitOption = {
+  benefit: string;
+  label: string;
+  anniv: string;
+  policyLimit: string;
+  bedLimit: string;
+  hospitalWard: string;
+};
+
 export type PreAuthorizationMemberOption = {
   memberNo: string;
   familyNo: string;
@@ -55,6 +64,7 @@ export type PreAuthorizationMemberOption = {
   memberType: "Principal" | "Dependant";
   anniv: string;
   cancelled: number | null;
+  benefits: PreAuthorizationMemberBenefitOption[];
 };
 
 export type PreAuthorizationField = {
