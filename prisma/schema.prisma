@@ -322,6 +322,7 @@ model MemberBenefit {
   statusUser     String?   @map("status_user") @db.VarChar(15)
   verifyStatus   Int?      @map("verify_status")
   waitingPeriod  Int?      @map("waiting_period")
+  hospitalWard   Int?      @map("hospital_ward")
   bedLimit       Decimal?  @map("bed_limit") @db.Decimal(10, 2)
   sync           Int?
   allocateTo     Int?      @map("allocate_to")

@@ -1,5 +1,6 @@
 import { loadAgentOptions } from "@/features/medical/admin/agents/server/load-page-data";
 import { loadBenefitOptions } from "@/features/medical/admin/benefits/server/load-page-data";
+import { loadHospitalWardOptions } from "@/features/medical/admin/hospital-wards/server/load-page-data";
 import { branchOptions } from "@/features/medical/lookups";
 import type { LookupOption } from "@/features/medical/lookups/types";
 import { formatThousands } from "@/lib/format";
@@ -98,6 +99,7 @@ function buildCorpGroupBenefitsByCorpId(
     sharing: number | null;
     subLimitOf: number | null;
     waitingPeriod: number | null;
+    hospitalWard: number | null;
   }>,
   maxAnnivByCorpId: Map<string, number>
 ) {
@@ -118,6 +120,8 @@ function buildCorpGroupBenefitsByCorpId(
       subLimitOf: group.subLimitOf != null ? String(group.subLimitOf) : "",
       waitingPeriod:
         group.waitingPeriod != null ? String(group.waitingPeriod) : "",
+      hospitalWard:
+        group.hospitalWard != null ? String(group.hospitalWard) : "",
     };
 
     const rows = benefitsByCorpId.get(group.corpId) ?? [];
@@ -143,6 +147,7 @@ export async function loadMembersPageData() {
     corpGroups,
     agentOptions,
     benefitOptions,
+    hospitalWardOptions,
   ] = await Promise.all([
     prisma.principalApplicant.findMany({
       select: {
@@ -187,10 +192,12 @@ export async function loadMembersPageData() {
         sharing: true,
         subLimitOf: true,
         waitingPeriod: true,
+        hospitalWard: true,
       },
     }),
     loadAgentOptions(),
     loadBenefitOptions(),
+    loadHospitalWardOptions(),
   ]);
 
   const latestAnniversaryByCorpId = new Map<
@@ -285,5 +292,6 @@ export async function loadMembersPageData() {
     principalOptions,
     agentOptions,
     benefitOptions,
+    hospitalWardOptions,
   };
 }

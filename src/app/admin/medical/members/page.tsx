@@ -10,6 +10,7 @@ async function MembersContent() {
     principalOptions,
     agentOptions,
     benefitOptions,
+    hospitalWardOptions,
   } = await loadMembersPageData();
   return (
     <MembersPageClient
@@ -19,6 +20,7 @@ async function MembersContent() {
       principalOptions={principalOptions}
       agentOptions={agentOptions}
       benefitOptions={benefitOptions}
+      hospitalWardOptions={hospitalWardOptions}
     />
   );
 }

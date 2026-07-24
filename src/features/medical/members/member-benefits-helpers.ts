@@ -129,6 +129,7 @@ export type MemberBenefitSyncRow = {
   statusUser: string | null;
   verifyStatus: number | null;
   waitingPeriod: number | null;
+  hospitalWard: number | null;
   bedLimit: string | null;
   sync: number | null;
   allocateTo: number | null;
@@ -167,6 +168,7 @@ function buildMemberBenefitRowData(
     { key: "ceiling", label: "Ceiling" },
     { key: "verifyStatus", label: "Verify status" },
     { key: "waitingPeriod", label: "Waiting period" },
+    { key: "hospitalWard", label: "Hospital ward" },
     { key: "sync", label: "Sync" },
     { key: "allocateTo", label: "Allocate to" },
   ];
@@ -269,6 +271,7 @@ function buildMemberBenefitRowData(
       statusUser: trimOrNull(row.statusUser),
       verifyStatus: ints.verifyStatus,
       waitingPeriod: ints.waitingPeriod,
+      hospitalWard: ints.hospitalWard,
       bedLimit: decimals.bedLimit,
       sync: ints.sync,
       allocateTo: ints.allocateTo,
@@ -364,6 +367,7 @@ export function memberBenefitToFormValues(row: {
   statusUser: string | null;
   verifyStatus: number | null;
   waitingPeriod: number | null;
+  hospitalWard: number | null;
   bedLimit: { toString(): string } | string | null;
   sync: number | null;
   allocateTo: number | null;
@@ -397,6 +401,7 @@ export function memberBenefitToFormValues(row: {
     statusUser: row.statusUser ?? "",
     verifyStatus: intToString(row.verifyStatus),
     waitingPeriod: intToString(row.waitingPeriod),
+    hospitalWard: intToString(row.hospitalWard),
     bedLimit: formatAmountString(row.bedLimit),
     sync: intToString(row.sync),
     allocateTo: intToString(row.allocateTo),

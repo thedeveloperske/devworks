@@ -67,6 +67,7 @@ type MemberFormProps = {
   agentOptions: LookupOption[];
   categoryOptions: LookupOption[];
   benefitOptions: LookupOption[];
+  hospitalWardOptions: LookupOption[];
   /** Benefits available from corp_groups for this corporate. */
   corpGroupBenefits?: MembersCorpGroupBenefit[];
   corporateOptions: LookupOption[];
@@ -104,6 +105,7 @@ export function MemberForm({
   agentOptions,
   categoryOptions,
   benefitOptions,
+  hospitalWardOptions,
   corpGroupBenefits = [],
   onSuccess,
   onCancel,
@@ -292,6 +294,7 @@ export function MemberForm({
               sharing: row.sharing,
               subLimitOf: row.subLimitOf,
               waitingPeriod: row.waitingPeriod,
+              hospitalWard: row.hospitalWard,
             })
           )
         );
@@ -701,6 +704,7 @@ export function MemberForm({
               corpId: row.corpId || principalInformation.corpId || corpId,
             }))}
             benefitOptions={categoryBenefitOptions}
+            hospitalWardOptions={hospitalWardOptions}
             fieldInputClass={fieldInputClass}
           />
         );

@@ -13,6 +13,7 @@ import { formatThousands } from "@/lib/format";
 type BenefitsTabProps = {
   rows: MemberBenefitFormData[];
   benefitOptions: LookupOption[];
+  hospitalWardOptions: LookupOption[];
   fieldInputClass: string;
 };
 
@@ -61,6 +62,7 @@ function renderCell(
   row: MemberBenefitFormData,
   rowIndex: number,
   benefitOptions: LookupOption[],
+  hospitalWardOptions: LookupOption[],
   fieldInputClass: string
 ) {
   const fieldId = `member-benefit-${rowIndex}-${field.name}`;
@@ -90,6 +92,18 @@ function renderCell(
       row[field.name],
       benefitOptions,
       field.name === "benefit" ? "Select benefit" : "Select sub limit of",
+      disabledClass
+    );
+  }
+
+  if (field.name === "hospitalWard") {
+    return renderSelect(
+      fieldId,
+      field.name,
+      field.label,
+      row.hospitalWard,
+      hospitalWardOptions,
+      "Select hospital ward",
       disabledClass
     );
   }
@@ -139,6 +153,7 @@ function renderCell(
 export function BenefitsTab({
   rows,
   benefitOptions,
+  hospitalWardOptions,
   fieldInputClass,
 }: BenefitsTabProps) {
   return (
@@ -194,6 +209,7 @@ export function BenefitsTab({
                         row,
                         rowIndex,
                         benefitOptions,
+                        hospitalWardOptions,
                         fieldInputClass
                       )}
                     </td>

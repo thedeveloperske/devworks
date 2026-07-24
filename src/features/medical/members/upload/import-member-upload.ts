@@ -117,6 +117,7 @@ async function loadCorporateContext(
         sharing: true,
         fund: true,
         waitingPeriod: true,
+        hospitalWard: true,
         subLimitOf: true,
         anniv: true,
       },
@@ -133,6 +134,7 @@ async function loadCorporateContext(
       sharing: string;
       fund: string;
       waitingPeriod: string;
+      hospitalWard: string;
       subLimitOf: string;
     }>
   >();
@@ -149,6 +151,7 @@ async function loadCorporateContext(
       sharing: decimalToString(group.sharing),
       fund: decimalToString(group.fund),
       waitingPeriod: decimalToString(group.waitingPeriod),
+      hospitalWard: decimalToString(group.hospitalWard),
       subLimitOf: decimalToString(group.subLimitOf),
     });
     benefitsByCategory.set(category, list);
@@ -247,6 +250,7 @@ async function importOneRow(
       sharing: benefit.sharing,
       fund: benefit.fund,
       waitingPeriod: benefit.waitingPeriod,
+      hospitalWard: benefit.hospitalWard,
       subLimitOf: benefit.subLimitOf,
     })),
     memberNo,

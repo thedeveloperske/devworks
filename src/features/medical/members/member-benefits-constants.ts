@@ -32,6 +32,7 @@ export const defaultMemberBenefitForm: MemberBenefitFormData = {
   statusUser: "",
   verifyStatus: "",
   waitingPeriod: "",
+  hospitalWard: "",
   bedLimit: "",
   sync: "",
   allocateTo: "",
@@ -54,6 +55,7 @@ export const memberBenefitFields = [
   { name: "sharing", label: "Sharing" },
   { name: "anniv", label: "Anniv *", type: "number", required: true },
   { name: "waitingPeriod", label: "Waiting Period", type: "number" },
+  { name: "hospitalWard", label: "Hospital Ward" },
   { name: "bedLimit", label: "Bed Limit" },
   { name: "fund", label: "Fund" },
   { name: "copayAmount", label: "Copay Amount", type: "number" },
@@ -88,6 +90,7 @@ export const memberBenefitFieldNames: (keyof MemberBenefitFormData)[] = [
   "sharing",
   "anniv",
   "waitingPeriod",
+  "hospitalWard",
   "bedLimit",
 ];
 

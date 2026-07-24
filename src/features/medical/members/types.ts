@@ -63,6 +63,7 @@ export type MembersCorpGroupBenefit = {
   sharing: string;
   subLimitOf: string;
   waitingPeriod: string;
+  hospitalWard: string;
 };
 
 export type MembersCorporateOption = {

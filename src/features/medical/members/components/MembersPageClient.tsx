@@ -37,6 +37,7 @@ type MembersPageClientProps = {
   principalOptions: PrincipalOption[];
   agentOptions: LookupOption[];
   benefitOptions: LookupOption[];
+  hospitalWardOptions: LookupOption[];
 };
 
 type EditMemberState = {
@@ -96,6 +97,7 @@ export function MembersPageClient({
   principalOptions,
   agentOptions,
   benefitOptions,
+  hospitalWardOptions,
 }: MembersPageClientProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -813,6 +815,7 @@ export function MembersPageClient({
               }
               agentOptions={agentOptions}
               benefitOptions={benefitOptions}
+              hospitalWardOptions={hospitalWardOptions}
               corpGroupBenefits={selectedCorporate?.corpGroupBenefits ?? []}
               categoryOptions={formCategoryOptions}
               corporateOptions={corporateOptions}
@@ -884,6 +887,7 @@ export function MembersPageClient({
                   sharing: row.sharing,
                   subLimitOf: row.subLimitOf,
                   waitingPeriod: row.waitingPeriod,
+                  hospitalWard: row.hospitalWard,
                 })
               )}
             initialCoverHistory={[
@@ -896,6 +900,7 @@ export function MembersPageClient({
             initialAcceptance={defaultMemberAcceptanceForm}
             agentOptions={agentOptions}
             benefitOptions={benefitOptions}
+            hospitalWardOptions={hospitalWardOptions}
             corpGroupBenefits={selectedCorporate?.corpGroupBenefits ?? []}
             categoryOptions={formCategoryOptions}
             corporateOptions={corporateOptions}
@@ -928,6 +933,7 @@ export function MembersPageClient({
             }}
             agentOptions={agentOptions}
             benefitOptions={benefitOptions}
+            hospitalWardOptions={hospitalWardOptions}
             corpGroupBenefits={selectedCorporate?.corpGroupBenefits ?? []}
             categoryOptions={formCategoryOptions}
             corporateOptions={corporateOptions}
@@ -1016,6 +1022,7 @@ export function MembersPageClient({
             initialDependants={editDependants}
             agentOptions={agentOptions}
             benefitOptions={benefitOptions}
+            hospitalWardOptions={hospitalWardOptions}
             corpGroupBenefits={selectedCorporate?.corpGroupBenefits ?? []}
             categoryOptions={formCategoryOptions}
             corporateOptions={corporateOptions}

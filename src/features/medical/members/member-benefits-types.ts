@@ -27,6 +27,7 @@ export type MemberBenefitFormData = {
   statusUser: string;
   verifyStatus: string;
   waitingPeriod: string;
+  hospitalWard: string;
   bedLimit: string;
   sync: string;
   allocateTo: string;
