@@ -325,7 +325,7 @@ export function PreAuthorizationPageClient({
 
   const corporatesStep = (
     <div className="flex min-h-0 flex-1 flex-col gap-3">
-      <div className="flex shrink-0 items-center justify-between gap-2">
+      <div className="flex shrink-0 flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-[12px] text-slate-600">
           Select a corporate to continue
         </p>
@@ -335,10 +335,10 @@ export function PreAuthorizationPageClient({
           onChange={(e) => setCorporateSearchQuery(e.target.value)}
           placeholder="Search corporates..."
           aria-label="Search corporates"
-          className={searchInputClass}
+          className={`${searchInputClass} w-full sm:w-40`}
         />
       </div>
-      <div className={`${tableWrapperClass} min-h-0 flex-1 overflow-y-auto`}>
+      <div className={`${tableWrapperClass} min-h-0 flex-1 overflow-auto`}>
         <table className={tableClass}>
           <thead className={tableHeadClass}>
             <tr>
@@ -390,12 +390,18 @@ export function PreAuthorizationPageClient({
 
   const membersStep = (
     <div className="flex min-h-0 flex-1 flex-col gap-3">
-      <div className="flex shrink-0 items-center justify-between gap-2">
-        <div className="flex min-w-0 items-center gap-2">
-          <Button type="button" variant="secondary" size="sm" onClick={openCorporateStep}>
+      <div className="flex shrink-0 flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center">
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            onClick={openCorporateStep}
+            className="w-full shrink-0 sm:w-auto"
+          >
             Back
           </Button>
-          <p className="min-w-0 truncate text-[12px] text-slate-600">
+          <p className="min-w-0 wrap-break-word text-[12px] text-slate-600 sm:truncate">
             {selectedCorporate?.corporate ?? "Members"}
           </p>
         </div>
@@ -405,10 +411,10 @@ export function PreAuthorizationPageClient({
           onChange={(e) => setMemberSearchQuery(e.target.value)}
           placeholder="Search members..."
           aria-label="Search members"
-          className={searchInputClass}
+          className={`${searchInputClass} w-full sm:w-40`}
         />
       </div>
-      <div className={`${tableWrapperClass} min-h-0 flex-1 overflow-y-auto`}>
+      <div className={`${tableWrapperClass} min-h-0 flex-1 overflow-auto`}>
         <table className={tableClass}>
           <thead className={tableHeadClass}>
             <tr>
@@ -458,35 +464,38 @@ export function PreAuthorizationPageClient({
 
   const formStep = selectedMember ? (
     <div className="flex min-h-0 flex-1 flex-col gap-3">
-      <div className="flex shrink-0 items-center gap-2">
+      <div className="flex shrink-0 flex-col gap-2 sm:flex-row sm:items-center">
         <Button
           type="button"
           variant="secondary"
           size="sm"
           onClick={() => openMembersStep(selectedCorporateId)}
+          className="w-full shrink-0 sm:w-auto"
         >
           Back
         </Button>
-        <p className="min-w-0 truncate text-[12px] text-slate-600">
+        <p className="min-w-0 wrap-break-word text-[12px] text-slate-600 sm:truncate">
           {selectedMember.name} ({selectedMember.memberNo})
           {selectedCorporate?.corporate
             ? ` · ${selectedCorporate.corporate}`
             : ""}
         </p>
       </div>
-      <PreAuthorizationForm
-        key={selectedMember.memberNo}
-        embedded
-        lockMemberNo
-        initial={{
-          memberNo: selectedMember.memberNo,
-          anniv: selectedMember.anniv,
-        }}
-        providerOptions={providerOptions}
-        hospitalWardOptions={hospitalWardOptions}
-        onSuccess={handleSaved}
-        onCancel={closeFormModal}
-      />
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+        <PreAuthorizationForm
+          key={selectedMember.memberNo}
+          embedded
+          lockMemberNo
+          initial={{
+            memberNo: selectedMember.memberNo,
+            anniv: selectedMember.anniv,
+          }}
+          providerOptions={providerOptions}
+          hospitalWardOptions={hospitalWardOptions}
+          onSuccess={handleSaved}
+          onCancel={closeFormModal}
+        />
+      </div>
     </div>
   ) : (
     <div className="flex min-h-0 flex-1 flex-col gap-3">

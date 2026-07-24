@@ -64,4 +64,6 @@ export type PreAuthorizationField = {
   placeholder?: string;
   required?: boolean;
   as?: "input" | "select" | "textarea";
+  /** Grid column span classes for responsive layout. */
+  className?: string;
 };

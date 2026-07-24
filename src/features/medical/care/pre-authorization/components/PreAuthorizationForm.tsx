@@ -8,7 +8,8 @@ import { FormField } from "@/components/admin/FormField";
 import {
   defaultPreAuthorizationForm,
   getPreAuthorizationFields,
-  preAuthorizationFieldNames,
+  preAuthorizationFormSections,
+  type PreAuthorizationField,
   type PreAuthorizationFormData,
 } from "@/features/medical/care/pre-authorization";
 import type { LookupOption } from "@/features/medical/lookups/types";
@@ -101,85 +102,131 @@ export function PreAuthorizationForm({
     : "w-full space-y-6 border border-slate-200 bg-white p-6";
 
   const fieldGrid = embedded
-    ? "grid gap-1.5 sm:grid-cols-2 lg:grid-cols-3"
-    : "grid gap-4 sm:grid-cols-2 lg:grid-cols-3";
+    ? "grid grid-cols-1 gap-x-3 gap-y-1.5 sm:grid-cols-2 lg:grid-cols-4"
+    : "grid grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-2 lg:grid-cols-3";
 
   const fieldLabelClass = embedded
     ? "mb-0.5 block text-[12px] font-medium text-slate-700"
     : labelClass;
   const fieldInputClass = embedded
-    ? "w-full border border-slate-300 bg-white px-2 py-1 text-[12px] text-slate-900 placeholder:text-slate-400 focus:border-maroon focus:outline-none"
+    ? "w-full min-w-0 border border-slate-300 bg-white px-2 py-1 text-[12px] text-slate-900 placeholder:text-slate-400 focus:border-maroon focus:outline-none"
     : inputClass;
+
+  const renderField = (field: PreAuthorizationField) => {
+    const isSelect = field.as === "select";
+    const isTextarea = field.as === "textarea";
+    const options =
+      field.name === "provider"
+        ? [{ value: "", label: "Select provider" }, ...providerOptions]
+        : field.name === "ward"
+          ? [{ value: "", label: "Select ward" }, ...hospitalWardOptions]
+          : undefined;
+
+    return (
+      <div key={field.name} className={`min-w-0 ${field.className ?? ""}`}>
+        <FormField
+          id={field.name}
+          name={field.name}
+          label={field.label}
+          as={isTextarea ? "textarea" : isSelect ? "select" : "input"}
+          type={field.type ?? "text"}
+          required={field.required}
+          value={form[field.name]}
+          onChange={handleChange}
+          disabled={lockMemberNo && field.name === "memberNo"}
+          inputClassName={
+            amountFields.has(field.name)
+              ? `${fieldInputClass} text-right`
+              : lockMemberNo && field.name === "memberNo"
+                ? `${fieldInputClass} cursor-not-allowed bg-slate-50 text-slate-600`
+                : fieldInputClass
+          }
+          selectClassName={`${fieldInputClass} h-[30px]`}
+          labelClassName={fieldLabelClass}
+          rows={isTextarea ? 3 : undefined}
+          options={options}
+        />
+      </div>
+    );
+  };
 
   const formBody = (
     <>
       <FormError message={error} />
-      <div className={fieldGrid}>
-        {getPreAuthorizationFields(preAuthorizationFieldNames).map((field) => {
-          const isSelect = field.as === "select";
-          const isTextarea = field.as === "textarea";
-          const options =
-            field.name === "provider"
-              ? [
-                  { value: "", label: "Select provider" },
-                  ...providerOptions,
-                ]
-              : field.name === "ward"
-                ? [
-                    { value: "", label: "Select ward" },
-                    ...hospitalWardOptions,
-                  ]
-                : undefined;
-
+      <div className="space-y-4">
+        {preAuthorizationFormSections.map((section) => {
+          const fields = getPreAuthorizationFields(section.fields);
+          if (fields.length === 0) return null;
           return (
-            <FormField
-              key={field.name}
-              id={field.name}
-              name={field.name}
-              label={field.label}
-              as={isTextarea ? "textarea" : isSelect ? "select" : "input"}
-              type={field.type ?? "text"}
-              required={field.required}
-              value={form[field.name]}
-              onChange={handleChange}
-              disabled={lockMemberNo && field.name === "memberNo"}
-              inputClassName={
-                amountFields.has(field.name)
-                  ? `${fieldInputClass} text-right`
-                  : lockMemberNo && field.name === "memberNo"
-                    ? `${fieldInputClass} cursor-not-allowed bg-slate-50 text-slate-600`
-                    : fieldInputClass
-              }
-              selectClassName={`${fieldInputClass} h-[30px]`}
-              labelClassName={fieldLabelClass}
-              rows={isTextarea ? 2 : undefined}
-              options={options}
-            />
+            <section key={section.title} className="min-w-0 space-y-1.5">
+              <h3 className="border-b border-slate-200 pb-1 text-[11px] font-bold uppercase tracking-wide text-slate-500">
+                {section.title}
+              </h3>
+              <div className={fieldGrid}>{fields.map(renderField)}</div>
+            </section>
           );
         })}
       </div>
     </>
   );
 
-  if (embedded) {
-    return (
-      <form onSubmit={handleSubmit} className={formClassName}>
-        <div className="min-h-0 flex-1 space-y-3 overflow-y-auto pr-1">
-          {formBody}
-        </div>
-        <div className="mt-3 flex shrink-0 justify-end gap-2 border-t border-slate-200 pt-3">
+  const actions = (
+    <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+      {embedded ? (
+        <>
           {onCancel ? (
-            <Button type="button" variant="secondary" size="sm" onClick={onCancel}>
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              onClick={onCancel}
+              className="w-full sm:w-auto"
+            >
               Cancel
             </Button>
           ) : null}
-          <Button type="submit" size="sm" disabled={loading}>
+          <Button
+            type="submit"
+            size="sm"
+            disabled={loading}
+            className="w-full sm:w-auto"
+          >
             {loading
               ? "Saving..."
               : preAuthorizationId
                 ? "Update Pre-authorization"
                 : "Create Pre-authorization"}
           </Button>
+        </>
+      ) : (
+        <>
+          <ButtonLink
+            href="/admin/medical/care/pre-authorization?manage=1"
+            variant="secondary"
+            className="w-full sm:w-auto"
+          >
+            Cancel
+          </ButtonLink>
+          <Button type="submit" disabled={loading} className="w-full sm:w-auto">
+            {loading
+              ? "Saving..."
+              : preAuthorizationId
+                ? "Update Pre-authorization"
+                : "Create Pre-authorization"}
+          </Button>
+        </>
+      )}
+    </div>
+  );
+
+  if (embedded) {
+    return (
+      <form onSubmit={handleSubmit} className={formClassName}>
+        <div className="min-h-0 flex-1 space-y-3 overflow-y-auto overflow-x-hidden pr-1">
+          {formBody}
+        </div>
+        <div className="mt-3 shrink-0 border-t border-slate-200 pt-3">
+          {actions}
         </div>
       </form>
     );
@@ -188,18 +235,7 @@ export function PreAuthorizationForm({
   return (
     <form onSubmit={handleSubmit} className={formClassName}>
       {formBody}
-      <div className="flex justify-end gap-2">
-        <ButtonLink href="/admin/medical/care/pre-authorization?manage=1" variant="secondary">
-          Cancel
-        </ButtonLink>
-        <Button type="submit" disabled={loading}>
-          {loading
-            ? "Saving..."
-            : preAuthorizationId
-              ? "Update Pre-authorization"
-              : "Create Pre-authorization"}
-        </Button>
-      </div>
+      <div className="mt-6">{actions}</div>
     </form>
   );
 }
