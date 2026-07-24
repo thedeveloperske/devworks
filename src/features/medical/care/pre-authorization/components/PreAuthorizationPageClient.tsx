@@ -19,7 +19,10 @@ import {
   tableHeadClass,
   tableWrapperClass,
 } from "@/lib/form-styles";
+import { PreAuthorizationActionsMenu } from "./PreAuthorizationActionsMenu";
+import type { PreAuthorizationAction } from "./PreAuthorizationActionsMenu";
 import { PreAuthorizationForm } from "./PreAuthorizationForm";
+import { PreAuthorizationReserveModal } from "./PreAuthorizationReserveModal";
 
 type PreAuthorizationPageClientProps = {
   preAuthorizations: PreAuthorizationListItem[];
@@ -57,16 +60,22 @@ export function PreAuthorizationPageClient({
   const searchParams = useSearchParams();
   const isNew = searchParams.get("new") === "1";
   const editId = searchParams.get("edit");
+  const viewId = searchParams.get("view");
   const manageOpen = searchParams.get("manage") === "1";
   const selectedCorporateId = searchParams.get("corporate") ?? "";
   const selectedMemberNo = searchParams.get("member") ?? "";
-  const formModalOpen = isNew || Boolean(editId);
+  const formModalOpen = isNew || Boolean(editId) || Boolean(viewId);
   const modalOpen = manageOpen || formModalOpen;
 
   const [searchQuery, setSearchQuery] = useState("");
   const [corporateSearchQuery, setCorporateSearchQuery] = useState("");
   const [memberSearchQuery, setMemberSearchQuery] = useState("");
   const [editState, setEditState] = useState<EditState | null>(null);
+  const [reserveAction, setReserveAction] = useState<{
+    mode: "top-up" | "release";
+    row: PreAuthorizationListItem;
+  } | null>(null);
+  const [printNotice, setPrintNotice] = useState<string | null>(null);
 
   const selectedCorporate = useMemo(
     () => corporates.find((corporate) => corporate.id === selectedCorporateId),
@@ -95,11 +104,11 @@ export function PreAuthorizationPageClient({
       [
         row.code,
         row.memberNo,
+        row.memberName,
         row.provider,
         row.providerName,
         row.reportedBy,
         row.authorizedBy,
-        row.preDiagnosis,
       ]
         .filter(Boolean)
         .some((value) => String(value).toLowerCase().includes(query))
@@ -150,6 +159,7 @@ export function PreAuthorizationPageClient({
     const params = new URLSearchParams(searchParams.toString());
     params.delete("new");
     params.delete("edit");
+    params.delete("view");
     params.delete("corporate");
     params.delete("member");
     if (manageOpen) params.set("manage", "1");
@@ -192,22 +202,48 @@ export function PreAuthorizationPageClient({
     [pathname, router]
   );
 
+  const openViewModal = useCallback(
+    (id: string) => {
+      router.push(`${pathname}?manage=1&view=${id}`, { scroll: false });
+    },
+    [pathname, router]
+  );
+
   const handleSaved = useCallback(() => {
     closeFormModal();
     router.refresh();
   }, [closeFormModal, router]);
 
+  const handleAction = useCallback(
+    (action: PreAuthorizationAction, row: PreAuthorizationListItem) => {
+      if (action === "view") {
+        openViewModal(row.id);
+        return;
+      }
+      if (action === "print") {
+        setPrintNotice(
+          `Print for pre-authorization ${row.code} will be available once the template is provided.`
+        );
+        return;
+      }
+      if (action === "top-up" || action === "release") {
+        setReserveAction({ mode: action, row });
+      }
+    },
+    [openViewModal]
+  );
   useEffect(() => {
     if (searchParams.get("manage") === "1") return;
     router.replace(`${pathname}?manage=1`, { scroll: false });
   }, [pathname, router, searchParams]);
 
   useEffect(() => {
-    if (!editId) return;
+    const detailId = editId ?? viewId;
+    if (!detailId) return;
 
     let cancelled = false;
 
-    fetch(`/api/medical/care/pre-authorization/${editId}`)
+    fetch(`/api/medical/care/pre-authorization/${detailId}`)
       .then(async (res) => {
         if (!res.ok) {
           const data = await res.json().catch(() => ({}));
@@ -218,7 +254,7 @@ export function PreAuthorizationPageClient({
       .then((row) => {
         if (cancelled) return;
         setEditState({
-          id: editId,
+          id: detailId,
           form: preAuthorizationToFormValues(row),
           label: `Code ${row.code} · ${row.memberNo}`,
           error: "",
@@ -227,7 +263,7 @@ export function PreAuthorizationPageClient({
       .catch((error: unknown) => {
         if (cancelled) return;
         setEditState({
-          id: editId,
+          id: detailId,
           form: null,
           label: "",
           error:
@@ -240,14 +276,16 @@ export function PreAuthorizationPageClient({
     return () => {
       cancelled = true;
     };
-  }, [editId]);
+  }, [editId, viewId]);
 
-  const editLoading = Boolean(editId && editState?.id !== editId);
-  const editForm = editState?.id === editId ? editState.form : null;
-  const editLabel = editState?.id === editId ? editState.label : "";
-  const editError = editState?.id === editId ? editState.error : "";
-  const editingRow = editId
-    ? preAuthorizations.find((row) => row.id === editId)
+  const detailId = editId ?? viewId;
+  const isViewMode = Boolean(viewId) && !editId && !isNew;
+  const editLoading = Boolean(detailId && editState?.id !== detailId);
+  const editForm = editState?.id === detailId ? editState.form : null;
+  const editLabel = editState?.id === detailId ? editState.label : "";
+  const editError = editState?.id === detailId ? editState.error : "";
+  const editingRow = detailId
+    ? preAuthorizations.find((row) => row.id === detailId)
     : undefined;
 
   const rowsTable = (
@@ -257,17 +295,18 @@ export function PreAuthorizationPageClient({
           <tr>
             <th className={compactThClass}>Code</th>
             <th className={compactThClass}>Member No</th>
+            <th className={compactThClass}>Member Name</th>
             <th className={compactThClass}>Provider</th>
             <th className={compactThClass}>Date Reported</th>
-            <th className={compactThClass}>Pre Diagnosis</th>
             <th className={compactThClass}>Validity</th>
             <th className={compactThClass}>Authorized By</th>
+            <th className={`${compactThClass} w-10 text-right`}> </th>
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-200">
           {filteredRows.length === 0 ? (
             <tr>
-              <td colSpan={7} className={compactEmptyCellClass}>
+              <td colSpan={8} className={compactEmptyCellClass}>
                 {preAuthorizations.length === 0 ? (
                   <>
                     No pre-authorizations found.{" "}
@@ -297,19 +336,23 @@ export function PreAuthorizationPageClient({
                   </button>
                 </td>
                 <td className={compactTdClass}>{row.memberNo}</td>
+                <td className={compactTdClass}>{row.memberName ?? "—"}</td>
                 <td className={compactTdClass}>
-                  {row.providerName
-                    ? `${row.providerName} (${row.provider})`
-                    : row.provider}
+                  {row.providerName || row.provider || "—"}
                 </td>
                 <td className={compactTdClass}>
                   {row.dateReported ? formatDate(row.dateReported) : "—"}
                 </td>
-                <td className={compactTdClass}>{row.preDiagnosis ?? "—"}</td>
                 <td className={compactTdClass}>
                   {row.validityDate ? formatDate(row.validityDate) : "—"}
                 </td>
                 <td className={compactTdClass}>{row.authorizedBy ?? "—"}</td>
+                <td className={`${compactTdClass} text-right`}>
+                  <PreAuthorizationActionsMenu
+                    row={row}
+                    onAction={handleAction}
+                  />
+                </td>
               </tr>
             ))
           )}
@@ -522,7 +565,9 @@ export function PreAuthorizationPageClient({
         title={
           isNew
             ? newModalTitle
-            : "Edit Pre-authorization"
+            : isViewMode
+              ? "View Pre-authorization"
+              : "Edit Pre-authorization"
         }
         description={
           isNew
@@ -530,7 +575,9 @@ export function PreAuthorizationPageClient({
             : editLabel ||
               (editingRow
                 ? `Code ${editingRow.code} · ${editingRow.memberNo}`
-                : "Update pre-authorization details")
+                : isViewMode
+                  ? "Pre-authorization details"
+                  : "Update pre-authorization details")
         }
         size="xl"
       >
@@ -546,11 +593,12 @@ export function PreAuthorizationPageClient({
           <p className="text-[12px] text-slate-500">Loading pre-authorization...</p>
         ) : editError ? (
           <p className="text-[12px] text-red-600">{editError}</p>
-        ) : editForm && editId ? (
+        ) : editForm && detailId ? (
           <PreAuthorizationForm
-            key={editId}
+            key={`${isViewMode ? "view" : "edit"}-${detailId}`}
             embedded
-            preAuthorizationId={editId}
+            readOnly={isViewMode}
+            preAuthorizationId={isViewMode ? undefined : detailId}
             initial={editForm}
             memberBenefits={
               members.find((member) => member.memberNo === editForm.memberNo)
@@ -566,6 +614,38 @@ export function PreAuthorizationPageClient({
             onCancel={closeFormModal}
           />
         ) : null}
+      </Modal>
+
+      <PreAuthorizationReserveModal
+        open={Boolean(reserveAction)}
+        mode={reserveAction?.mode ?? "top-up"}
+        row={reserveAction?.row ?? null}
+        onClose={() => setReserveAction(null)}
+        onSuccess={() => {
+          setReserveAction(null);
+          router.refresh();
+        }}
+      />
+
+      <Modal
+        open={Boolean(printNotice)}
+        onClose={() => setPrintNotice(null)}
+        title="Print Pre-authorization"
+        description="Template pending"
+        variant="popup"
+        size="md"
+      >
+        <p className="text-[12px] text-slate-600">{printNotice}</p>
+        <div className="mt-4 flex justify-end">
+          <Button
+            type="button"
+            size="sm"
+            variant="secondary"
+            onClick={() => setPrintNotice(null)}
+          >
+            Close
+          </Button>
+        </div>
       </Modal>
     </div>
   );

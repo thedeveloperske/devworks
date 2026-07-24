@@ -29,6 +29,7 @@ export type PreAuthorizationListItem = {
   id: string;
   code: number;
   memberNo: string;
+  memberName: string | null;
   provider: string;
   providerName: string | null;
   dateReported: string | null;
@@ -37,6 +38,7 @@ export type PreAuthorizationListItem = {
   authorizedBy: string | null;
   preDiagnosis: string | null;
   validityDate: string | null;
+  reserve: string | null;
 };
 
 export type PreAuthorizationCorporateOption = {

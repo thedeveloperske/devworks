@@ -85,6 +85,14 @@ export async function loadPreAuthorizationPageData() {
   const benefitLabelByCode = new Map(
     benefitOptions.map((option) => [option.value, option.label])
   );
+  const memberNameByMemberNo = new Map(
+    memberInfos.map((info) => [
+      info.memberNo,
+      [info.firstName?.trim(), info.surname?.trim()]
+        .filter(Boolean)
+        .join(" ") || null,
+    ])
+  );
 
   const preAuthorizations: PreAuthorizationListItem[] = rows.map((row) => {
     const providerCode = String(row.provider);
@@ -92,6 +100,7 @@ export async function loadPreAuthorizationPageData() {
       id: String(row.code),
       code: row.code,
       memberNo: row.memberNo,
+      memberName: memberNameByMemberNo.get(row.memberNo) ?? null,
       provider: providerCode,
       providerName: providerNameByCode.get(providerCode) ?? null,
       dateReported: formatDateIso(row.dateReported),
@@ -100,6 +109,7 @@ export async function loadPreAuthorizationPageData() {
       authorizedBy: row.authorizedBy,
       preDiagnosis: row.preDiagnosis,
       validityDate: formatDateIso(row.validityDate),
+      reserve: formatAmountString(row.reserve) || null,
     };
   });
 

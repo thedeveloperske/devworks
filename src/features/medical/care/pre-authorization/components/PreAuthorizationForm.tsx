@@ -30,6 +30,8 @@ type PreAuthorizationFormProps = {
   coverPeriods?: PreAuthorizationMemberCoverPeriod[];
   lockMemberNo?: boolean;
   embedded?: boolean;
+  /** When true, all fields are disabled and save actions are hidden. */
+  readOnly?: boolean;
   onSuccess?: () => void;
   onCancel?: () => void;
 };
@@ -49,6 +51,7 @@ export function PreAuthorizationForm({
   coverPeriods = [],
   lockMemberNo = false,
   embedded = false,
+  readOnly = false,
   onSuccess,
   onCancel,
 }: PreAuthorizationFormProps) {
@@ -145,6 +148,7 @@ export function PreAuthorizationForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (readOnly) return;
     setLoading(true);
     setError("");
 
@@ -232,6 +236,7 @@ export function PreAuthorizationForm({
           value={form[field.name]}
           onChange={handleChange}
           disabled={
+            readOnly ||
             field.name === "anniv" ||
             (lockMemberNo && field.name === "memberNo") ||
             (isAuthorityType && authorityTypeOptions.length === 0)
@@ -255,17 +260,20 @@ export function PreAuthorizationForm({
               : undefined
           }
           inputClassName={
-            amountFields.has(field.name)
-              ? `${fieldInputClass} text-right`
-              : field.name === "anniv" ||
-                  (lockMemberNo && field.name === "memberNo")
-                ? `${fieldInputClass} cursor-not-allowed bg-slate-50 text-slate-600`
+            readOnly ||
+            field.name === "anniv" ||
+            (lockMemberNo && field.name === "memberNo")
+              ? `${fieldInputClass} cursor-not-allowed bg-slate-50 text-slate-600${
+                  amountFields.has(field.name) ? " text-right" : ""
+                }`
+              : amountFields.has(field.name)
+                ? `${fieldInputClass} text-right`
                 : field.name === "dateReported" && dateReportedCoverError
                   ? `${fieldInputClass} border-red-400`
                   : fieldInputClass
           }
           selectClassName={`${fieldInputClass} h-[30px]${
-            isAuthorityType && authorityTypeOptions.length === 0
+            readOnly || (isAuthorityType && authorityTypeOptions.length === 0)
               ? " cursor-not-allowed bg-slate-50 text-slate-600"
               : ""
           }`}
@@ -361,7 +369,29 @@ export function PreAuthorizationForm({
     </>
   );
 
-  const actions = (
+  const actions = readOnly ? (
+    <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+      {onCancel ? (
+        <Button
+          type="button"
+          variant="secondary"
+          size="sm"
+          onClick={onCancel}
+          className="w-full sm:w-auto"
+        >
+          Close
+        </Button>
+      ) : (
+        <ButtonLink
+          href="/admin/medical/care/pre-authorization?manage=1"
+          variant="secondary"
+          className="w-full sm:w-auto"
+        >
+          Close
+        </ButtonLink>
+      )}
+    </div>
+  ) : (
     <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
       {embedded ? (
         <>
