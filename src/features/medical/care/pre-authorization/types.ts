@@ -53,6 +53,13 @@ export type PreAuthorizationMemberBenefitOption = {
   policyLimit: string;
   bedLimit: string;
   hospitalWard: string;
+  /** Benefit sharing key: 1 PER FAMILY, 2 PER PERSON, 3 PER PRINCIPAL, 4 PER DEPENDANT. */
+  sharing: string;
+  /**
+   * Limit shown in utilisation summary: member limit for per-person /
+   * per-dependant sharing, otherwise the principal/family benefit limit.
+   */
+  utilisationLimit: string;
 };
 
 export type PreAuthorizationMemberCoverPeriod = {

@@ -232,6 +232,7 @@ export function PreAuthorizationForm({
           value={form[field.name]}
           onChange={handleChange}
           disabled={
+            field.name === "anniv" ||
             (lockMemberNo && field.name === "memberNo") ||
             (isAuthorityType && authorityTypeOptions.length === 0)
           }
@@ -256,7 +257,8 @@ export function PreAuthorizationForm({
           inputClassName={
             amountFields.has(field.name)
               ? `${fieldInputClass} text-right`
-              : lockMemberNo && field.name === "memberNo"
+              : field.name === "anniv" ||
+                  (lockMemberNo && field.name === "memberNo")
                 ? `${fieldInputClass} cursor-not-allowed bg-slate-50 text-slate-600`
                 : field.name === "dateReported" && dateReportedCoverError
                   ? `${fieldInputClass} border-red-400`
@@ -275,6 +277,67 @@ export function PreAuthorizationForm({
     );
   };
 
+  const selectedBenefit = useMemo(
+    () =>
+      anniversaryBenefits.find(
+        (benefit) => benefit.benefit === form.authorityType
+      ) ?? null,
+    [anniversaryBenefits, form.authorityType]
+  );
+
+  const utilisationValues = useMemo(() => {
+    const limit = selectedBenefit?.utilisationLimit
+      ? formatThousands(selectedBenefit.utilisationLimit)
+      : "";
+    return {
+      limit: limit || "—",
+      claims: "0",
+      reserves: "0",
+      balance: "0",
+    };
+  }, [selectedBenefit]);
+
+  const readOnlyValueClass = `${fieldInputClass} cursor-not-allowed bg-slate-50 text-right text-slate-600`;
+
+  const utilisationSection = (
+    <section className="min-w-0 space-y-1.5">
+      <h3 className="border-b border-slate-200 pb-1 text-[11px] font-bold uppercase tracking-wide text-slate-500">
+        Utilisation
+      </h3>
+      <div className={fieldGrid}>
+        {(
+          [
+            { key: "limit", label: "Limit", value: utilisationValues.limit },
+            { key: "claims", label: "Claims", value: utilisationValues.claims },
+            {
+              key: "reserves",
+              label: "Reserves",
+              value: utilisationValues.reserves,
+            },
+            {
+              key: "balance",
+              label: "Balance",
+              value: utilisationValues.balance,
+            },
+          ] as const
+        ).map((item) => (
+          <div key={item.key} className="min-w-0 lg:col-span-3">
+            <FormField
+              id={`utilisation-${item.key}`}
+              name={`utilisation-${item.key}`}
+              label={item.label}
+              value={item.value}
+              onChange={() => undefined}
+              disabled
+              inputClassName={readOnlyValueClass}
+              labelClassName={fieldLabelClass}
+            />
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+
   const formBody = (
     <>
       <FormError message={error} />
@@ -283,12 +346,15 @@ export function PreAuthorizationForm({
           const fields = getPreAuthorizationFields(section.fields);
           if (fields.length === 0) return null;
           return (
-            <section key={section.title} className="min-w-0 space-y-1.5">
-              <h3 className="border-b border-slate-200 pb-1 text-[11px] font-bold uppercase tracking-wide text-slate-500">
-                {section.title}
-              </h3>
-              <div className={fieldGrid}>{fields.map(renderField)}</div>
-            </section>
+            <div key={section.title} className="space-y-4">
+              <section className="min-w-0 space-y-1.5">
+                <h3 className="border-b border-slate-200 pb-1 text-[11px] font-bold uppercase tracking-wide text-slate-500">
+                  {section.title}
+                </h3>
+                <div className={fieldGrid}>{fields.map(renderField)}</div>
+              </section>
+              {section.title === "Clinical" ? utilisationSection : null}
+            </div>
           );
         })}
       </div>

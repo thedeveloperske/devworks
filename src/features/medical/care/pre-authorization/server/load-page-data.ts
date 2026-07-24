@@ -73,6 +73,7 @@ export async function loadPreAuthorizationPageData() {
         policyLimit: true,
         bedLimit: true,
         hospitalWard: true,
+        sharing: true,
       },
       orderBy: [{ memberNo: "asc" }, { benefit: "asc" }],
     }),
@@ -136,19 +137,57 @@ export async function loadPreAuthorizationPageData() {
     coverPeriodsByMemberNo.set(row.memberNo, periods);
   }
 
+  const principalMemberNoByFamilyNo = new Map<string, string>();
+  for (const info of memberInfos) {
+    const isPrincipal =
+      info.relationToPrincipal === 1 || info.memberNo.endsWith("-00");
+    if (isPrincipal && info.familyNo && !principalMemberNoByFamilyNo.has(info.familyNo)) {
+      principalMemberNoByFamilyNo.set(info.familyNo, info.memberNo);
+    }
+  }
+
+  const familyNoByMemberNo = new Map(
+    memberInfos.map((info) => [info.memberNo, info.familyNo ?? ""])
+  );
+
+  const benefitLimitByKey = new Map<string, string>();
+  for (const row of memberBenefits) {
+    benefitLimitByKey.set(
+      `${row.memberNo}:${row.benefit}:${row.anniv}`,
+      formatAmountString(row.policyLimit)
+    );
+  }
+
   const benefitsByMemberNo = new Map<
     string,
     PreAuthorizationMemberBenefitOption[]
   >();
   for (const row of memberBenefits) {
     const benefitCode = String(row.benefit);
+    const anniv = String(row.anniv);
+    const sharing = row.sharing != null ? String(row.sharing) : "";
+    const memberLimit = formatAmountString(row.policyLimit);
+    const familyNo = familyNoByMemberNo.get(row.memberNo) ?? "";
+    const principalMemberNo = familyNo
+      ? principalMemberNoByFamilyNo.get(familyNo)
+      : undefined;
+    const usesFamilyLimit = sharing === "1" || sharing === "3";
+    const familyLimit =
+      principalMemberNo != null
+        ? benefitLimitByKey.get(
+            `${principalMemberNo}:${row.benefit}:${row.anniv}`
+          ) ?? memberLimit
+        : memberLimit;
+
     const option: PreAuthorizationMemberBenefitOption = {
       benefit: benefitCode,
       label: benefitLabelByCode.get(benefitCode) ?? `Benefit ${benefitCode}`,
-      anniv: String(row.anniv),
-      policyLimit: formatAmountString(row.policyLimit),
+      anniv,
+      policyLimit: memberLimit,
       bedLimit: formatAmountString(row.bedLimit),
       hospitalWard: row.hospitalWard != null ? String(row.hospitalWard) : "",
+      sharing,
+      utilisationLimit: usesFamilyLimit ? familyLimit : memberLimit,
     };
     const list = benefitsByMemberNo.get(row.memberNo) ?? [];
     list.push(option);
