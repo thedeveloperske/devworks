@@ -214,9 +214,13 @@ export function ClaimsBatchingPageClient({
             filteredBatches.map((batch) => (
               <tr key={batch.id} className="transition-colors hover:bg-slate-50">
                 <td className={compactTdClass}>
-                  <span className="font-semibold text-slate-900">
+                  <button
+                    type="button"
+                    onClick={() => openViewModal(batch.id)}
+                    className="font-semibold text-maroon hover:underline"
+                  >
                     {batch.batchNo ?? `#${batch.id}`}
-                  </span>
+                  </button>
                 </td>
                 <td className={compactTdClass}>{formatDate(batch.batchDate)}</td>
                 <td className={compactTdClass}>{batch.providerName ?? "—"}</td>
@@ -226,7 +230,6 @@ export function ClaimsBatchingPageClient({
                   <BatchActionsMenu
                     batch={batch}
                     onManage={openManageModal}
-                    onView={openViewModal}
                   />
                 </td>
               </tr>

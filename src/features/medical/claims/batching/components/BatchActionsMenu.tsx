@@ -10,11 +10,10 @@ import { canAssignAuthorizer, canAssignVetter } from "@/features/medical/claims/
 type BatchActionsMenuProps = {
   batch: ClaimsBatchListItem;
   onManage: (id: string, tab: BatchManageTab) => void;
-  onView: (id: string) => void;
 };
 
 const menuWidth = 176;
-const menuItemCount = 5;
+const menuItemCount = 4;
 const menuItemHeight = 30;
 const menuPadding = 8;
 const menuHeight = menuItemCount * menuItemHeight + menuPadding;
@@ -45,7 +44,7 @@ function getMenuPosition(button: HTMLButtonElement) {
   return { top, left };
 }
 
-export function BatchActionsMenu({ batch, onManage, onView }: BatchActionsMenuProps) {
+export function BatchActionsMenu({ batch, onManage }: BatchActionsMenuProps) {
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [position, setPosition] = useState({ top: 0, left: 0 });
@@ -154,14 +153,6 @@ export function BatchActionsMenu({ batch, onManage, onView }: BatchActionsMenuPr
         }}
       >
         {batch.authorisingUser ? "Reassign authorizer" : "Assign authorizer"}
-      </button>
-      <button
-        type="button"
-        role="menuitem"
-        className={menuItemClass}
-        onClick={() => runAction(() => onView(batch.id))}
-      >
-        View batch
       </button>
     </div>
   ) : null;
