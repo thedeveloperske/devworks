@@ -48,6 +48,35 @@ const compactEmptyCellClass =
 const searchInputClass =
   "w-40 border border-slate-300 bg-white px-2 py-1 text-[12px] text-slate-900 placeholder:text-slate-400 focus:border-maroon focus:outline-none";
 
+function resolvePreauthSubjectName(args: {
+  memberNo: string;
+  memberName?: string | null;
+  members: PreAuthorizationMemberOption[];
+  corporates: PreAuthorizationCorporateOption[];
+}) {
+  const listedName = args.memberName?.trim();
+  if (listedName) return listedName;
+
+  const member = args.members.find((row) => row.memberNo === args.memberNo);
+  const memberName = member?.name?.trim();
+  if (memberName && memberName !== "—") return memberName;
+
+  const corporate = args.corporates.find(
+    (row) => row.id === member?.corporateId
+  );
+  const corporateName = corporate?.corporate?.trim();
+  return corporateName || null;
+}
+
+function formatPreauthNumberLabel(
+  code: number | string,
+  subjectName: string | null | undefined
+) {
+  const base = `Preauth Number #${code}`;
+  const subject = subjectName?.trim();
+  return subject ? `${base} for ${subject}` : base;
+}
+
 export function PreAuthorizationPageClient({
   preAuthorizations,
   corporates,
@@ -108,7 +137,6 @@ export function PreAuthorizationPageClient({
         row.provider,
         row.providerName,
         row.reportedBy,
-        row.authorizedBy,
       ]
         .filter(Boolean)
         .some((value) => String(value).toLowerCase().includes(query))
@@ -195,13 +223,6 @@ export function PreAuthorizationPageClient({
     [pathname, router]
   );
 
-  const openEditModal = useCallback(
-    (id: string) => {
-      router.push(`${pathname}?manage=1&edit=${id}`, { scroll: false });
-    },
-    [pathname, router]
-  );
-
   const openViewModal = useCallback(
     (id: string) => {
       router.push(`${pathname}?manage=1&view=${id}`, { scroll: false });
@@ -221,8 +242,14 @@ export function PreAuthorizationPageClient({
         return;
       }
       if (action === "print") {
+        const subjectName = resolvePreauthSubjectName({
+          memberNo: row.memberNo,
+          memberName: row.memberName,
+          members,
+          corporates,
+        });
         setPrintNotice(
-          `Print for pre-authorization ${row.code} will be available once the template is provided.`
+          `Print for ${formatPreauthNumberLabel(row.code, subjectName)} will be available once the template is provided.`
         );
         return;
       }
@@ -230,7 +257,7 @@ export function PreAuthorizationPageClient({
         setReserveAction({ mode: action, row });
       }
     },
-    [openViewModal]
+    [corporates, members, openViewModal]
   );
   useEffect(() => {
     if (searchParams.get("manage") === "1") return;
@@ -253,10 +280,19 @@ export function PreAuthorizationPageClient({
       })
       .then((row) => {
         if (cancelled) return;
+        const listed = preAuthorizations.find(
+          (item) => String(item.code) === String(row.code)
+        );
+        const subjectName = resolvePreauthSubjectName({
+          memberNo: row.memberNo,
+          memberName: listed?.memberName,
+          members,
+          corporates,
+        });
         setEditState({
           id: detailId,
           form: preAuthorizationToFormValues(row),
-          label: `Code ${row.code} · ${row.memberNo}`,
+          label: formatPreauthNumberLabel(row.code, subjectName),
           error: "",
         });
       })
@@ -276,7 +312,7 @@ export function PreAuthorizationPageClient({
     return () => {
       cancelled = true;
     };
-  }, [editId, viewId]);
+  }, [corporates, editId, members, preAuthorizations, viewId]);
 
   const detailId = editId ?? viewId;
   const isViewMode = Boolean(viewId) && !editId && !isNew;
@@ -287,26 +323,32 @@ export function PreAuthorizationPageClient({
   const editingRow = detailId
     ? preAuthorizations.find((row) => row.id === detailId)
     : undefined;
+  const editingSubjectName = editingRow
+    ? resolvePreauthSubjectName({
+        memberNo: editingRow.memberNo,
+        memberName: editingRow.memberName,
+        members,
+        corporates,
+      })
+    : null;
 
   const rowsTable = (
     <div className={`${tableWrapperClass} overflow-y-auto`}>
       <table className={tableClass}>
         <thead className={tableHeadClass}>
           <tr>
-            <th className={compactThClass}>Code</th>
+            <th className={compactThClass}>Preauth Number</th>
             <th className={compactThClass}>Member No</th>
             <th className={compactThClass}>Member Name</th>
             <th className={compactThClass}>Provider</th>
             <th className={compactThClass}>Date Reported</th>
-            <th className={compactThClass}>Validity</th>
-            <th className={compactThClass}>Authorized By</th>
             <th className={`${compactThClass} w-10 text-right`}> </th>
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-200">
           {filteredRows.length === 0 ? (
             <tr>
-              <td colSpan={8} className={compactEmptyCellClass}>
+              <td colSpan={6} className={compactEmptyCellClass}>
                 {preAuthorizations.length === 0 ? (
                   <>
                     No pre-authorizations found.{" "}
@@ -326,15 +368,7 @@ export function PreAuthorizationPageClient({
           ) : (
             filteredRows.map((row) => (
               <tr key={row.id} className="transition-colors hover:bg-slate-50">
-                <td className={compactTdClass}>
-                  <button
-                    type="button"
-                    onClick={() => openEditModal(row.id)}
-                    className="text-left font-semibold text-slate-900 hover:text-maroon"
-                  >
-                    {row.code}
-                  </button>
-                </td>
+                <td className={compactTdClass}>{row.code}</td>
                 <td className={compactTdClass}>{row.memberNo}</td>
                 <td className={compactTdClass}>{row.memberName ?? "—"}</td>
                 <td className={compactTdClass}>
@@ -343,10 +377,6 @@ export function PreAuthorizationPageClient({
                 <td className={compactTdClass}>
                   {row.dateReported ? formatDate(row.dateReported) : "—"}
                 </td>
-                <td className={compactTdClass}>
-                  {row.validityDate ? formatDate(row.validityDate) : "—"}
-                </td>
-                <td className={compactTdClass}>{row.authorizedBy ?? "—"}</td>
                 <td className={`${compactTdClass} text-right`}>
                   <PreAuthorizationActionsMenu
                     row={row}
@@ -574,7 +604,7 @@ export function PreAuthorizationPageClient({
             ? newModalDescription
             : editLabel ||
               (editingRow
-                ? `Code ${editingRow.code} · ${editingRow.memberNo}`
+                ? formatPreauthNumberLabel(editingRow.code, editingSubjectName)
                 : isViewMode
                   ? "Pre-authorization details"
                   : "Update pre-authorization details")
@@ -620,6 +650,16 @@ export function PreAuthorizationPageClient({
         open={Boolean(reserveAction)}
         mode={reserveAction?.mode ?? "top-up"}
         row={reserveAction?.row ?? null}
+        subjectName={
+          reserveAction
+            ? resolvePreauthSubjectName({
+                memberNo: reserveAction.row.memberNo,
+                memberName: reserveAction.row.memberName,
+                members,
+                corporates,
+              })
+            : null
+        }
         onClose={() => setReserveAction(null)}
         onSuccess={() => {
           setReserveAction(null);

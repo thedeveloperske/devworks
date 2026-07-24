@@ -14,6 +14,7 @@ type PreAuthorizationReserveModalProps = {
   open: boolean;
   mode: ReserveAdjustMode;
   row: PreAuthorizationListItem | null;
+  subjectName?: string | null;
   onClose: () => void;
   onSuccess: () => void;
 };
@@ -22,6 +23,7 @@ export function PreAuthorizationReserveModal({
   open,
   mode,
   row,
+  subjectName,
   onClose,
   onSuccess,
 }: PreAuthorizationReserveModalProps) {
@@ -31,8 +33,12 @@ export function PreAuthorizationReserveModal({
 
   const isTopUp = mode === "top-up";
   const title = isTopUp ? "Top Up Reserve" : "Release Reserve";
+  const resolvedSubject =
+    subjectName?.trim() || row?.memberName?.trim() || null;
   const description = row
-    ? `Code ${row.code} · ${row.memberNo}${row.memberName ? ` · ${row.memberName}` : ""}`
+    ? resolvedSubject
+      ? `Preauth Number #${row.code} for ${resolvedSubject}`
+      : `Preauth Number #${row.code}`
     : undefined;
   const currentReserve = row?.reserve ?? "0";
 

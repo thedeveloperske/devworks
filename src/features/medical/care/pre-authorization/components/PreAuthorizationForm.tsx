@@ -361,7 +361,9 @@ export function PreAuthorizationForm({
                 </h3>
                 <div className={fieldGrid}>{fields.map(renderField)}</div>
               </section>
-              {section.title === "Clinical" ? utilisationSection : null}
+              {section.title === "Clinical" && !readOnly
+                ? utilisationSection
+                : null}
             </div>
           );
         })}
