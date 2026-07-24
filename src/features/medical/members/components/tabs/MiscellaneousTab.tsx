@@ -37,13 +37,6 @@ export function MiscellaneousTab({
 }: MiscellaneousTabProps) {
   return (
     <section className="flex h-full min-h-0 flex-col gap-1.5">
-      <div>
-        <h3 className="text-[12px] font-bold uppercase text-slate-700">
-          Miscellaneous
-        </h3>
-        <p className="text-[12px] text-slate-500">Misc information</p>
-      </div>
-
       {showCancellationHistory ? (
         <>
           <div>
