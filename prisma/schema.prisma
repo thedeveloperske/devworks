@@ -486,6 +486,29 @@ model PreAuthorization {
   @@map("pre_authorization")
 }
 
+model ClaimsReserve {
+  id         BigInt    @id @default(autoincrement())
+  preAuthNo  Decimal?  @map("pre_auth_no") @db.Decimal(7, 0)
+  memberNo   String?   @map("member_no") @db.VarChar(15)
+  transType  Decimal?  @map("trans_type") @db.Decimal(1, 0)
+  debit      Decimal?  @db.Decimal(10, 2)
+  credit     Decimal?  @db.Decimal(10, 2)
+  userId     String?   @map("user_id") @db.VarChar(10)
+  dateEntered DateTime? @map("date_entered") @db.Date
+  benefit    Decimal?  @db.Decimal(5, 0)
+  anniv      Decimal?  @db.Decimal(2, 0)
+  claimNo    String?   @map("claim_no") @db.VarChar(20)
+  invoiceNo  String?   @map("invoice_no") @db.VarChar(20)
+  service    Decimal?  @db.Decimal(5, 0)
+  provider   Decimal?  @db.Decimal(5, 0)
+  notes      String?   @db.VarChar(50)
+  batchNo    Decimal?  @map("batch_no") @db.Decimal(5, 0)
+
+  @@index([preAuthNo])
+  @@index([memberNo])
+  @@map("claims_reserve")
+}
+
 model Premium {
   id              String        @id @default(cuid())
   referenceNumber String        @unique

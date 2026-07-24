@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { buildPreAuthorizationData } from "@/features/medical/care/pre-authorization";
 import { assertDateReportedInMemberCoverPeriod } from "@/features/medical/care/pre-authorization/server/assert-cover-period";
+import { buildClaimsReserveFromPreAuthorization } from "@/features/medical/care/pre-authorization/server/create-claims-reserve";
 import { prisma } from "@/lib/prisma";
 
 export async function GET() {
@@ -26,8 +27,17 @@ export async function POST(request: Request) {
     });
     if (coverError) return coverError;
 
-    const row = await prisma.preAuthorization.create({
-      data: result.data,
+    const row = await prisma.$transaction(async (tx) => {
+      const preAuth = await tx.preAuthorization.create({
+        data: result.data,
+      });
+
+      const reserveData = await buildClaimsReserveFromPreAuthorization(preAuth);
+      await tx.claimsReserve.create({
+        data: reserveData,
+      });
+
+      return preAuth;
     });
 
     return NextResponse.json(row, { status: 201 });
