@@ -8,12 +8,14 @@ import {
   defaultAssignAuthorizerForm,
   type AssignAuthorizerFormData,
 } from "@/features/medical/claims/batching/assign-authorizer-types";
+import type { LookupOption } from "@/features/medical/lookups/types";
 import { labelClass } from "@/lib/form-styles";
 
 type AssignAuthorizerFormProps = {
   batchId: string;
   batchNo: string;
   vetterName: string;
+  userOptions: LookupOption[];
   initial?: Partial<AssignAuthorizerFormData>;
   embedded?: boolean;
   onSuccess?: () => void;
@@ -23,10 +25,22 @@ type AssignAuthorizerFormProps = {
 const compactInputClass =
   "w-full border border-slate-300 bg-white px-2 py-1 text-[12px] text-slate-900 placeholder:text-slate-400 focus:border-maroon focus:outline-none";
 
+function userSelectOptions(
+  users: LookupOption[],
+  currentValue: string
+): LookupOption[] {
+  const options = [{ value: "", label: "Select user..." }, ...users];
+  if (currentValue && !users.some((option) => option.value === currentValue)) {
+    options.push({ value: currentValue, label: currentValue });
+  }
+  return options;
+}
+
 export function AssignAuthorizerForm({
   batchId,
   batchNo,
   vetterName,
+  userOptions,
   initial,
   embedded = false,
   onSuccess,
@@ -83,10 +97,11 @@ export function AssignAuthorizerForm({
           id="authorizerUser"
           name="authorizerUser"
           label="Authorizer"
+          as="select"
           required
           value={form.authorizerUser}
           onChange={handleChange}
-          placeholder="Enter authorizer name"
+          options={userSelectOptions(userOptions, form.authorizerUser)}
           labelClassName={labelClass}
           inputClassName={compactInputClass}
         />

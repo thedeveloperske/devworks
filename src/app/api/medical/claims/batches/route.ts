@@ -7,7 +7,8 @@ import { prisma } from "@/lib/prisma";
 async function resolveBatchUserDefault() {
   const cookieStore = await cookies();
   const session = await verifySessionToken(cookieStore.get(SESSION_COOKIE)?.value);
-  return session?.name ?? session?.email ?? undefined;
+  // Session `email` holds the login username.
+  return session?.email ?? undefined;
 }
 export async function GET() {
   const batches = await prisma.claimsBatch.findMany({

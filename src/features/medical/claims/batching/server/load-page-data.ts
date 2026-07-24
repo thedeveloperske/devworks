@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { loadProviderOptions } from "@/features/medical/admin/providers/server/load-page-data";
+import { loadUserOptions } from "@/features/medical/admin/users/server/load-page-data";
 import type { LookupOption } from "@/features/medical/lookups/types";
 import { SESSION_COOKIE, verifySessionToken } from "@/lib/auth-session";
 import { prisma } from "@/lib/prisma";
@@ -12,17 +13,20 @@ function formatDate(value: Date | null) {
 export async function loadClaimsBatchingPageData(): Promise<{
   batches: ClaimsBatchListItem[];
   providers: LookupOption[];
-  currentUserName: string;
+  userOptions: LookupOption[];
+  currentUsername: string;
 }> {
   const cookieStore = await cookies();
   const session = await verifySessionToken(cookieStore.get(SESSION_COOKIE)?.value);
-  const currentUserName = session?.name ?? session?.email ?? "";
+  // Session `email` holds the login username.
+  const currentUsername = session?.email ?? "";
 
-  const [rows, providers] = await Promise.all([
+  const [rows, providers, userOptions] = await Promise.all([
     prisma.claimsBatch.findMany({
       orderBy: [{ batchDate: "desc" }, { idx: "desc" }],
     }),
     loadProviderOptions(),
+    loadUserOptions(),
   ]);
 
   const providerNameByCode = Object.fromEntries(
@@ -51,5 +55,5 @@ export async function loadClaimsBatchingPageData(): Promise<{
     };
   });
 
-  return { batches, providers, currentUserName };
+  return { batches, providers, userOptions, currentUsername };
 }

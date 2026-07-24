@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import type { ClaimsBatchListItem } from "@/features/medical/claims/batching";
 import type { BatchManageTab } from "@/features/medical/claims/batching/batch-manage-types";
-import { canAssignAuthorizer, canAssignVetter } from "@/features/medical/claims/batching/batch-workflow";
+import { canAssignAuthorizer, canAssignFinance, canAssignVetter } from "@/features/medical/claims/batching/batch-workflow";
 
 type BatchActionsMenuProps = {
   batch: ClaimsBatchListItem;
@@ -13,7 +13,7 @@ type BatchActionsMenuProps = {
 };
 
 const menuWidth = 176;
-const menuItemCount = 4;
+const menuItemCount = 5;
 const menuItemHeight = 30;
 const menuPadding = 8;
 const menuHeight = menuItemCount * menuItemHeight + menuPadding;
@@ -53,6 +53,7 @@ export function BatchActionsMenu({ batch, onManage }: BatchActionsMenuProps) {
 
   const entrantAssigned = canAssignVetter(batch);
   const vetterAssigned = canAssignAuthorizer(batch);
+  const authorizerAssigned = canAssignFinance(batch);
 
   useEffect(() => {
     setMounted(true);
@@ -153,6 +154,23 @@ export function BatchActionsMenu({ batch, onManage }: BatchActionsMenuProps) {
         }}
       >
         {batch.authorisingUser ? "Reassign authorizer" : "Assign authorizer"}
+      </button>
+      <button
+        type="button"
+        role="menuitem"
+        disabled={!authorizerAssigned}
+        title={
+          authorizerAssigned
+            ? undefined
+            : "Assign an authorizer before assigning finance"
+        }
+        className={authorizerAssigned ? menuItemClass : menuItemDisabledClass}
+        onClick={() => {
+          if (!authorizerAssigned) return;
+          runAction(() => onManage(batch.id, "finance"));
+        }}
+      >
+        {batch.financeUser ? "Reassign finance" : "Assign finance"}
       </button>
     </div>
   ) : null;

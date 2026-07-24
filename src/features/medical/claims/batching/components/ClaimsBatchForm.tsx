@@ -15,7 +15,7 @@ type ClaimsBatchFormProps = {
   batchId?: string;
   initial?: Partial<ClaimsBatchFormData>;
   providers: LookupOption[];
-  currentUserName?: string;
+  currentUsername?: string;
   embedded?: boolean;
   onSuccess?: () => void;
   onCancel?: () => void;
@@ -36,7 +36,7 @@ export function ClaimsBatchForm({
   batchId,
   initial,
   providers,
-  currentUserName,
+  currentUsername,
   embedded = false,
   onSuccess,
   onCancel,
@@ -45,8 +45,11 @@ export function ClaimsBatchForm({
   const [error, setError] = useState("");
   const [form, setForm] = useState<ClaimsBatchFormData>(() => ({
     ...defaultClaimsBatchForm(),
-    batchUser: currentUserName ?? "",
     ...initial,
+    // New batches always use the signed-in username; edits keep stored batch user.
+    batchUser: batchId
+      ? (initial?.batchUser ?? currentUsername ?? "")
+      : (currentUsername ?? ""),
   }));
 
   const handleChange = (
@@ -101,8 +104,13 @@ export function ClaimsBatchForm({
               value={form.batchNo}
               onChange={handleChange}
               placeholder={isEdit ? "" : "Auto-generated as BAT-n"}
+              disabled={!isEdit}
               labelClassName={labelClass}
-              inputClassName={compactInputClass}
+              inputClassName={
+                isEdit
+                  ? compactInputClass
+                  : `${compactInputClass} cursor-not-allowed bg-slate-50 text-slate-600`
+              }
             />
             <FormField
               id="batchDate"
@@ -154,8 +162,9 @@ export function ClaimsBatchForm({
               label="Batch User"
               value={form.batchUser}
               onChange={handleChange}
+              disabled
               labelClassName={labelClass}
-              inputClassName={compactInputClass}
+              inputClassName={`${compactInputClass} cursor-not-allowed bg-slate-50 text-slate-600`}
             />
           </div>
         </div>

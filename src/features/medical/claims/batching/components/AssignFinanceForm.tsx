@@ -5,17 +5,18 @@ import { Button } from "@/components/admin/Button";
 import { FormError } from "@/components/admin/FormError";
 import { FormField } from "@/components/admin/FormField";
 import {
-  defaultAssignEntrantForm,
-  type AssignEntrantFormData,
-} from "@/features/medical/claims/batching/assign-entrant-types";
+  defaultAssignFinanceForm,
+  type AssignFinanceFormData,
+} from "@/features/medical/claims/batching/assign-finance-types";
 import type { LookupOption } from "@/features/medical/lookups/types";
 import { labelClass } from "@/lib/form-styles";
 
-type AssignEntrantFormProps = {
+type AssignFinanceFormProps = {
   batchId: string;
   batchNo: string;
+  authorizerName: string;
   userOptions: LookupOption[];
-  initial?: Partial<AssignEntrantFormData>;
+  initial?: Partial<AssignFinanceFormData>;
   embedded?: boolean;
   onSuccess?: () => void;
   onCancel?: () => void;
@@ -35,19 +36,20 @@ function userSelectOptions(
   return options;
 }
 
-export function AssignEntrantForm({
+export function AssignFinanceForm({
   batchId,
   batchNo,
+  authorizerName,
   userOptions,
   initial,
   embedded = false,
   onSuccess,
   onCancel,
-}: AssignEntrantFormProps) {
+}: AssignFinanceFormProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [form, setForm] = useState<AssignEntrantFormData>(() => ({
-    ...defaultAssignEntrantForm(),
+  const [form, setForm] = useState<AssignFinanceFormData>(() => ({
+    ...defaultAssignFinanceForm(),
     ...initial,
   }));
 
@@ -63,7 +65,7 @@ export function AssignEntrantForm({
     setLoading(true);
     setError("");
 
-    const res = await fetch(`/api/medical/claims/batches/${batchId}/assign-entrant`, {
+    const res = await fetch(`/api/medical/claims/batches/${batchId}/assign-finance`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(form),
@@ -87,18 +89,19 @@ export function AssignEntrantForm({
     <form onSubmit={handleSubmit} className={formClassName}>
       <div className={embedded ? "min-h-0 flex-1 space-y-3 overflow-y-auto pr-1" : "space-y-3"}>
         <p className="text-[12px] text-slate-600">
-          Assign batch <span className="font-semibold text-slate-900">{batchNo}</span> to an
-          entrant for data entry.
+          Assign batch <span className="font-semibold text-slate-900">{batchNo}</span> to
+          finance. Current authorizer:{" "}
+          <span className="font-semibold text-slate-900">{authorizerName}</span>.
         </p>
         <FormField
-          id="entrantUser"
-          name="entrantUser"
-          label="Entrant"
+          id="financeUser"
+          name="financeUser"
+          label="Finance user"
           as="select"
           required
-          value={form.entrantUser}
+          value={form.financeUser}
           onChange={handleChange}
-          options={userSelectOptions(userOptions, form.entrantUser)}
+          options={userSelectOptions(userOptions, form.financeUser)}
           labelClassName={labelClass}
           inputClassName={compactInputClass}
         />
@@ -130,7 +133,7 @@ export function AssignEntrantForm({
           </Button>
         ) : null}
         <Button type="submit" size="sm" disabled={loading}>
-          {loading ? "Assigning..." : "Assign Entrant"}
+          {loading ? "Assigning..." : "Assign Finance"}
         </Button>
       </div>
     </form>

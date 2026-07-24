@@ -8,7 +8,7 @@ import { ClaimsBatchForm } from "./ClaimsBatchForm";
 type EditBatchModalContentProps = {
   batchId: string;
   providers: LookupOption[];
-  currentUserName: string;
+  currentUsername: string;
   onClose: () => void;
   onUpdated: (message: string) => void;
 };
@@ -16,7 +16,7 @@ type EditBatchModalContentProps = {
 export function EditBatchModalContent({
   batchId,
   providers,
-  currentUserName,
+  currentUsername,
   onClose,
   onUpdated,
 }: EditBatchModalContentProps) {
@@ -75,7 +75,7 @@ export function EditBatchModalContent({
       batchId={batchId}
       initial={editForm}
       providers={providers}
-      currentUserName={currentUserName}
+      currentUsername={currentUsername}
       onSuccess={() => {
         onUpdated("Batch updated.");
         onClose();

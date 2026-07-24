@@ -21,3 +21,14 @@ export function hasVetterAssigned(batch: {
 export function canAssignAuthorizer(batch: ClaimsBatchListItem) {
   return hasVetterAssigned(batch);
 }
+
+export function hasAuthorizerAssigned(batch: {
+  authorisingUser: string | null;
+  authorisingUserDate: string | Date | null;
+}) {
+  return Boolean(batch.authorisingUser?.trim() && batch.authorisingUserDate);
+}
+
+export function canAssignFinance(batch: ClaimsBatchListItem) {
+  return hasAuthorizerAssigned(batch);
+}

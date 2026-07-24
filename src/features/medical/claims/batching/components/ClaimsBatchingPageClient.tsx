@@ -8,9 +8,10 @@ import { PageHeader } from "@/components/admin/PageHeader";
 import type { LookupOption } from "@/features/medical/lookups/types";
 import type { ClaimsBatchListItem } from "@/features/medical/claims/batching";
 import type { BatchManageTab } from "@/features/medical/claims/batching/batch-manage-types";
-import { canAssignAuthorizer, canAssignVetter } from "@/features/medical/claims/batching/batch-workflow";
+import { canAssignAuthorizer, canAssignFinance, canAssignVetter } from "@/features/medical/claims/batching/batch-workflow";
 import { AssignAuthorizerForm } from "./AssignAuthorizerForm";
 import { AssignEntrantForm } from "./AssignEntrantForm";
+import { AssignFinanceForm } from "./AssignFinanceForm";
 import { AssignVetterForm } from "./AssignVetterForm";
 import { BatchActionsMenu } from "./BatchActionsMenu";
 import { ClaimsBatchForm } from "./ClaimsBatchForm";
@@ -26,7 +27,8 @@ import {
 type ClaimsBatchingPageClientProps = {
   batches: ClaimsBatchListItem[];
   providers: LookupOption[];
-  currentUserName: string;
+  userOptions: LookupOption[];
+  currentUsername: string;
 };
 
 const compactThClass =
@@ -38,7 +40,13 @@ const emptyCellClass =
 const searchInputClass =
   "w-44 border border-slate-300 bg-white px-2 py-1 text-[12px] text-slate-900 placeholder:text-slate-400 focus:border-maroon focus:outline-none";
 
-const manageTabs: BatchManageTab[] = ["edit", "entrant", "vetter", "authorizer"];
+const manageTabs: BatchManageTab[] = [
+  "edit",
+  "entrant",
+  "vetter",
+  "authorizer",
+  "finance",
+];
 
 function parseManageTab(value: string | null): BatchManageTab | null {
   if (value && manageTabs.includes(value as BatchManageTab)) {
@@ -54,7 +62,8 @@ function todayIsoDate() {
 export function ClaimsBatchingPageClient({
   batches,
   providers,
-  currentUserName,
+  userOptions,
+  currentUsername,
 }: ClaimsBatchingPageClientProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -69,6 +78,7 @@ export function ClaimsBatchingPageClient({
   const assignEntrantOpen = Boolean(batchId && batchTab === "entrant");
   const assignVetterOpen = Boolean(batchId && batchTab === "vetter");
   const assignAuthorizerOpen = Boolean(batchId && batchTab === "authorizer");
+  const assignFinanceOpen = Boolean(batchId && batchTab === "finance");
   const viewModalOpen = Boolean(viewId);
   const modalOpen =
     manageOpen ||
@@ -77,6 +87,7 @@ export function ClaimsBatchingPageClient({
     assignEntrantOpen ||
     assignVetterOpen ||
     assignAuthorizerOpen ||
+    assignFinanceOpen ||
     viewModalOpen;
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -286,7 +297,7 @@ export function ClaimsBatchingPageClient({
         <ClaimsBatchForm
           embedded
           providers={providers}
-          currentUserName={currentUserName}
+          currentUsername={currentUsername}
           onSuccess={handleNewBatchSaved}
           onCancel={closeNewBatchModal}
         />
@@ -309,7 +320,7 @@ export function ClaimsBatchingPageClient({
             key={`edit-${batchId}`}
             batchId={batchId}
             providers={providers}
-            currentUserName={currentUserName}
+            currentUsername={currentUsername}
             onClose={closeActionModal}
             onUpdated={handleBatchUpdated}
           />
@@ -332,6 +343,7 @@ export function ClaimsBatchingPageClient({
             embedded
             batchId={batchId}
             batchNo={batchLabel}
+            userOptions={userOptions}
             initial={{
               entrantUser: actionBatch.dataEntryUser ?? "",
               assignedDate: actionBatch.dateEntryDate ?? todayIsoDate(),
@@ -360,6 +372,7 @@ export function ClaimsBatchingPageClient({
               batchId={batchId}
               batchNo={batchLabel}
               entrantName={actionBatch.dataEntryUser ?? ""}
+              userOptions={userOptions}
               initial={{
                 vetterUser: actionBatch.vettingUser ?? "",
                 assignedDate: actionBatch.vettingUserDate ?? todayIsoDate(),
@@ -395,6 +408,7 @@ export function ClaimsBatchingPageClient({
               batchId={batchId}
               batchNo={batchLabel}
               vetterName={actionBatch.vettingUser ?? ""}
+              userOptions={userOptions}
               initial={{
                 authorizerUser: actionBatch.authorisingUser ?? "",
                 assignedDate: actionBatch.authorisingUserDate ?? todayIsoDate(),
@@ -405,6 +419,41 @@ export function ClaimsBatchingPageClient({
           ) : (
             <p className="text-[12px] text-red-600">
               This batch must be assigned to a vetter before an authorizer can be assigned.
+            </p>
+          )
+        ) : batchId ? (
+          <p className="text-[12px] text-red-600">Batch not found.</p>
+        ) : null}
+      </Modal>
+
+      <Modal
+        open={assignFinanceOpen}
+        onClose={closeActionModal}
+        variant="popup"
+        size="md"
+        title={actionBatch?.financeUser ? "Reassign Finance" : "Assign Finance"}
+        description={`Assign finance for ${batchLabel}`}
+      >
+        {batchId && actionBatch ? (
+          canAssignFinance(actionBatch) ? (
+            <AssignFinanceForm
+              key={`${batchId}-finance-${actionBatch.financeUser ?? ""}-${actionBatch.financeUserDate ?? ""}`}
+              embedded
+              batchId={batchId}
+              batchNo={batchLabel}
+              authorizerName={actionBatch.authorisingUser ?? ""}
+              userOptions={userOptions}
+              initial={{
+                financeUser: actionBatch.financeUser ?? "",
+                assignedDate: actionBatch.financeUserDate ?? todayIsoDate(),
+              }}
+              onSuccess={() => handleBatchUpdated("Batch assigned to finance.")}
+              onCancel={closeActionModal}
+            />
+          ) : (
+            <p className="text-[12px] text-red-600">
+              This batch must be assigned to an authorizer before finance can be
+              assigned.
             </p>
           )
         ) : batchId ? (

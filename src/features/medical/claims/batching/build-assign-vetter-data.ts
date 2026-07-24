@@ -30,7 +30,7 @@ function parseRequiredString(value: string | undefined, label: string, maxLength
 }
 
 export function buildAssignVetterData(body: Partial<AssignVetterFormData>) {
-  const vetterResult = parseRequiredString(body.vetterUser, "Vetter name", 100);
+  const vetterResult = parseRequiredString(body.vetterUser, "Vetter", 100);
   if ("error" in vetterResult) return vetterResult;
 
   const assignedDateResult = parseRequiredDate(body.assignedDate, "Assignment date");

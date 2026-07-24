@@ -30,7 +30,7 @@ function parseRequiredString(value: string | undefined, label: string, maxLength
 }
 
 export function buildAssignAuthorizerData(body: Partial<AssignAuthorizerFormData>) {
-  const authorizerResult = parseRequiredString(body.authorizerUser, "Authorizer name", 100);
+  const authorizerResult = parseRequiredString(body.authorizerUser, "Authorizer", 100);
   if ("error" in authorizerResult) return authorizerResult;
 
   const assignedDateResult = parseRequiredDate(body.assignedDate, "Assignment date");

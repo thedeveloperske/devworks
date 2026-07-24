@@ -8,12 +8,14 @@ import {
   defaultAssignVetterForm,
   type AssignVetterFormData,
 } from "@/features/medical/claims/batching/assign-vetter-types";
+import type { LookupOption } from "@/features/medical/lookups/types";
 import { labelClass } from "@/lib/form-styles";
 
 type AssignVetterFormProps = {
   batchId: string;
   batchNo: string;
   entrantName: string;
+  userOptions: LookupOption[];
   initial?: Partial<AssignVetterFormData>;
   embedded?: boolean;
   onSuccess?: () => void;
@@ -23,10 +25,22 @@ type AssignVetterFormProps = {
 const compactInputClass =
   "w-full border border-slate-300 bg-white px-2 py-1 text-[12px] text-slate-900 placeholder:text-slate-400 focus:border-maroon focus:outline-none";
 
+function userSelectOptions(
+  users: LookupOption[],
+  currentValue: string
+): LookupOption[] {
+  const options = [{ value: "", label: "Select user..." }, ...users];
+  if (currentValue && !users.some((option) => option.value === currentValue)) {
+    options.push({ value: currentValue, label: currentValue });
+  }
+  return options;
+}
+
 export function AssignVetterForm({
   batchId,
   batchNo,
   entrantName,
+  userOptions,
   initial,
   embedded = false,
   onSuccess,
@@ -83,10 +97,11 @@ export function AssignVetterForm({
           id="vetterUser"
           name="vetterUser"
           label="Vetter"
+          as="select"
           required
           value={form.vetterUser}
           onChange={handleChange}
-          placeholder="Enter vetter name"
+          options={userSelectOptions(userOptions, form.vetterUser)}
           labelClassName={labelClass}
           inputClassName={compactInputClass}
         />

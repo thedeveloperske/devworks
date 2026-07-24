@@ -3,12 +3,14 @@ import { ClaimsBatchingPageClient } from "@/features/medical/claims/batching/com
 import { loadClaimsBatchingPageData } from "@/features/medical/claims/batching/server/load-page-data";
 
 async function ClaimsBatchingContent() {
-  const { batches, providers, currentUserName } = await loadClaimsBatchingPageData();
+  const { batches, providers, userOptions, currentUsername } =
+    await loadClaimsBatchingPageData();
   return (
     <ClaimsBatchingPageClient
       batches={batches}
       providers={providers}
-      currentUserName={currentUserName}
+      userOptions={userOptions}
+      currentUsername={currentUsername}
     />
   );
 }

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import type { AssignEntrantFormData } from "./assign-entrant-types";
+import type { AssignFinanceFormData } from "./assign-finance-types";
 
 type BuildError = { error: NextResponse };
 
@@ -29,17 +29,17 @@ function parseRequiredString(value: string | undefined, label: string, maxLength
   return { value: trimmed };
 }
 
-export function buildAssignEntrantData(body: Partial<AssignEntrantFormData>) {
-  const entrantResult = parseRequiredString(body.entrantUser, "Entrant", 100);
-  if ("error" in entrantResult) return entrantResult;
+export function buildAssignFinanceData(body: Partial<AssignFinanceFormData>) {
+  const financeResult = parseRequiredString(body.financeUser, "Finance user", 100);
+  if ("error" in financeResult) return financeResult;
 
   const assignedDateResult = parseRequiredDate(body.assignedDate, "Assignment date");
   if ("error" in assignedDateResult) return assignedDateResult;
 
   return {
     data: {
-      dataEntryUser: entrantResult.value,
-      dateEntryDate: assignedDateResult.date,
+      financeUser: financeResult.value,
+      financeUserDate: assignedDateResult.date,
     },
   };
 }

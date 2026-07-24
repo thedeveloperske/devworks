@@ -3,6 +3,7 @@ export { EditBatchModalContent } from "./EditBatchModalContent";
 export { ClaimsBatchForm } from "./ClaimsBatchForm";
 export { AssignEntrantForm } from "./AssignEntrantForm";
 export { AssignAuthorizerForm } from "./AssignAuthorizerForm";
+export { AssignFinanceForm } from "./AssignFinanceForm";
 export { AssignVetterForm } from "./AssignVetterForm";
 export { ViewBatchDetails } from "./ViewBatchDetails";
 export { ClaimsBatchingPageClient } from "./ClaimsBatchingPageClient";

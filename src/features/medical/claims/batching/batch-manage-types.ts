@@ -1,1 +1,1 @@
-export type BatchManageTab = "edit" | "entrant" | "vetter" | "authorizer";
+export type BatchManageTab = "edit" | "entrant" | "vetter" | "authorizer" | "finance";
