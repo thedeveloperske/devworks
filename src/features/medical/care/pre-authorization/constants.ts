@@ -40,7 +40,7 @@ export const preAuthorizationFields: PreAuthorizationField[] = [
     label: "Provider *",
     required: true,
     as: "select",
-    className: "lg:col-span-4",
+    className: "lg:col-span-3",
   },
   {
     name: "anniv",
@@ -57,28 +57,28 @@ export const preAuthorizationFields: PreAuthorizationField[] = [
   {
     name: "reportedBy",
     label: "Reported By",
-    className: "lg:col-span-2",
+    className: "lg:col-span-3",
   },
   {
     name: "availableLimit",
     label: "Available Limit",
-    className: "lg:col-span-3",
+    className: "lg:col-span-2",
   },
   {
     name: "bedLimit",
     label: "Bed Limit",
-    className: "lg:col-span-3",
+    className: "lg:col-span-2",
   },
   {
     name: "admitDays",
     label: "Admit Days",
     type: "number",
-    className: "lg:col-span-2",
+    className: "lg:col-span-1",
   },
   {
     name: "reserve",
     label: "Reserve",
-    className: "lg:col-span-4",
+    className: "lg:col-span-2",
   },
   {
     name: "preDiagnosis",
