@@ -6,6 +6,7 @@ import { categoryGroupFields } from "@/features/medical/corporates";
 import type { CategoryGroupFormData } from "@/features/medical/corporates";
 import { benefitSharingOptions, fundOn } from "@/features/medical/lookups";
 import type { LookupOption } from "@/features/medical/lookups/types";
+import { formatThousands } from "@/lib/format";
 
 type CategoriesFormProps = {
   rows: CategoryGroupFormData[];
@@ -167,6 +168,27 @@ function renderCell(
       selectClass,
       (e) => onRowChange(rowIndex, e),
       { required: field.required }
+    );
+  }
+
+  if (field.name === "policyLimit" || field.name === "copayAmount") {
+    return (
+      <input
+        id={fieldId}
+        name={field.name}
+        aria-label={field.label}
+        type="text"
+        inputMode="decimal"
+        required={field.required}
+        value={row[field.name]}
+        onChange={(e) => {
+          const formatted = formatThousands(e.target.value);
+          onRowChange(rowIndex, {
+            target: { name: field.name, value: formatted },
+          } as React.ChangeEvent<HTMLInputElement>);
+        }}
+        className={`${fieldInputClass} min-w-[120px] text-right`}
+      />
     );
   }
 

@@ -164,12 +164,12 @@ export const categoryGroupFields = [
   { name: "category", label: "Category", required: true },
   { name: "benefit", label: "Benefit" },
   { name: "fund", label: "Fund" },
-  { name: "policyLimit", label: "Limit", type: "number" },
+  { name: "hospitalWard", label: "Hospital Ward" },
+  { name: "policyLimit", label: "Limit" },
   { name: "subLimitOf", label: "Sub Limit Of" },
   { name: "sharing", label: "Sharing" },
-  { name: "copayAmount", label: "Copay Amount", type: "number" },
+  { name: "copayAmount", label: "Copay Amount" },
   { name: "waitingPeriod", label: "Waiting Period" },
-  { name: "hospitalWard", label: "Hospital Ward" },
 ] satisfies CategoryGroupField[];
 
 export const providerRestrictionFields = [

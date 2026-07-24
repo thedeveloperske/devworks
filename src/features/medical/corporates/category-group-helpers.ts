@@ -23,7 +23,7 @@ function parseOptionalInt(value: string | undefined, label: string) {
 }
 
 function parseOptionalDecimal(value: string | undefined, label: string) {
-  const trimmed = value?.trim();
+  const trimmed = value?.replace(/,/g, "").trim();
   if (!trimmed) return { value: null };
   const parsed = Number(trimmed);
   if (Number.isNaN(parsed)) {
@@ -43,6 +43,14 @@ function parseRequiredCategory(value: string | undefined, label: string) {
 function decimalToString(value: Prisma.Decimal | number | null | undefined) {
   if (value == null) return "";
   return String(value);
+}
+
+function formatAmountString(value: Prisma.Decimal | number | null | undefined) {
+  if (value == null) return "";
+  const raw = String(value);
+  const [intPart, fracPart] = raw.split(".");
+  const formattedInt = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  return fracPart != null ? `${formattedInt}.${fracPart}` : formattedInt;
 }
 
 export function hasCategoryGroupRowInput(group?: CategoryGroupInput) {
@@ -230,10 +238,10 @@ export function corpGroupToFormValues(group: {
     category: group.category ?? "",
     benefit: intToString(group.benefit),
     fund: group.fund != null ? String(group.fund) : "0",
-    policyLimit: decimalToString(group.policyLimit),
+    policyLimit: formatAmountString(group.policyLimit),
     subLimitOf: intToString(group.subLimitOf),
     sharing: intToString(group.sharing),
-    copayAmount: decimalToString(group.copayAmount),
+    copayAmount: formatAmountString(group.copayAmount),
     waitingPeriod: intToString(group.waitingPeriod),
     hospitalWard: intToString(group.hospitalWard),
   };
