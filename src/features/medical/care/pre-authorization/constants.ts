@@ -58,8 +58,6 @@ export const preAuthorizationFieldNames: (keyof PreAuthorizationFormData)[] = [
   "provider",
   "dateReported",
   "reportedBy",
-  "dateAuthorized",
-  "authorizedBy",
   "preDiagnosis",
   "authorityType",
   "ward",
@@ -67,14 +65,9 @@ export const preAuthorizationFieldNames: (keyof PreAuthorizationFormData)[] = [
   "admitDays",
   "reserve",
   "notes",
-  "coSignee",
   "anniv",
   "clinicalProcedure",
-  "doctor1",
-  "doctor2",
-  "batchNo",
   "bedLimit",
-  "validityDate",
   "careNotes",
 ];
 
