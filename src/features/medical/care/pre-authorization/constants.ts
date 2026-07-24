@@ -125,13 +125,13 @@ export const preAuthorizationFieldNames: (keyof PreAuthorizationFormData)[] = [
   "anniv",
   "dateReported",
   "reportedBy",
+  "authorityType",
+  "ward",
   "availableLimit",
   "bedLimit",
   "admitDays",
   "reserve",
   "preDiagnosis",
-  "authorityType",
-  "ward",
   "clinicalProcedure",
   "notes",
 ];
@@ -148,6 +148,8 @@ export const preAuthorizationFormSections: {
       "anniv",
       "dateReported",
       "reportedBy",
+      "authorityType",
+      "ward",
       "availableLimit",
       "bedLimit",
       "admitDays",
@@ -156,7 +158,7 @@ export const preAuthorizationFormSections: {
   },
   {
     title: "Clinical",
-    fields: ["preDiagnosis", "authorityType", "ward", "clinicalProcedure"],
+    fields: ["preDiagnosis", "clinicalProcedure"],
   },
   {
     title: "Notes",
