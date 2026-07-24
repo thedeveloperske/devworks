@@ -60,6 +60,18 @@ export const preAuthorizationFields: PreAuthorizationField[] = [
     className: "lg:col-span-3",
   },
   {
+    name: "authorityType",
+    label: "Authority Type",
+    as: "select",
+    className: "lg:col-span-3",
+  },
+  {
+    name: "ward",
+    label: "Ward",
+    as: "select",
+    className: "lg:col-span-2",
+  },
+  {
     name: "availableLimit",
     label: "Available Limit",
     className: "lg:col-span-2",
@@ -84,18 +96,6 @@ export const preAuthorizationFields: PreAuthorizationField[] = [
     name: "preDiagnosis",
     label: "Pre Diagnosis",
     className: "sm:col-span-2 lg:col-span-6",
-  },
-  {
-    name: "authorityType",
-    label: "Authority Type",
-    as: "select",
-    className: "lg:col-span-3",
-  },
-  {
-    name: "ward",
-    label: "Ward",
-    as: "select",
-    className: "lg:col-span-3",
   },
   {
     name: "clinicalProcedure",
