@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
-import {
-  assertDateReportedInMemberCoverPeriod,
-  buildPreAuthorizationData,
-} from "@/features/medical/care/pre-authorization";
+import { buildPreAuthorizationData } from "@/features/medical/care/pre-authorization";
+import { assertDateReportedInMemberCoverPeriod } from "@/features/medical/care/pre-authorization/server/assert-cover-period";
 import { prisma } from "@/lib/prisma";
 
 type RouteParams = { params: Promise<{ id: string }> };
