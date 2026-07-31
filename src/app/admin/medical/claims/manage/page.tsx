@@ -1,7 +1,5 @@
-import { PageHeader } from "@/components/admin/PageHeader";
+import { ManageClaimsPageClient } from "@/features/medical/claims/manage";
 
 export default function ManageClaimsPage() {
-  return (
-    <PageHeader title="Manage Claims" description="Manage claims" />
-  );
+  return <ManageClaimsPageClient />;
 }
