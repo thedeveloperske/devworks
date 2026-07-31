@@ -69,3 +69,10 @@ html {
     left: 14rem; /* matches aside w-56 */
   }
 }
+
+/* Admin shell owns the viewport; avoid page-level scroll */
+body:has([data-admin]) {
+  height: 100%;
+  overflow: hidden;
+  padding-bottom: 0;
+}

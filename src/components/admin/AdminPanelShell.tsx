@@ -525,8 +525,8 @@ export function AdminPanelShell({
   );
 
   return (
-    <div data-admin className="flex min-h-dvh flex-1 flex-col bg-slate-50">
-      <header className="sticky top-0 z-100 shrink-0 border-b border-slate-200 bg-white">
+    <div data-admin className="flex h-dvh flex-col overflow-hidden bg-slate-50">
+      <header className="z-100 shrink-0 border-b border-slate-200 bg-white">
         <div className="flex items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
           <div className="flex min-w-0 flex-1 items-center gap-3">
             <button
@@ -544,12 +544,12 @@ export function AdminPanelShell({
         </div>
       </header>
 
-      <div className="relative flex min-h-0 flex-1 overflow-hidden">
-        <aside className="hidden h-full min-h-0 w-56 shrink-0 flex-col border-r border-slate-200 bg-white lg:flex">
+      <div className="flex min-h-0 flex-1 overflow-hidden">
+        <aside className="hidden min-h-0 w-56 shrink-0 flex-col overflow-hidden border-r border-slate-200 bg-white lg:flex">
           <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
             {renderNavContent()}
           </div>
-          <footer className="mt-auto shrink-0 border-t border-slate-200 bg-white p-2.5">
+          <footer className="shrink-0 border-t border-slate-200 bg-white p-2.5">
             {renderUserCard()}
           </footer>
         </aside>
@@ -562,7 +562,7 @@ export function AdminPanelShell({
               className="fixed inset-0 z-40 bg-slate-900/30 lg:hidden"
               onClick={() => setMobileNavOpen(false)}
             />
-            <aside className="fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-slate-200 bg-white shadow-lg lg:hidden">
+            <aside className="fixed inset-y-0 left-0 z-50 flex w-64 flex-col overflow-hidden border-r border-slate-200 bg-white shadow-lg lg:hidden">
               <div className="flex shrink-0 items-center justify-between border-b border-slate-200 px-3 py-3">
                 <p className="text-[11px] font-semibold text-slate-700">
                   Navigation
@@ -578,14 +578,14 @@ export function AdminPanelShell({
               <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
                 {renderNavContent()}
               </div>
-              <footer className="mt-auto shrink-0 border-t border-slate-200 bg-white p-2">
+              <footer className="shrink-0 border-t border-slate-200 bg-white p-2">
                 {renderUserCard()}
               </footer>
             </aside>
           </>
         ) : null}
 
-        <main className="relative min-w-0 flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+        <main className="min-h-0 min-w-0 flex-1 overflow-y-auto p-4 pb-10 sm:p-6 sm:pb-10 lg:p-8 lg:pb-10">
           {children}
         </main>
       </div>
