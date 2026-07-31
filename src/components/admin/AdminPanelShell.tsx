@@ -355,13 +355,13 @@ function NavLink({
     <Link
       href={href}
       onClick={onNavigate}
-      className={`flex items-center gap-2 rounded px-2.5 py-2 text-[12px] font-semibold transition ${
+      className={`flex items-center gap-2.5 rounded px-2.5 py-2.5 text-[12px] font-semibold transition ${
         active
           ? "bg-maroon/10 text-maroon"
           : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
       }`}
     >
-      {Icon ? <Icon className="h-3.5 w-3.5 shrink-0" /> : null}
+      {Icon ? <Icon className="h-4 w-4 shrink-0" /> : null}
       <span>{label}</span>
     </Link>
   );
@@ -400,22 +400,22 @@ function NavGroup({
           if (!hasChildren) return;
           setOpenGroupHref(open ? null : item.href);
         }}
-        className={`flex w-full items-center gap-2 rounded px-2.5 py-2 text-left text-[12px] font-semibold transition ${
+        className={`flex w-full items-center gap-2.5 rounded px-2.5 py-2.5 text-left text-[12px] font-semibold transition ${
           groupActive
             ? "bg-maroon/10 text-maroon"
             : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
         }`}
       >
-        <Icon className="h-3.5 w-3.5 shrink-0" />
+        <Icon className="h-4 w-4 shrink-0" />
         <span className="min-w-0 flex-1">{item.label}</span>
         {hasChildren ? (
           <ChevronDown
-            className={`h-3.5 w-3.5 shrink-0 transition ${open ? "rotate-180" : ""}`}
+            className={`h-4 w-4 shrink-0 transition ${open ? "rotate-180" : ""}`}
           />
         ) : null}
       </button>
       {open && hasChildren ? (
-        <div className="mt-0.5 space-y-0.5 border-l border-slate-200 py-0.5 pl-3 ml-3.5">
+        <div className="mt-1 space-y-1 border-l border-slate-200 py-1 pl-3 ml-4">
           {item.children!.map((child) => {
             const active = child.match
               ? child.match(pathname, searchParams)
@@ -427,7 +427,7 @@ function NavGroup({
                 onClick={() => {
                   onNavigate?.();
                 }}
-                className={`block rounded px-2.5 py-1.5 text-[12px] font-medium transition ${
+                className={`block rounded px-2.5 py-2 text-[12px] font-medium transition ${
                   active
                     ? "bg-maroon/10 text-maroon"
                     : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
@@ -503,7 +503,7 @@ export function AdminPanelShell({
   }, []);
 
   const navContent = (
-    <nav className="flex flex-col gap-0.5 p-3">
+    <nav className="flex flex-col gap-1.5 p-3">
       {navItems.map((item) =>
         renderNavItem(item, openGroupHref, setOpenGroupHref, () =>
           setMobileNavOpen(false)
