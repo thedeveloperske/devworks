@@ -30,14 +30,16 @@ export default async function ApplicationsPage() {
           <div className="flex items-center gap-3">
             <Image
               src="/logo-amanaha.png"
-              alt="Amanah Insurance"
+              alt="Promed Web Experience"
               width={180}
               height={54}
               className="h-10 w-auto sm:h-12"
               priority
             />
             <div>
-              <p className="text-[12px] font-semibold text-maroon">Promed Applications</p>
+              <p className="text-[12px] font-semibold text-maroon">
+                Promed Web Experience
+              </p>
               <p className="text-[12px] text-slate-500">Signed in as {session.name}</p>
             </div>
           </div>

@@ -61,12 +61,15 @@ export function LoginForm() {
       <div className="mb-8">
         <Image
           src="/logo-amanaha.png"
-          alt="Amanah Insurance"
+          alt="Promed Web Experience"
           width={280}
           height={84}
           className="h-16 w-auto sm:h-20"
           priority
         />
+        <p className="mt-3 text-center text-[12px] font-semibold text-maroon">
+          Promed Web Experience
+        </p>
       </div>
 
       <form onSubmit={handleSubmit} className={`${formCardClass} w-full max-w-md`}>

@@ -10,7 +10,7 @@ const geist = Geist({
 });
 
 export const metadata: Metadata = {
-  title: "Amanah Admin",
+  title: "Promed Web Experience",
   description: "Admin panel for managing corporates and members",
   icons: {
     icon: "/logo-amanaha.png",

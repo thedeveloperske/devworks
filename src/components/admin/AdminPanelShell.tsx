@@ -322,14 +322,14 @@ function AdminBrand({ homeHref }: { homeHref: string }) {
     <Link href={homeHref} className="flex min-w-0 items-center gap-3">
       <Image
         src="/logo-amanaha.png"
-        alt="Amanah Insurance"
+        alt="Promed Web Experience"
         width={180}
         height={54}
         className="h-12 w-auto shrink-0 sm:h-14"
         priority
       />
       <span className="max-w-36 text-left text-[8px] font-medium leading-snug tracking-wide text-slate-500 sm:max-w-none sm:text-[9px]">
-        Medical Insurance Experience
+        Promed Web Experience
       </span>
     </Link>
   );
