@@ -163,10 +163,10 @@ export function MemberStatusPageClient({
     []
   );
 
-  const memberCountByCorporateId = useMemo(() => {
+  const principalCountByCorporateId = useMemo(() => {
     const counts: Record<string, number> = {};
     for (const member of membersList) {
-      if (!member.corporateId) continue;
+      if (!member.corporateId || member.memberType !== "Principal") continue;
       counts[member.corporateId] = (counts[member.corporateId] ?? 0) + 1;
     }
     return counts;
@@ -188,19 +188,22 @@ export function MemberStatusPageClient({
     [corporates, selectedCorporateId]
   );
 
-  const filteredMembers = useMemo(() => {
+  const corporatePrincipals = useMemo(() => {
     if (!selectedCorporateId) return [];
-    let corporateMembers = membersList.filter(
-      (member) => member.corporateId === selectedCorporateId
+    return membersList.filter(
+      (member) =>
+        member.corporateId === selectedCorporateId &&
+        member.memberType === "Principal"
     );
+  }, [membersList, selectedCorporateId]);
 
-    // Cancelling targets members not yet cancelled (null/0); Reinstating
-    // targets cancelled ones (1). Family scope only lists principals.
-    corporateMembers = corporateMembers.filter((member) => {
+  const filteredMembers = useMemo(() => {
+    // Always list principals only; member vs family scope controls apply target.
+    let corporateMembers = corporatePrincipals.filter((member) => {
       const isCancelled = member.cancelled === 1;
       if (action === "cancel" && isCancelled) return false;
       if (action === "reinstate" && !isCancelled) return false;
-      return scope === "family" ? member.memberType === "Principal" : true;
+      return true;
     });
 
     const query = memberSearchQuery.trim().toLowerCase();
@@ -211,7 +214,6 @@ export function MemberStatusPageClient({
         member.memberNo,
         member.familyNo,
         member.name,
-        member.memberType,
         statusLabelById[member.status] ?? member.status,
       ]
         .filter(Boolean)
@@ -219,16 +221,44 @@ export function MemberStatusPageClient({
     );
   }, [
     action,
+    corporatePrincipals,
     memberSearchQuery,
-    membersList,
-    scope,
-    selectedCorporateId,
     statusLabelById,
   ]);
+
+  const activeModeLabel =
+    statusModeOptions.find(
+      (option) => option.action === action && option.scope === scope
+    )?.label ?? "";
+
+  const membersEmptyMessage = useMemo(() => {
+    if (corporatePrincipals.length === 0) {
+      return "No principal members found for this corporate.";
+    }
+    const eligibleCount = corporatePrincipals.filter((member) => {
+      const isCancelled = member.cancelled === 1;
+      if (action === "cancel" && isCancelled) return false;
+      if (action === "reinstate" && !isCancelled) return false;
+      return true;
+    }).length;
+    if (eligibleCount === 0) {
+      return action === "cancel"
+        ? "No active principal members to cancel."
+        : "No cancelled principal members to reinstate.";
+    }
+    if (memberSearchQuery.trim()) {
+      return "No principal members match your search.";
+    }
+    return "No principal members found.";
+  }, [action, corporatePrincipals, memberSearchQuery]);
 
   const closeModal = useCallback(() => {
     router.replace("/admin/medical");
   }, [router]);
+
+  const backToCorporates = useCallback(() => {
+    router.replace(pathname, { scroll: false });
+  }, [pathname, router]);
 
   const closeConfirmDialog = useCallback(() => {
     if (savingKey) return;
@@ -344,7 +374,7 @@ export function MemberStatusPageClient({
               <th className={thClass}>Corporate</th>
               <th className={thClass}>Corp ID</th>
               <th className={thClass}>Policy No</th>
-              <th className={thClass}>Members</th>
+              <th className={thClass}>Principals</th>
             </tr>
           </thead>
           <tbody>
@@ -371,7 +401,7 @@ export function MemberStatusPageClient({
                   <td className={tdClass}>{corporate.corpId ?? "—"}</td>
                   <td className={tdClass}>{corporate.policyNo ?? "—"}</td>
                   <td className={tdClass}>
-                    {memberCountByCorporateId[corporate.id] ?? 0}
+                    {principalCountByCorporateId[corporate.id] ?? 0}
                   </td>
                 </tr>
               ))
@@ -389,9 +419,20 @@ export function MemberStatusPageClient({
   const membersTable = (
     <section className="flex min-h-0 flex-1 flex-col gap-1.5">
       <div className="flex shrink-0 flex-wrap items-center justify-between gap-2">
-        <p className="min-w-0 truncate text-[12px] text-slate-600">
-          {selectedCorporate?.corporate ?? "Members"}
-        </p>
+        <div className="flex min-w-0 flex-wrap items-center gap-2">
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            onClick={backToCorporates}
+            disabled={saving}
+          >
+            Back
+          </Button>
+          <p className="min-w-0 truncate text-[12px] text-slate-600">
+            {selectedCorporate?.corporate ?? "Principals"}
+          </p>
+        </div>
         <div className="flex flex-wrap items-center justify-end gap-1.5">
           {statusModeOptions.map((option) => {
             const active =
@@ -419,12 +460,18 @@ export function MemberStatusPageClient({
             type="text"
             value={memberSearchQuery}
             onChange={(e) => setMemberSearchQuery(e.target.value)}
-            placeholder="Search..."
-            aria-label="Search members"
+            placeholder="Search principals..."
+            aria-label="Search principal members"
             className={searchInputClass}
           />
         </div>
       </div>
+      <p className="shrink-0 text-[12px] text-slate-500">
+        {activeModeLabel}. Showing principal members only
+        {scope === "family"
+          ? " — action applies to the whole family."
+          : " — action applies to the principal only."}
+      </p>
       {actionError ? (
         <p className="shrink-0 text-[12px] text-red-600">{actionError}</p>
       ) : null}
@@ -444,7 +491,6 @@ export function MemberStatusPageClient({
               <th className={thClass}>Member No</th>
               <th className={thClass}>Family No</th>
               <th className={thClass}>Name</th>
-              <th className={thClass}>Type</th>
               <th className={thClass}>Anniv</th>
               <th className={thClass}>Status</th>
               <th className={thClass}>Action</th>
@@ -453,12 +499,8 @@ export function MemberStatusPageClient({
           <tbody>
             {filteredMembers.length === 0 ? (
               <tr>
-                <td colSpan={7} className={emptyCellClass}>
-                  {membersList.some(
-                    (member) => member.corporateId === selectedCorporateId
-                  )
-                    ? "No members match your search."
-                    : "No members found for this corporate."}
+                <td colSpan={6} className={emptyCellClass}>
+                  {membersEmptyMessage}
                 </td>
               </tr>
             ) : (
@@ -475,7 +517,6 @@ export function MemberStatusPageClient({
                     <td className={tdClass}>{member.memberNo}</td>
                     <td className={tdClass}>{member.familyNo || "—"}</td>
                     <td className={tdClass}>{member.name}</td>
-                    <td className={tdClass}>{member.memberType}</td>
                     <td className={tdClass}>{member.anniv || "—"}</td>
                     <td className={tdClass}>
                       {member.status
@@ -517,7 +558,7 @@ export function MemberStatusPageClient({
         open
         onClose={closeModal}
         title="Member Cancellation & Reinstate"
-        description="Select a corporate, choose an action, then apply it from a member row"
+        description="Select a corporate, then cancel or reinstate by principal"
       >
         <div className="flex min-h-0 flex-1 flex-col gap-3">
           {selectedCorporateId ? membersTable : corporatesTable}
