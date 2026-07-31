@@ -18,7 +18,7 @@ const menuHeaderHeight = 48;
 const menuHeight = menuHeaderHeight + menuItemCount * menuItemHeight + menuPadding;
 
 const menuPanelClass =
-  "fixed z-50 min-w-[12.5rem] border border-slate-200 bg-white py-1 shadow-lg";
+  "fixed z-[120] min-w-[12.5rem] border border-slate-200 bg-white py-1 shadow-lg";
 const menuItemClass =
   "block w-full px-3 py-1.5 text-left text-[12px] text-slate-700 hover:bg-slate-50";
 const menuItemDangerClass =
@@ -186,19 +186,19 @@ export function UserAvatarMenu({ name, email }: UserAvatarMenuProps) {
         aria-expanded={open}
         aria-haspopup="menu"
         onClick={() => setOpen((current) => !current)}
-        className="inline-flex items-center gap-2 border border-slate-200 bg-white px-1.5 py-1 hover:border-maroon/40"
+        className="relative z-[110] inline-flex max-w-full shrink-0 items-center gap-2 border border-slate-200 bg-white px-1.5 py-1 hover:border-maroon/40"
       >
         <span
           aria-hidden
-          className="inline-flex h-7 w-7 items-center justify-center bg-maroon text-[11px] font-bold text-white"
+          className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-maroon text-[11px] font-bold text-white"
         >
           {initials}
         </span>
-        <span className="hidden max-w-28 truncate text-[12px] font-semibold text-slate-700 sm:inline">
+        <span className="hidden min-w-0 max-w-[9rem] truncate text-[12px] font-semibold text-slate-700 sm:inline">
           {displayName}
         </span>
         <ChevronDown
-          className={`h-3.5 w-3.5 text-slate-500 transition ${
+          className={`h-3.5 w-3.5 shrink-0 text-slate-500 transition ${
             open ? "rotate-180" : ""
           }`}
         />

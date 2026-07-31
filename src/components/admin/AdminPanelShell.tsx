@@ -328,7 +328,7 @@ function AdminBrand({ homeHref }: { homeHref: string }) {
         className="h-12 w-auto shrink-0 sm:h-14"
         priority
       />
-      <span className="max-w-36 text-left text-[8px] font-medium leading-snug tracking-wide text-slate-500 sm:max-w-none sm:text-[9px]">
+      <span className="hidden min-w-0 truncate text-left text-[8px] font-medium leading-snug tracking-wide text-slate-500 sm:inline sm:text-[9px]">
         Promed Web Experience
       </span>
     </Link>
@@ -520,10 +520,10 @@ export function AdminPanelShell({
     <div data-admin className="flex min-h-dvh flex-1 flex-col bg-slate-50">
       <header className="sticky top-0 z-100 shrink-0 border-b border-slate-200 bg-white">
         <div className="flex items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
-          <div className="flex min-w-0 items-center gap-3">
+          <div className="flex min-w-0 flex-1 items-center gap-3">
             <button
               type="button"
-              className="inline-flex items-center justify-center rounded border border-slate-200 p-1.5 text-slate-600 hover:bg-slate-50 lg:hidden"
+              className="inline-flex shrink-0 items-center justify-center rounded border border-slate-200 p-1.5 text-slate-600 hover:bg-slate-50 lg:hidden"
               aria-label={mobileNavOpen ? "Close navigation" : "Open navigation"}
               onClick={() => setMobileNavOpen((open) => !open)}
             >
@@ -533,7 +533,7 @@ export function AdminPanelShell({
             </button>
             <AdminBrand homeHref={basePath} />
           </div>
-          <div className="flex items-center gap-4">
+          <div className="relative z-[110] flex shrink-0 items-center">
             <UserAvatarMenu
               name={userName?.trim() || userEmail?.trim() || "User"}
               email={userEmail}
