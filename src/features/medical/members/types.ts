@@ -89,31 +89,6 @@ export type MemberField = {
   required?: boolean;
 };
 
-/** Row on the Member Status page — one per member (principal or dependant). */
-export type MemberStatusRow = {
-  memberNo: string;
-  familyNo: string;
-  name: string;
-  corporateId: string;
-  corporateName: string;
-  memberType: "Principal" | "Dependant";
-  /** Display label from relation_to_principal (Spouse, Son, Daughter, etc.). */
-  relationLabel: string;
-  /** Latest cover anniversary number, "" when the member has no cover history. */
-  anniv: string;
-  /** Current status code from member_anniversary.status, "" when unset. */
-  status: string;
-  /** member_info.cancelled — 1 when cancelled, 0/null otherwise. */
-  cancelled: number | null;
-};
-
-export type MemberStatusCorporate = {
-  id: string;
-  corporate: string;
-  corpId: string | null;
-  policyNo: string | null;
-};
-
 /** Row on the Renew Members page — one per member (principal or dependant). */
 export type MemberRenewRow = {
   memberNo: string;
