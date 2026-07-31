@@ -23,7 +23,7 @@ export function RadioGroup({
   value,
   options,
   onChange,
-  labelClassName = "mb-0.5 block text-[12px] font-medium text-slate-700",
+  labelClassName = "mb-0.5 block text-[11px] font-medium text-slate-600",
   disabled = false,
 }: RadioGroupProps) {
   return (
@@ -42,7 +42,7 @@ export function RadioGroup({
             <label
               key={option.value}
               htmlFor={optionId}
-              className={`inline-flex items-center gap-2 text-[12px] font-medium ${
+              className={`inline-flex items-center gap-2 text-[11px] font-medium ${
                 disabled
                   ? "cursor-not-allowed text-slate-500"
                   : checked

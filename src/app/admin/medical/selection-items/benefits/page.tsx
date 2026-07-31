@@ -9,7 +9,7 @@ async function BenefitsContent() {
 
 export default function BenefitsPage() {
   return (
-    <Suspense fallback={<div className="text-[12px] text-slate-500">Loading benefits...</div>}>
+    <Suspense fallback={<div className="text-[11px] text-slate-500">Loading benefits...</div>}>
       <BenefitsContent />
     </Suspense>
   );

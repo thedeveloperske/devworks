@@ -1,4 +1,4 @@
-﻿import { Suspense } from "react";
+import { Suspense } from "react";
 import { CorporatesPageClient } from "@/features/medical/corporates/components";
 import { loadCorporatesPageData } from "@/features/medical/corporates/server/load-page-data";
 
@@ -25,7 +25,7 @@ async function CorporatesContent() {
 
 export default function CorporatesPage() {
   return (
-    <Suspense fallback={<div className="text-[12px] text-slate-500">Loading corporates...</div>}>
+    <Suspense fallback={<div className="text-[11px] text-slate-500">Loading corporates...</div>}>
       <CorporatesContent />
     </Suspense>
   );

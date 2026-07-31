@@ -4,7 +4,7 @@ import { SelectionItemsPageClient } from "@/features/medical/admin/selection-ite
 export default function SelectionItemsPage() {
   return (
     <Suspense
-      fallback={<div className="text-[12px] text-slate-500">Loading selection items...</div>}
+      fallback={<div className="text-[11px] text-slate-500">Loading selection items...</div>}
     >
       <SelectionItemsPageClient />
     </Suspense>

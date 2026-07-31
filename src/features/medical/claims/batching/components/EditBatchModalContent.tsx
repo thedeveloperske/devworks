@@ -57,11 +57,11 @@ export function EditBatchModalContent({
   }, [batchId]);
 
   if (loading) {
-    return <p className="text-[12px] text-slate-500">Loading batch...</p>;
+    return <p className="text-[11px] text-slate-500">Loading batch...</p>;
   }
 
   if (error) {
-    return <p className="text-[12px] text-red-600">{error}</p>;
+    return <p className="text-[11px] text-red-600">{error}</p>;
   }
 
   if (!editForm) {

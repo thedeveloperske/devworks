@@ -4,7 +4,7 @@ import { MemberReportsPageClient } from "@/features/medical/members/components";
 export default function MemberReportsPage() {
   return (
     <Suspense
-      fallback={<div className="text-[12px] text-slate-500">Loading reports...</div>}
+      fallback={<div className="text-[11px] text-slate-500">Loading reports...</div>}
     >
       <MemberReportsPageClient />
     </Suspense>

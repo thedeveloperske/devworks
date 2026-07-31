@@ -85,10 +85,10 @@ export function BenefitForm({
     : "grid gap-4 sm:grid-cols-2";
 
   const fieldLabelClass = embedded
-    ? "mb-0.5 block text-[12px] font-medium text-slate-700"
+    ? "mb-0.5 block text-[11px] font-medium text-slate-700"
     : labelClass;
   const fieldInputClass = embedded
-    ? "w-full border border-slate-300 bg-white px-2 py-1 text-[12px] text-slate-900 placeholder:text-slate-400 focus:border-maroon focus:outline-none"
+    ? "w-full border border-slate-300 bg-white px-2 py-1 text-[11px] text-slate-900 placeholder:text-slate-400 focus:border-maroon focus:outline-none"
     : inputClass;
 
   const formBody = (

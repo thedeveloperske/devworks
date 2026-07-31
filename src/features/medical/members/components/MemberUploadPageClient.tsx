@@ -201,10 +201,10 @@ export function MemberUploadPageClient() {
               className={`h-6 w-6 ${dragging ? "text-maroon" : "text-slate-400"}`}
               aria-hidden
             />
-            <p className="text-[12px] font-semibold text-slate-800">
+            <p className="text-[11px] font-semibold text-slate-800">
               Drop a file here, or click to browse
             </p>
-            <p className="text-[12px] text-slate-500">
+            <p className="text-[11px] text-slate-500">
               Accepted formats: .csv, .xlsx, .xls
             </p>
             <p className="max-w-md text-[11px] text-slate-400">
@@ -215,10 +215,10 @@ export function MemberUploadPageClient() {
           </div>
 
           {error ? (
-            <p className="text-[12px] text-red-600">{error}</p>
+            <p className="text-[11px] text-red-600">{error}</p>
           ) : null}
           {notice ? (
-            <p className="text-[12px] text-emerald-700">{notice}</p>
+            <p className="text-[11px] text-emerald-700">{notice}</p>
           ) : null}
 
           {file ? (
@@ -228,10 +228,10 @@ export function MemberUploadPageClient() {
                 aria-hidden
               />
               <div className="min-w-0 flex-1">
-                <p className="truncate text-[12px] font-semibold text-slate-900">
+                <p className="truncate text-[11px] font-semibold text-slate-900">
                   {file.name}
                 </p>
-                <p className="text-[12px] text-slate-500">
+                <p className="text-[11px] text-slate-500">
                   {formatFileSize(file.size)}
                   {file.type ? ` · ${file.type}` : ""}
                 </p>
@@ -247,7 +247,7 @@ export function MemberUploadPageClient() {
               </Button>
             </div>
           ) : (
-            <p className="text-[12px] text-slate-500">No file selected.</p>
+            <p className="text-[11px] text-slate-500">No file selected.</p>
           )}
 
           {results.length > 0 ? (
@@ -255,13 +255,13 @@ export function MemberUploadPageClient() {
               <table className="w-full border-collapse">
                 <thead className="sticky top-0 bg-slate-50">
                   <tr>
-                    <th className="border-b border-slate-200 px-2 py-1.5 text-left text-[12px] font-bold uppercase tracking-wider text-slate-500">
+                    <th className="border-b border-slate-200 px-2 py-1.5 text-left text-[11px] font-bold uppercase tracking-wider text-slate-500">
                       Row
                     </th>
-                    <th className="border-b border-slate-200 px-2 py-1.5 text-left text-[12px] font-bold uppercase tracking-wider text-slate-500">
+                    <th className="border-b border-slate-200 px-2 py-1.5 text-left text-[11px] font-bold uppercase tracking-wider text-slate-500">
                       Member
                     </th>
-                    <th className="border-b border-slate-200 px-2 py-1.5 text-left text-[12px] font-bold uppercase tracking-wider text-slate-500">
+                    <th className="border-b border-slate-200 px-2 py-1.5 text-left text-[11px] font-bold uppercase tracking-wider text-slate-500">
                       Result
                     </th>
                   </tr>
@@ -269,16 +269,16 @@ export function MemberUploadPageClient() {
                 <tbody>
                   {[...createdResults, ...failedResults].map((row) => (
                     <tr key={`${row.rowNumber}-${row.memberNo ?? row.error}`}>
-                      <td className="border-b border-slate-200 px-2 py-1.5 text-[12px] text-slate-600">
+                      <td className="border-b border-slate-200 px-2 py-1.5 text-[11px] text-slate-600">
                         {row.rowNumber}
                       </td>
-                      <td className="border-b border-slate-200 px-2 py-1.5 text-[12px] text-slate-600">
+                      <td className="border-b border-slate-200 px-2 py-1.5 text-[11px] text-slate-600">
                         {row.memberNo
                           ? `${row.memberNo}${row.name ? ` — ${row.name}` : ""}`
                           : "—"}
                       </td>
                       <td
-                        className={`border-b border-slate-200 px-2 py-1.5 text-[12px] ${
+                        className={`border-b border-slate-200 px-2 py-1.5 text-[11px] ${
                           row.error ? "text-red-600" : "text-emerald-700"
                         }`}
                       >

@@ -25,7 +25,7 @@ export default function CarePreAuthorizationPage() {
   return (
     <Suspense
       fallback={
-        <div className="text-[12px] text-slate-500">
+        <div className="text-[11px] text-slate-500">
           Loading pre-authorizations...
         </div>
       }

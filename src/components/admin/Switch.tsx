@@ -18,7 +18,7 @@ export function Switch({
   checked,
   onChange,
   label,
-  labelClassName = "mb-1.5 block text-[12px] font-medium text-slate-700",
+  labelClassName = "mb-1 block text-[11px] font-medium text-slate-600",
   disabled = false,
 }: SwitchProps) {
   const toggle = () => {

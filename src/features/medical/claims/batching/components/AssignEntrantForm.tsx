@@ -22,7 +22,7 @@ type AssignEntrantFormProps = {
 };
 
 const compactInputClass =
-  "w-full border border-slate-300 bg-white px-2 py-1 text-[12px] text-slate-900 placeholder:text-slate-400 focus:border-maroon focus:outline-none";
+  "w-full border border-slate-300 bg-white px-2 py-1 text-[11px] text-slate-900 placeholder:text-slate-400 focus:border-maroon focus:outline-none";
 
 function userSelectOptions(
   users: LookupOption[],
@@ -86,7 +86,7 @@ export function AssignEntrantForm({
   return (
     <form onSubmit={handleSubmit} className={formClassName}>
       <div className={embedded ? "min-h-0 flex-1 space-y-3 overflow-y-auto pr-1" : "space-y-3"}>
-        <p className="text-[12px] text-slate-600">
+        <p className="text-[11px] text-slate-600">
           Assign batch <span className="font-semibold text-slate-900">{batchNo}</span> to an
           entrant for data entry.
         </p>

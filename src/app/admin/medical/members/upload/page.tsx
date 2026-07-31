@@ -5,7 +5,7 @@ export default function MemberUploadPage() {
   return (
     <Suspense
       fallback={
-        <div className="text-[12px] text-slate-500">Loading upload...</div>
+        <div className="text-[11px] text-slate-500">Loading upload...</div>
       }
     >
       <MemberUploadPageClient />

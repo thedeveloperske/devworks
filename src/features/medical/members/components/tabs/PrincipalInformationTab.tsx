@@ -77,10 +77,10 @@ export function PrincipalInformationTab({
     <div className="space-y-2">
       <section className="space-y-1.5">
         <div>
-          <h3 className="text-[12px] font-bold uppercase text-slate-700">
+          <h3 className="text-[11px] font-bold uppercase text-slate-700">
             Principal Details
           </h3>
-          <p className="text-[12px] text-slate-500">
+          <p className="text-[11px] text-slate-500">
             Capture principal information.
           </p>
         </div>

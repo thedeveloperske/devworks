@@ -153,9 +153,9 @@ export function ProvidersPageClient({ providers }: ProvidersPageClientProps) {
     : undefined;
 
   const compactThClass =
-    "px-2.5 py-1.5 text-[12px] font-bold uppercase tracking-wide text-slate-500";
-  const compactTdClass = "px-2.5 py-1.5 text-[12px] text-slate-600";
-  const compactEmptyCellClass = "px-2.5 py-4 text-center text-[12px] text-slate-500";
+    "px-2.5 py-1.5 text-[11px] font-bold uppercase tracking-wide text-slate-500";
+  const compactTdClass = "px-2.5 py-1.5 text-[11px] text-slate-600";
+  const compactEmptyCellClass = "px-2.5 py-4 text-center text-[11px] text-slate-500";
 
   const providersTable = (
     <div className={`${tableWrapperClass} overflow-y-auto`}>
@@ -242,7 +242,7 @@ export function ProvidersPageClient({ providers }: ProvidersPageClientProps) {
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search..."
               aria-label="Search providers"
-              className="w-40 border border-slate-300 bg-white px-2 py-1 text-[12px] text-slate-900 placeholder:text-slate-400 focus:border-maroon focus:outline-none"
+              className="w-40 border border-slate-300 bg-white px-2 py-1 text-[11px] text-slate-900 placeholder:text-slate-400 focus:border-maroon focus:outline-none"
             />
             <Button type="button" size="sm" onClick={openNewModal}>
               Add Provider
@@ -265,9 +265,9 @@ export function ProvidersPageClient({ providers }: ProvidersPageClientProps) {
         {isNew ? (
           <ProviderForm embedded onSuccess={handleSaved} onCancel={closeProviderModal} />
         ) : editLoading ? (
-          <p className="text-[12px] text-slate-500">Loading provider...</p>
+          <p className="text-[11px] text-slate-500">Loading provider...</p>
         ) : editError ? (
-          <p className="text-[12px] text-red-600">{editError}</p>
+          <p className="text-[11px] text-red-600">{editError}</p>
         ) : editProvider && editId ? (
           <ProviderForm
             key={editId}

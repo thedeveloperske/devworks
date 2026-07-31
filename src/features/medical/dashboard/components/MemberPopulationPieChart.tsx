@@ -82,10 +82,10 @@ export function MemberPopulationPieChart({
   return (
     <div className="border border-slate-200 bg-white">
       <div className="border-b border-slate-200 px-4 py-3">
-        <h2 className="text-[12px] font-semibold text-slate-900">
+        <h2 className="text-[11px] font-semibold text-slate-900">
           Member Population
         </h2>
-        <p className="mt-0.5 text-[12px] text-slate-500">
+        <p className="mt-0.5 text-[11px] text-slate-500">
           Individual vs corporate
         </p>
       </div>
@@ -132,7 +132,7 @@ export function MemberPopulationPieChart({
             return (
               <li
                 key={slice.label}
-                className="flex items-center gap-2 text-[12px] text-slate-700"
+                className="flex items-center gap-2 text-[11px] text-slate-700"
               >
                 <span
                   aria-hidden
@@ -151,7 +151,7 @@ export function MemberPopulationPieChart({
               </li>
             );
           })}
-          <li className="pt-0.5 text-[12px] text-slate-500">
+          <li className="pt-0.5 text-[11px] text-slate-500">
             Total:{" "}
             <span className="font-semibold text-slate-700">
               {total.toLocaleString()}

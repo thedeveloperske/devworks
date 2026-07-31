@@ -20,17 +20,17 @@ const tableBodyMaxHeight = 280;
 const corporatesTableMinWidth = 640;
 const membersTableMinWidth = 720;
 const thClass =
-  "whitespace-nowrap border-b border-slate-200 px-2 py-1.5 text-left text-[12px] font-bold uppercase tracking-wider text-slate-500";
+  "whitespace-nowrap border-b border-slate-200 px-2 py-1.5 text-left text-[11px] font-bold uppercase tracking-wider text-slate-500";
 const tdClass =
-  "border-b border-slate-200 px-2 py-1.5 align-middle text-[12px] text-slate-600";
+  "border-b border-slate-200 px-2 py-1.5 align-middle text-[11px] text-slate-600";
 const emptyCellClass =
-  "border-b border-slate-200 px-2 py-4 text-center text-[12px] text-slate-500";
+  "border-b border-slate-200 px-2 py-4 text-center text-[11px] text-slate-500";
 const searchInputClass =
-  "w-40 border border-slate-300 bg-white px-2 py-1 text-[12px] text-slate-900 placeholder:text-slate-400 focus:border-maroon focus:outline-none";
+  "w-40 border border-slate-300 bg-white px-2 py-1 text-[11px] text-slate-900 placeholder:text-slate-400 focus:border-maroon focus:outline-none";
 const renewButtonClass =
-  "border border-maroon bg-maroon px-2.5 py-1 text-[12px] font-semibold text-white hover:bg-maroon/90 disabled:cursor-not-allowed disabled:border-slate-300 disabled:bg-slate-200 disabled:text-slate-500";
+  "border border-maroon bg-maroon px-2.5 py-1 text-[11px] font-semibold text-white hover:bg-maroon/90 disabled:cursor-not-allowed disabled:border-slate-300 disabled:bg-slate-200 disabled:text-slate-500";
 const skipButtonClass =
-  "border border-slate-300 bg-white px-2.5 py-1 text-[12px] font-semibold text-slate-700 hover:border-maroon hover:text-maroon disabled:cursor-not-allowed disabled:border-slate-200 disabled:text-slate-400";
+  "border border-slate-300 bg-white px-2.5 py-1 text-[11px] font-semibold text-slate-700 hover:border-maroon hover:text-maroon disabled:cursor-not-allowed disabled:border-slate-200 disabled:text-slate-400";
 
 function buildRenewHref(pathname: string, corporateId?: string) {
   if (!corporateId) return pathname;
@@ -327,22 +327,22 @@ export function MemberRenewPageClient({
         </div>
       </div>
       {!hasCorpPeriod ? (
-        <p className="shrink-0 text-[12px] text-amber-700">
+        <p className="shrink-0 text-[11px] text-amber-700">
           This corporate has no cover period. Renew the corporate first.
         </p>
       ) : null}
       {skippedMemberNos.size > 0 ? (
-        <p className="shrink-0 text-[12px] text-slate-500">
+        <p className="shrink-0 text-[11px] text-slate-500">
           {skippedMemberNos.size} family
           {skippedMemberNos.size === 1 ? "" : "ies"} skipped from Renew Enmass.
           Use Include family to put them back.
         </p>
       ) : null}
       {actionError ? (
-        <p className="shrink-0 text-[12px] text-red-600">{actionError}</p>
+        <p className="shrink-0 text-[11px] text-red-600">{actionError}</p>
       ) : null}
       {actionNotice ? (
-        <p className="shrink-0 text-[12px] text-emerald-700">{actionNotice}</p>
+        <p className="shrink-0 text-[11px] text-emerald-700">{actionNotice}</p>
       ) : null}
       <div
         className="min-h-0 overflow-x-auto overflow-y-scroll border border-slate-200"

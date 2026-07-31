@@ -1,4 +1,4 @@
-ï»¿"use client";
+"use client";
 
 import { useEffect, useMemo, useState } from "react";
 import { CategoriesForm } from "./CategoriesForm";
@@ -38,16 +38,16 @@ type RenewCorporateModalProps = {
   onSuccess: () => void;
 };
 
-const fieldLabelClass = "mb-0.5 block text-[12px] font-medium text-slate-700";
+const fieldLabelClass = "mb-0.5 block text-[11px] font-medium text-slate-700";
 const fieldInputClass =
-  "w-full border border-slate-300 bg-white px-2 py-1 text-[12px] text-slate-900 placeholder:text-slate-400 focus:border-maroon focus:outline-none";
+  "w-full border border-slate-300 bg-white px-2 py-1 text-[11px] text-slate-900 placeholder:text-slate-400 focus:border-maroon focus:outline-none";
 const corporatesTableMaxHeight = 280;
 const corporatesTableMinWidth = 480;
 const thClass =
-  "whitespace-nowrap border-b border-slate-200 px-2 py-1.5 text-left text-[12px] font-bold uppercase tracking-wider text-slate-500";
-const tdClass = "border-b border-slate-200 px-2 py-1.5 align-middle text-[12px] text-slate-600";
+  "whitespace-nowrap border-b border-slate-200 px-2 py-1.5 text-left text-[11px] font-bold uppercase tracking-wider text-slate-500";
+const tdClass = "border-b border-slate-200 px-2 py-1.5 align-middle text-[11px] text-slate-600";
 const emptyCellClass =
-  "border-b border-slate-200 px-2 py-4 text-center text-[12px] text-slate-500";
+  "border-b border-slate-200 px-2 py-4 text-center text-[11px] text-slate-500";
 
 function nextDay(dateValue: string) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(dateValue)) return "";
@@ -374,7 +374,7 @@ export function RenewCorporateModal({
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search..."
                 aria-label="Search corporates"
-                className="w-40 border border-slate-300 bg-white px-2 py-1 text-[12px] text-slate-900 placeholder:text-slate-400 focus:border-maroon focus:outline-none"
+                className="w-40 border border-slate-300 bg-white px-2 py-1 text-[11px] text-slate-900 placeholder:text-slate-400 focus:border-maroon focus:outline-none"
               />
             </div>
             <div
@@ -427,14 +427,14 @@ export function RenewCorporateModal({
                               {corporate.corporate}
                             </a>
                           </td>
-                          <td className={tdClass}>{corporate.corpId ?? "â€”"}</td>
+                          <td className={tdClass}>{corporate.corpId ?? "—"}</td>
                           <td className={tdClass}>
-                            {corporate.policyNo ?? "â€”"}
+                            {corporate.policyNo ?? "—"}
                           </td>
                           <td className={tdClass}>
                             {corporate.corpStartDate && corporate.corpEndDate
                               ? `${corporate.corpStartDate} to ${corporate.corpEndDate}`
-                              : "â€”"}
+                              : "—"}
                           </td>
                         </tr>
                       );
@@ -447,11 +447,11 @@ export function RenewCorporateModal({
         );
       case "coverDates":
         return !corporateId ? (
-          <p className="text-[12px] text-slate-500">
+          <p className="text-[11px] text-slate-500">
             Select a corporate from Corporates Ready for Renewal to load cover dates.
           </p>
         ) : loadingCorporate ? (
-          <p className="text-[12px] text-slate-500">Loading corporate...</p>
+          <p className="text-[11px] text-slate-500">Loading corporate...</p>
         ) : (
           <CoverDatesForm
             value={coverDateForm}
@@ -539,7 +539,7 @@ export function RenewCorporateModal({
                   key={tab.id}
                   type="button"
                   onClick={() => setActiveTab(tab.id)}
-                  className={`block shrink-0 px-2 py-1 text-left text-[12px] font-medium transition md:w-full ${
+                  className={`block shrink-0 px-2 py-1 text-left text-[11px] font-medium transition md:w-full ${
                     activeTab === tab.id
                       ? "bg-maroon/10 text-maroon"
                       : "text-slate-500 hover:bg-white hover:text-slate-900"

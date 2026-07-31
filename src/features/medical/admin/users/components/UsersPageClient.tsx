@@ -31,13 +31,13 @@ type EditUserState = {
 };
 
 const compactThClass =
-  "whitespace-nowrap px-2.5 py-1.5 text-[12px] font-bold uppercase tracking-wide text-slate-500";
+  "whitespace-nowrap px-2.5 py-1.5 text-[11px] font-bold uppercase tracking-wide text-slate-500";
 const compactTdClass =
-  "whitespace-nowrap border-b border-slate-200 px-2.5 py-1.5 text-[12px] text-slate-600";
+  "whitespace-nowrap border-b border-slate-200 px-2.5 py-1.5 text-[11px] text-slate-600";
 const emptyCellClass =
-  "border-b border-slate-200 px-2.5 py-4 text-center text-[12px] text-slate-500";
+  "border-b border-slate-200 px-2.5 py-4 text-center text-[11px] text-slate-500";
 const searchInputClass =
-  "w-44 border border-slate-300 bg-white px-2 py-1 text-[12px] text-slate-900 placeholder:text-slate-400 focus:border-maroon focus:outline-none";
+  "w-44 border border-slate-300 bg-white px-2 py-1 text-[11px] text-slate-900 placeholder:text-slate-400 focus:border-maroon focus:outline-none";
 
 export function UsersPageClient({ users }: UsersPageClientProps) {
   const router = useRouter();
@@ -207,7 +207,7 @@ export function UsersPageClient({ users }: UsersPageClientProps) {
                         <button
                           type="button"
                           onClick={() => openEditModal(user.id)}
-                          className="text-[12px] font-semibold text-maroon hover:underline"
+                          className="text-[11px] font-semibold text-maroon hover:underline"
                         >
                           Edit
                         </button>
@@ -239,7 +239,7 @@ export function UsersPageClient({ users }: UsersPageClientProps) {
           <UserForm embedded onSuccess={handleSaved} onCancel={closeUserModal} />
         ) : editId && editState?.id === editId ? (
           editState.error ? (
-            <p className="text-[12px] text-red-600">{editState.error}</p>
+            <p className="text-[11px] text-red-600">{editState.error}</p>
           ) : editState.user ? (
             <UserForm
               key={editId}
@@ -250,7 +250,7 @@ export function UsersPageClient({ users }: UsersPageClientProps) {
               onCancel={closeUserModal}
             />
           ) : (
-            <p className="text-[12px] text-slate-500">Loading user...</p>
+            <p className="text-[11px] text-slate-500">Loading user...</p>
           )
         ) : null}
       </Modal>

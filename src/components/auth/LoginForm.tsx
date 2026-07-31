@@ -67,20 +67,20 @@ export function LoginForm() {
           className="h-16 w-auto sm:h-20"
           priority
         />
-        <p className="mt-3 text-center text-[12px] font-semibold text-maroon">
+        <p className="mt-3 text-center text-[11px] font-medium text-maroon">
           Promed Web Experience
         </p>
       </div>
 
       <form onSubmit={handleSubmit} className={`${formCardClass} w-full max-w-md`}>
-        <h1 className="mb-1 text-[12px] font-bold text-maroon">Sign in</h1>
-        <p className="mb-6 text-[12px] text-slate-500">
+        <h1 className="mb-1 text-[11px] font-medium text-maroon">Sign in</h1>
+        <p className="mb-4 text-[11px] font-normal text-slate-500">
           Access Promed applications for Medical, Aviation, and General insurance.
         </p>
 
         <FormError
           message={error}
-          className="mb-4 border border-red-200 bg-red-50 px-4 py-3 text-[12px] text-red-700"
+          className="mb-4 border border-red-200 bg-red-50 px-4 py-3 text-[11px] text-red-700"
         />
 
         <div className="space-y-4">

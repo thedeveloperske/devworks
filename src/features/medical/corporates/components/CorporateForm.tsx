@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -354,10 +354,10 @@ export function CorporateForm({
     : "grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4";
 
   const fieldLabelClass = embedded
-    ? "mb-0.5 block text-[12px] font-medium text-slate-700"
+    ? "mb-0.5 block text-[11px] font-medium text-slate-700"
     : labelClass;
   const fieldInputClass = embedded
-    ? "w-full border border-slate-300 bg-white px-2 py-1 text-[12px] text-slate-900 placeholder:text-slate-400 focus:border-maroon focus:outline-none"
+    ? "w-full border border-slate-300 bg-white px-2 py-1 text-[11px] text-slate-900 placeholder:text-slate-400 focus:border-maroon focus:outline-none"
     : inputClass;
 
   const readOnlyFields: (keyof CorporateFormData)[] = ["corpId", "policyNo"];
@@ -422,10 +422,10 @@ export function CorporateForm({
   const corporateDetailsSection = (
     <section className="space-y-1.5">
       <div>
-        <h3 className="text-[12px] font-bold uppercase text-slate-700">
+        <h3 className="text-[11px] font-bold uppercase text-slate-700">
           Corporate Information
         </h3>
-        <p className="text-[12px] text-slate-500">Capture corporate information.</p>
+        <p className="text-[11px] text-slate-500">Capture corporate information.</p>
       </div>
       {renderFields(getCorporateFields(corporateFieldNames))}
     </section>
@@ -515,7 +515,7 @@ export function CorporateForm({
                 key={tab.id}
                 type="button"
                 onClick={() => setActiveTab(tab.id)}
-                className={`block shrink-0 px-2 py-1 text-left text-[12px] font-medium transition md:w-full ${
+                className={`block shrink-0 px-2 py-1 text-left text-[11px] font-medium transition md:w-full ${
                   activeTab === tab.id
                     ? "bg-maroon/10 text-maroon"
                     : "text-slate-500 hover:bg-white hover:text-slate-900"

@@ -25,11 +25,11 @@ const tableMinWidth = columns.length * columnMinWidth;
 const tableBodyMaxHeight = 280;
 
 const thClass =
-  "whitespace-nowrap border-b border-slate-200 px-2 py-1.5 text-left text-[12px] font-bold uppercase tracking-wider text-slate-500";
+  "whitespace-nowrap border-b border-slate-200 px-2 py-1.5 text-left text-[11px] font-bold uppercase tracking-wider text-slate-500";
 const tdClass =
-  "border-b border-slate-200 px-2 py-1.5 align-middle text-[12px] text-slate-600";
+  "border-b border-slate-200 px-2 py-1.5 align-middle text-[11px] text-slate-600";
 const emptyCellClass =
-  "border-b border-slate-200 px-2 py-4 text-center text-[12px] text-slate-500";
+  "border-b border-slate-200 px-2 py-4 text-center text-[11px] text-slate-500";
 
 export function MiscellaneousTab({
   rows = [],
@@ -40,10 +40,10 @@ export function MiscellaneousTab({
       {showCancellationHistory ? (
         <>
           <div>
-            <h4 className="text-[12px] font-bold uppercase text-slate-700">
+            <h4 className="text-[11px] font-bold uppercase text-slate-700">
               Cancellation & Reinstate History
             </h4>
-            <p className="text-[12px] text-slate-500">
+            <p className="text-[11px] text-slate-500">
               Read-only history from member cancellations.
             </p>
           </div>

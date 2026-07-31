@@ -71,11 +71,11 @@ export function Modal({
   const header = (
     <div className="flex shrink-0 items-start justify-between gap-4 border-b border-slate-200 px-4 py-2 sm:px-5">
       <div>
-        <h2 id="modal-title" className="text-[12px] font-bold uppercase text-slate-900">
+        <h2 id="modal-title" className="text-[11px] font-medium uppercase tracking-wide text-slate-800">
           {title}
         </h2>
         {description ? (
-          <p className="mt-0.5 text-[12px] text-slate-500">{description}</p>
+          <p className="mt-0.5 text-[11px] text-slate-500">{description}</p>
         ) : null}
       </div>
       <button
@@ -102,7 +102,7 @@ export function Modal({
           role="dialog"
           aria-modal="true"
           aria-labelledby="modal-title"
-          className={`relative flex max-h-[min(85vh,820px)] w-full flex-col overflow-hidden border border-slate-200 bg-white text-[12px] shadow-xl ${popupSizeClass[size]}`}
+          className={`relative flex max-h-[min(85vh,820px)] w-full flex-col overflow-hidden border border-slate-200 bg-white text-[11px] shadow-xl ${popupSizeClass[size]}`}
         >
           {header}
           <div className="flex min-h-0 flex-1 flex-col overflow-hidden px-4 py-2 sm:px-5">
@@ -128,7 +128,7 @@ export function Modal({
         role="dialog"
         aria-modal="true"
         aria-labelledby="modal-title"
-        className="relative flex min-h-0 flex-1 flex-col overflow-hidden border border-slate-200 bg-white text-[12px] shadow-lg"
+        className="relative flex min-h-0 flex-1 flex-col overflow-hidden border border-slate-200 bg-white text-[11px] shadow-lg"
       >
         {header}
         <div className="flex min-h-0 flex-1 flex-col overflow-hidden px-4 py-2 sm:px-5">

@@ -1,4 +1,4 @@
-import { UserAvatarMenu } from "@/components/auth/UserAvatarMenu";
+import { UserNavCard } from "@/components/auth/UserNavCard";
 import { ADMIN_SYSTEMS } from "@/lib/admin-systems";
 import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
@@ -20,10 +20,14 @@ export default async function GeneralAdminLayout({
       <header className="border-b border-slate-200 bg-white px-4 py-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between gap-4">
           <div>
-            <p className="text-[12px] font-semibold text-maroon">{system.label}</p>
-            <p className="text-[12px] text-slate-500">Application workspace</p>
+            <p className="text-[11px] font-semibold text-maroon">{system.label}</p>
+            <p className="text-[11px] text-slate-500">Application workspace</p>
           </div>
-          <UserAvatarMenu name={session.name} email={session.email} />
+          <UserNavCard
+            name={session.name}
+            email={session.email}
+            layout="compact"
+          />
         </div>
       </header>
       <main className="flex-1 p-4 sm:p-6 lg:p-8">{children}</main>

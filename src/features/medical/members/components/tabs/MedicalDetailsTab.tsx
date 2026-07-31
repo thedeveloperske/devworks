@@ -123,7 +123,7 @@ export function MedicalDetailsTab({
           labelClassName={fieldLabelClass}
         />
         {on ? (
-          <div className="mt-1 flex min-w-0 items-center gap-2 text-[12px] text-slate-600">
+          <div className="mt-1 flex min-w-0 items-center gap-2 text-[11px] text-slate-600">
             <span className="min-w-0 truncate">
               {detail || (
                 <span className="text-slate-400">No details captured</span>
@@ -187,10 +187,10 @@ export function MedicalDetailsTab({
   return (
     <section className="space-y-3">
       <div>
-        <h3 className="text-[12px] font-bold uppercase text-slate-700">
+        <h3 className="text-[11px] font-bold uppercase text-slate-700">
           Medical Details
         </h3>
-        <p className="text-[12px] text-slate-500">
+        <p className="text-[11px] text-slate-500">
           Capture medical details information.
         </p>
       </div>
@@ -229,7 +229,7 @@ export function MedicalDetailsTab({
           >
             <h3
               id="medical-detail-modal-title"
-              className="text-[12px] font-bold uppercase text-slate-900"
+              className="text-[11px] font-bold uppercase text-slate-900"
             >
               {modalSwitchField.label}
             </h3>

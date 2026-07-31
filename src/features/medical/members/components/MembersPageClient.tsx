@@ -70,13 +70,13 @@ const tableBodyMaxHeight = 280;
 const corporatesTableMinWidth = 560;
 const membersTableMinWidth = 640;
 const thClass =
-  "whitespace-nowrap border-b border-slate-200 px-2 py-1.5 text-left text-[12px] font-bold uppercase tracking-wider text-slate-500";
+  "whitespace-nowrap border-b border-slate-200 px-2 py-1.5 text-left text-[11px] font-bold uppercase tracking-wider text-slate-500";
 const tdClass =
-  "border-b border-slate-200 px-2 py-1.5 align-middle text-[12px] text-slate-600";
+  "border-b border-slate-200 px-2 py-1.5 align-middle text-[11px] text-slate-600";
 const emptyCellClass =
-  "border-b border-slate-200 px-2 py-4 text-center text-[12px] text-slate-500";
+  "border-b border-slate-200 px-2 py-4 text-center text-[11px] text-slate-500";
 const searchInputClass =
-  "w-40 border border-slate-300 bg-white px-2 py-1 text-[12px] text-slate-900 placeholder:text-slate-400 focus:border-maroon focus:outline-none";
+  "w-40 border border-slate-300 bg-white px-2 py-1 text-[11px] text-slate-900 placeholder:text-slate-400 focus:border-maroon focus:outline-none";
 
 function buildMembersManageHref(
   pathname: string,
@@ -608,7 +608,7 @@ export function MembersPageClient({
   const membersTable = (
     <section className="flex min-h-0 flex-1 flex-col gap-1.5">
       <div className="flex shrink-0 items-center justify-between gap-2">
-        <p className="min-w-0 truncate text-[12px] text-slate-600">
+        <p className="min-w-0 truncate text-[11px] text-slate-600">
           {selectedCorporate?.corporate ?? "Members"}
         </p>
         <div className="flex shrink-0 items-center gap-2">
@@ -743,10 +743,10 @@ export function MembersPageClient({
       >
         {editingDependant && editId && editPrincipalInformation ? (
           editingDependant.loading ? (
-            <p className="text-[12px] text-slate-500">Loading dependant...</p>
+            <p className="text-[11px] text-slate-500">Loading dependant...</p>
           ) : editingDependant.error ? (
             <div className="space-y-2">
-              <p className="text-[12px] text-red-600">
+              <p className="text-[11px] text-red-600">
                 {editingDependant.error}
               </p>
               <Button
@@ -942,13 +942,13 @@ export function MembersPageClient({
             onCancel={closeMemberModal}
           />
         ) : editLoading ? (
-          <p className="text-[12px] text-slate-500">Loading member...</p>
+          <p className="text-[11px] text-slate-500">Loading member...</p>
         ) : editError && !editPrincipalInformation ? (
-          <p className="text-[12px] text-red-600">{editError}</p>
+          <p className="text-[11px] text-red-600">{editError}</p>
         ) : editPrincipalInformation && editId ? (
           <>
             {actionError ? (
-              <p className="mb-1.5 text-[12px] text-red-600">{actionError}</p>
+              <p className="mb-1.5 text-[11px] text-red-600">{actionError}</p>
             ) : null}
             <MemberForm
             key={editId}

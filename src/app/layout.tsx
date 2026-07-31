@@ -25,7 +25,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${geist.variable} h-full antialiased`}>
-      <body className="min-h-screen bg-background pb-12 font-sans text-foreground">
+      <body className="min-h-screen bg-background pb-8 font-sans text-foreground font-normal">
         {children}
         <AppFooter />
       </body>

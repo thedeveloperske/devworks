@@ -40,7 +40,7 @@ const tableMinWidth =
 const tableBodyMaxHeight = 280;
 
 const thClass =
-  "whitespace-nowrap border-b border-slate-200 px-2 py-1.5 text-left text-[12px] font-bold uppercase tracking-wider text-slate-500";
+  "whitespace-nowrap border-b border-slate-200 px-2 py-1.5 text-left text-[11px] font-bold uppercase tracking-wider text-slate-500";
 const tdClass = "border-b border-slate-200 px-1 py-1.5 align-middle";
 
 function getColumnWidth(fieldName: CategoryGroupField["name"]) {
@@ -226,10 +226,10 @@ export function CategoriesForm({
       <div className="flex shrink-0 items-start justify-between gap-2">
         {showHeader ? (
           <div>
-            <h3 className="text-[12px] font-bold uppercase text-slate-700">
+            <h3 className="text-[11px] font-bold uppercase text-slate-700">
               Benefit Categorization
             </h3>
-            <p className="text-[12px] text-slate-500">
+            <p className="text-[11px] text-slate-500">
               Groups and Categorization
             </p>
           </div>

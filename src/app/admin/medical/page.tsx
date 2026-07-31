@@ -147,8 +147,8 @@ export default async function MedicalDashboardPage() {
             href={stat.href}
             className="border border-slate-200 bg-white p-5 transition-colors hover:border-maroon/30"
           >
-            <p className="text-[12px] text-slate-500">{stat.label}</p>
-            <p className="mt-2 text-[12px] font-bold text-maroon">{stat.value}</p>
+            <p className="text-[11px] text-slate-500">{stat.label}</p>
+            <p className="mt-2 text-[11px] font-bold text-maroon">{stat.value}</p>
           </Link>
         ))}
       </div>
@@ -164,18 +164,18 @@ export default async function MedicalDashboardPage() {
       <div className="grid gap-6 lg:grid-cols-2">
         <div className="border border-slate-200 bg-white">
           <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4">
-            <h2 className="text-[12px] font-semibold text-slate-900">
+            <h2 className="text-[11px] font-semibold text-slate-900">
               Recent Corporates
             </h2>
             <Link
               href="/admin/medical/corporates?manage=1"
-              className="text-[12px] font-semibold text-maroon hover:underline"
+              className="text-[11px] font-semibold text-maroon hover:underline"
             >
               View all
             </Link>
           </div>
           {recentCorporates.length === 0 ? (
-            <p className="px-6 py-8 text-[12px] text-slate-500">
+            <p className="px-6 py-8 text-[11px] text-slate-500">
               No corporates yet.{" "}
               <Link
                 href="/admin/medical/corporates?manage=1&new=1"
@@ -193,10 +193,10 @@ export default async function MedicalDashboardPage() {
                   className="flex items-center justify-between px-6 py-4 transition-colors hover:bg-slate-50"
                 >
                   <div>
-                    <p className="text-[12px] font-semibold text-slate-900">
+                    <p className="text-[11px] font-semibold text-slate-900">
                       {corporate.corporate}
                     </p>
-                    <p className="text-[12px] text-slate-500">
+                    <p className="text-[11px] text-slate-500">
                       {corporate.corpId ?? "—"} · {corporate.policyNo ?? "—"}
                     </p>
                   </div>
@@ -211,18 +211,18 @@ export default async function MedicalDashboardPage() {
 
         <div className="border border-slate-200 bg-white">
           <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4">
-            <h2 className="text-[12px] font-semibold text-slate-900">
+            <h2 className="text-[11px] font-semibold text-slate-900">
               Recent Renewals
             </h2>
             <Link
               href="/admin/medical/corporates/renew"
-              className="text-[12px] font-semibold text-maroon hover:underline"
+              className="text-[11px] font-semibold text-maroon hover:underline"
             >
               View all
             </Link>
           </div>
           {recentRenewals.length === 0 ? (
-            <p className="px-6 py-8 text-[12px] text-slate-500">
+            <p className="px-6 py-8 text-[11px] text-slate-500">
               No cover periods yet.{" "}
               <Link
                 href="/admin/medical/corporates/renew"
@@ -242,10 +242,10 @@ export default async function MedicalDashboardPage() {
                     className="flex items-center justify-between px-6 py-4"
                   >
                     <div>
-                      <p className="text-[12px] font-semibold text-slate-900">
+                      <p className="text-[11px] font-semibold text-slate-900">
                         {renewal.corporate}
                       </p>
-                      <p className="text-[12px] text-slate-500">
+                      <p className="text-[11px] text-slate-500">
                         Anniv {renewal.anniv} · {formatDate(renewal.periodStart)}{" "}
                         – {formatDate(renewal.periodEnd)}
                       </p>

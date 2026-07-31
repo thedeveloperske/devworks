@@ -16,7 +16,7 @@ const statusStyles: Record<string, string> = {
 export function StatusBadge({ status }: { status: string }) {
   return (
     <span
-      className={`inline-flex rounded-full border px-2.5 py-0.5 text-[12px] font-semibold ${
+      className={`inline-flex rounded-full border px-2 py-0.5 text-[10px] font-medium ${
         statusStyles[status] ?? statusStyles.INACTIVE
       }`}
     >

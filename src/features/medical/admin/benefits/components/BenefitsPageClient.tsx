@@ -135,9 +135,9 @@ export function BenefitsPageClient({ benefits }: BenefitsPageClientProps) {
     : undefined;
 
   const compactThClass =
-    "px-2.5 py-1.5 text-[12px] font-bold uppercase tracking-wide text-slate-500";
-  const compactTdClass = "px-2.5 py-1.5 text-[12px] text-slate-600";
-  const compactEmptyCellClass = "px-2.5 py-4 text-center text-[12px] text-slate-500";
+    "px-2.5 py-1.5 text-[11px] font-bold uppercase tracking-wide text-slate-500";
+  const compactTdClass = "px-2.5 py-1.5 text-[11px] text-slate-600";
+  const compactEmptyCellClass = "px-2.5 py-4 text-center text-[11px] text-slate-500";
 
   const benefitsTable = (
     <div className={`${tableWrapperClass} overflow-y-auto`}>
@@ -221,9 +221,9 @@ export function BenefitsPageClient({ benefits }: BenefitsPageClientProps) {
         {isNew ? (
           <BenefitForm embedded onSuccess={handleSaved} onCancel={closeBenefitModal} />
         ) : editLoading ? (
-          <p className="text-[12px] text-slate-500">Loading benefit...</p>
+          <p className="text-[11px] text-slate-500">Loading benefit...</p>
         ) : editError ? (
-          <p className="text-[12px] text-red-600">{editError}</p>
+          <p className="text-[11px] text-red-600">{editError}</p>
         ) : editBenefit && editId ? (
           <BenefitForm
             key={editId}

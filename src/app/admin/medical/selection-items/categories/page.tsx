@@ -9,7 +9,7 @@ async function CategoryTypesContent() {
 
 export default function CategoryTypesPage() {
   return (
-    <Suspense fallback={<div className="text-[12px] text-slate-500">Loading categories...</div>}>
+    <Suspense fallback={<div className="text-[11px] text-slate-500">Loading categories...</div>}>
       <CategoryTypesContent />
     </Suspense>
   );

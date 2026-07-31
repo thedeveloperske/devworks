@@ -10,9 +10,9 @@ type ViewBatchDetailsProps = {
 };
 
 const sectionTitleClass =
-  "border-b border-slate-200 pb-1 text-[12px] font-bold uppercase tracking-wide text-slate-700";
+  "border-b border-slate-200 pb-1 text-[11px] font-bold uppercase tracking-wide text-slate-700";
 const fieldLabelClass = "text-[11px] font-medium uppercase tracking-wide text-slate-500";
-const fieldValueClass = "text-[12px] text-slate-900";
+const fieldValueClass = "text-[11px] text-slate-900";
 
 function DetailField({ label, value }: { label: string; value: string }) {
   return (

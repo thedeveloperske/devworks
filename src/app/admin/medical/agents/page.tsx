@@ -9,7 +9,7 @@ async function AgentsContent() {
 
 export default function AgentsPage() {
   return (
-    <Suspense fallback={<div className="text-[12px] text-slate-500">Loading agents...</div>}>
+    <Suspense fallback={<div className="text-[11px] text-slate-500">Loading agents...</div>}>
       <AgentsContent />
     </Suspense>
   );

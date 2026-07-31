@@ -111,7 +111,7 @@ export function PreAuthorizationReserveModal({
           value={currentReserve || "0"}
           onChange={() => undefined}
           disabled
-          inputClassName="w-full border border-slate-300 bg-slate-50 px-2 py-1.5 text-right text-[12px] text-slate-600"
+          inputClassName="w-full border border-slate-300 bg-slate-50 px-2 py-1.5 text-right text-[11px] text-slate-600"
         />
         <FormField
           id="reserve-amount"
@@ -120,7 +120,7 @@ export function PreAuthorizationReserveModal({
           value={amount}
           onChange={(e) => setAmount(formatThousands(e.target.value))}
           required
-          inputClassName="w-full border border-slate-300 bg-white px-2 py-1.5 text-right text-[12px] text-slate-900 focus:border-maroon focus:outline-none"
+          inputClassName="w-full border border-slate-300 bg-white px-2 py-1.5 text-right text-[11px] text-slate-900 focus:border-maroon focus:outline-none"
         />
         <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
           <Button

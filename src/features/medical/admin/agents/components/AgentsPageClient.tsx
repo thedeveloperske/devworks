@@ -148,9 +148,9 @@ export function AgentsPageClient({ agents }: AgentsPageClientProps) {
   const editingAgent = editId ? agents.find((agent) => agent.id === editId) : undefined;
 
   const compactThClass =
-    "px-2.5 py-1.5 text-[12px] font-bold uppercase tracking-wide text-slate-500";
-  const compactTdClass = "px-2.5 py-1.5 text-[12px] text-slate-600";
-  const compactEmptyCellClass = "px-2.5 py-4 text-center text-[12px] text-slate-500";
+    "px-2.5 py-1.5 text-[11px] font-bold uppercase tracking-wide text-slate-500";
+  const compactTdClass = "px-2.5 py-1.5 text-[11px] text-slate-600";
+  const compactEmptyCellClass = "px-2.5 py-4 text-center text-[11px] text-slate-500";
 
   const agentsTable = (
     <div className={`${tableWrapperClass} overflow-y-auto`}>
@@ -233,7 +233,7 @@ export function AgentsPageClient({ agents }: AgentsPageClientProps) {
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search..."
               aria-label="Search agents"
-              className="w-40 border border-slate-300 bg-white px-2 py-1 text-[12px] text-slate-900 placeholder:text-slate-400 focus:border-maroon focus:outline-none"
+              className="w-40 border border-slate-300 bg-white px-2 py-1 text-[11px] text-slate-900 placeholder:text-slate-400 focus:border-maroon focus:outline-none"
             />
             <Button type="button" size="sm" onClick={openNewModal}>
               Add Agent
@@ -256,9 +256,9 @@ export function AgentsPageClient({ agents }: AgentsPageClientProps) {
         {isNew ? (
           <AgentForm embedded onSuccess={handleSaved} onCancel={closeAgentModal} />
         ) : editLoading ? (
-          <p className="text-[12px] text-slate-500">Loading agent...</p>
+          <p className="text-[11px] text-slate-500">Loading agent...</p>
         ) : editError ? (
-          <p className="text-[12px] text-red-600">{editError}</p>
+          <p className="text-[11px] text-red-600">{editError}</p>
         ) : editAgent && editId ? (
           <AgentForm
             key={editId}

@@ -9,7 +9,7 @@ async function UsersContent() {
 
 export default function UsersPage() {
   return (
-    <Suspense fallback={<div className="text-[12px] text-slate-500">Loading users...</div>}>
+    <Suspense fallback={<div className="text-[11px] text-slate-500">Loading users...</div>}>
       <UsersContent />
     </Suspense>
   );

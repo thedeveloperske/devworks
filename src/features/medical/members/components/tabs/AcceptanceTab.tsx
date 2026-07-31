@@ -112,10 +112,10 @@ export function AcceptanceTab({
   return (
     <section className="space-y-1.5">
       <div>
-        <h3 className="text-[12px] font-bold uppercase text-slate-700">
+        <h3 className="text-[11px] font-bold uppercase text-slate-700">
           Acceptance
         </h3>
-        <p className="text-[12px] text-slate-500">
+        <p className="text-[11px] text-slate-500">
           Approve, Reject or Defer Member.
         </p>
       </div>
@@ -148,7 +148,7 @@ export function AcceptanceTab({
           />
         </div>
         {value.status ? (
-          <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1 text-[12px] text-slate-600 sm:col-span-2 lg:col-span-3">
+          <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-slate-600 sm:col-span-2 lg:col-span-3">
             <span>
               Status Date:{" "}
               {value.statusDate || (
@@ -198,7 +198,7 @@ export function AcceptanceTab({
           >
             <h3
               id="acceptance-status-modal-title"
-              className="text-[12px] font-bold uppercase text-slate-900"
+              className="text-[11px] font-bold uppercase text-slate-900"
             >
               {statusLabel(modal.status)}
             </h3>

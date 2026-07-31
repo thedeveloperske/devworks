@@ -10,7 +10,7 @@ async function ProvidersContent() {
 export default function ProvidersPage() {
   return (
     <Suspense
-      fallback={<div className="text-[12px] text-slate-500">Loading providers...</div>}
+      fallback={<div className="text-[11px] text-slate-500">Loading providers...</div>}
     >
       <ProvidersContent />
     </Suspense>

@@ -40,13 +40,13 @@ type EditState = {
 };
 
 const compactThClass =
-  "whitespace-nowrap px-2.5 py-1.5 text-[12px] font-bold uppercase tracking-wide text-slate-500";
+  "whitespace-nowrap px-2.5 py-1.5 text-[11px] font-bold uppercase tracking-wide text-slate-500";
 const compactTdClass =
-  "whitespace-nowrap px-2.5 py-1.5 text-[12px] text-slate-600";
+  "whitespace-nowrap px-2.5 py-1.5 text-[11px] text-slate-600";
 const compactEmptyCellClass =
-  "px-2.5 py-4 text-center text-[12px] text-slate-500";
+  "px-2.5 py-4 text-center text-[11px] text-slate-500";
 const searchInputClass =
-  "w-40 border border-slate-300 bg-white px-2 py-1 text-[12px] text-slate-900 placeholder:text-slate-400 focus:border-maroon focus:outline-none";
+  "w-40 border border-slate-300 bg-white px-2 py-1 text-[11px] text-slate-900 placeholder:text-slate-400 focus:border-maroon focus:outline-none";
 
 function resolvePreauthSubjectName(args: {
   memberNo: string;
@@ -394,7 +394,7 @@ export function PreAuthorizationPageClient({
   const corporatesStep = (
     <div className="flex min-h-0 flex-1 flex-col gap-3">
       <div className="flex shrink-0 flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-[12px] text-slate-600">
+        <p className="text-[11px] text-slate-600">
           Select a corporate to continue
         </p>
         <input
@@ -535,7 +535,7 @@ export function PreAuthorizationPageClient({
       />
     </div>
   ) : (
-    <p className="text-[12px] text-red-600">Selected member was not found.</p>
+    <p className="text-[11px] text-red-600">Selected member was not found.</p>
   );
 
   const newModalTitle =
@@ -620,9 +620,9 @@ export function PreAuthorizationPageClient({
             formStep
           )
         ) : editLoading ? (
-          <p className="text-[12px] text-slate-500">Loading pre-authorization...</p>
+          <p className="text-[11px] text-slate-500">Loading pre-authorization...</p>
         ) : editError ? (
-          <p className="text-[12px] text-red-600">{editError}</p>
+          <p className="text-[11px] text-red-600">{editError}</p>
         ) : editForm && detailId ? (
           <PreAuthorizationForm
             key={`${isViewMode ? "view" : "edit"}-${detailId}`}
@@ -675,7 +675,7 @@ export function PreAuthorizationPageClient({
         variant="popup"
         size="md"
       >
-        <p className="text-[12px] text-slate-600">{printNotice}</p>
+        <p className="text-[11px] text-slate-600">{printNotice}</p>
         <div className="mt-4 flex justify-end">
           <Button
             type="button"

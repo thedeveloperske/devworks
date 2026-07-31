@@ -23,9 +23,9 @@ const menuButtonClass =
 const menuPanelClass =
   "fixed z-50 min-w-[11rem] border border-slate-200 bg-white py-1 shadow-lg";
 const menuItemClass =
-  "block w-full px-3 py-1.5 text-left text-[12px] text-slate-700 hover:bg-slate-50";
+  "block w-full px-3 py-1.5 text-left text-[11px] text-slate-700 hover:bg-slate-50";
 const menuItemDisabledClass =
-  "block w-full cursor-not-allowed px-3 py-1.5 text-left text-[12px] text-slate-400";
+  "block w-full cursor-not-allowed px-3 py-1.5 text-left text-[11px] text-slate-400";
 
 function getMenuPosition(button: HTMLButtonElement) {
   const rect = button.getBoundingClientRect();

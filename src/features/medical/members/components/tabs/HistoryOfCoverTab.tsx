@@ -22,7 +22,7 @@ const tableMinWidth = visibleFields.length * columnMinWidth;
 const tableBodyMaxHeight = 280;
 
 const thClass =
-  "whitespace-nowrap border-b border-slate-200 px-2 py-1.5 text-left text-[12px] font-bold uppercase tracking-wider text-slate-500";
+  "whitespace-nowrap border-b border-slate-200 px-2 py-1.5 text-left text-[11px] font-bold uppercase tracking-wider text-slate-500";
 const tdClass = "border-b border-slate-200 px-1 py-1.5 align-middle";
 
 function renderCell(
@@ -68,10 +68,10 @@ export function HistoryOfCoverTab({
   return (
     <section className="flex h-full min-h-0 flex-col gap-1.5">
       <div>
-        <h3 className="text-[12px] font-bold uppercase text-slate-700">
+        <h3 className="text-[11px] font-bold uppercase text-slate-700">
           Cover Dates
         </h3>
-        <p className="text-[12px] text-slate-500">
+        <p className="text-[11px] text-slate-500">
           Capture cover dates information.
         </p>
       </div>

@@ -78,9 +78,9 @@ type MemberFormProps = {
   onEditDependant?: (memberNo: string) => void;
 };
 
-const fieldLabelClass = "mb-0.5 block text-[12px] font-medium text-slate-700";
+const fieldLabelClass = "mb-0.5 block text-[11px] font-medium text-slate-700";
 const fieldInputClass =
-  "w-full border border-slate-300 bg-white px-2 py-1 text-[12px] text-slate-900 placeholder:text-slate-400 focus:border-maroon focus:outline-none";
+  "w-full border border-slate-300 bg-white px-2 py-1 text-[11px] text-slate-900 placeholder:text-slate-400 focus:border-maroon focus:outline-none";
 
 export function MemberForm({
   mode = "principal",
@@ -769,7 +769,7 @@ export function MemberForm({
               key={tab.id}
               type="button"
               onClick={() => setActiveTab(tab.id)}
-              className={`block shrink-0 px-2 py-1 text-left text-[12px] font-medium transition md:w-full ${
+              className={`block shrink-0 px-2 py-1 text-left text-[11px] font-medium transition md:w-full ${
                 activeTab === tab.id
                   ? "bg-maroon/10 text-maroon"
                   : "text-slate-500 hover:bg-white hover:text-slate-900"

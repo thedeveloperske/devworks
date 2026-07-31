@@ -153,8 +153,8 @@ function SelectionItemCard({ item }: { item: SelectionItem }) {
       <div className="mb-2 flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-maroon">
         <Icon className="h-4 w-4" />
       </div>
-      <p className="text-[12px] font-semibold text-slate-900">{item.label}</p>
-      <p className="mt-1 text-[12px] text-slate-500">{item.description}</p>
+      <p className="text-[11px] font-semibold text-slate-900">{item.label}</p>
+      <p className="mt-1 text-[11px] text-slate-500">{item.description}</p>
     </Link>
   );
 }
@@ -171,10 +171,10 @@ function SelectionGroup({
   return (
     <section className="min-w-0">
       <div className="mb-3 border-b border-slate-200 pb-2">
-        <h2 className="text-[12px] font-bold uppercase tracking-wide text-maroon">
+        <h2 className="text-[11px] font-bold uppercase tracking-wide text-maroon">
           {title}
         </h2>
-        <p className="mt-1 text-[12px] text-slate-500">{description}</p>
+        <p className="mt-1 text-[11px] text-slate-500">{description}</p>
       </div>
 
       <div className="grid gap-3">

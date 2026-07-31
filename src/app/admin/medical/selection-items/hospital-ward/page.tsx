@@ -10,7 +10,7 @@ async function HospitalWardsContent() {
 export default function HospitalWardPage() {
   return (
     <Suspense
-      fallback={<div className="text-[12px] text-slate-500">Loading hospital wards...</div>}
+      fallback={<div className="text-[11px] text-slate-500">Loading hospital wards...</div>}
     >
       <HospitalWardsContent />
     </Suspense>

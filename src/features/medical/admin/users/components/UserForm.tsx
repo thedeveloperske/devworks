@@ -22,7 +22,7 @@ type UserFormProps = {
 };
 
 const compactInputClass =
-  "w-full border border-slate-300 bg-white px-2 py-1 text-[12px] text-slate-900 placeholder:text-slate-400 focus:border-maroon focus:outline-none";
+  "w-full border border-slate-300 bg-white px-2 py-1 text-[11px] text-slate-900 placeholder:text-slate-400 focus:border-maroon focus:outline-none";
 
 export function UserForm({
   userId,
@@ -161,7 +161,7 @@ export function UserForm({
               return (
                 <label
                   key={option.value}
-                  className="inline-flex items-center gap-1.5 text-[12px] text-slate-700"
+                  className="inline-flex items-center gap-1.5 text-[11px] text-slate-700"
                 >
                   <input
                     type="checkbox"

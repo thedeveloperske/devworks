@@ -61,10 +61,10 @@ export function MemberStatusLineChart({ points }: MemberStatusLineChartProps) {
   return (
     <div className="border border-slate-200 bg-white">
       <div className="border-b border-slate-200 px-4 py-3">
-        <h2 className="text-[12px] font-semibold text-slate-900">
+        <h2 className="text-[11px] font-semibold text-slate-900">
           Active vs Cancelled
         </h2>
-        <p className="mt-0.5 text-[12px] text-slate-500">
+        <p className="mt-0.5 text-[11px] text-slate-500">
           Member status over the last 12 months
         </p>
       </div>
@@ -166,7 +166,7 @@ export function MemberStatusLineChart({ points }: MemberStatusLineChartProps) {
         </svg>
 
         <ul className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1">
-          <li className="flex items-center gap-1.5 text-[12px] text-slate-700">
+          <li className="flex items-center gap-1.5 text-[11px] text-slate-700">
             <span
               aria-hidden
               className="inline-block h-px w-3 bg-maroon"
@@ -178,7 +178,7 @@ export function MemberStatusLineChart({ points }: MemberStatusLineChartProps) {
               </span>
             ) : null}
           </li>
-          <li className="flex items-center gap-1.5 text-[12px] text-slate-700">
+          <li className="flex items-center gap-1.5 text-[11px] text-slate-700">
             <span
               aria-hidden
               className="inline-block h-px w-3 border-t border-dashed border-slate-500"

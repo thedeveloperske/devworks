@@ -71,8 +71,8 @@ function ReportCard({ item }: { item: MemberReportItem }) {
       <div className="mb-2 flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-maroon">
         <Icon className="h-4 w-4" />
       </div>
-      <p className="text-[12px] font-semibold text-slate-900">{item.label}</p>
-      <p className="mt-1 text-[12px] text-slate-500">{item.description}</p>
+      <p className="text-[11px] font-semibold text-slate-900">{item.label}</p>
+      <p className="mt-1 text-[11px] text-slate-500">{item.description}</p>
     </Link>
   );
 }

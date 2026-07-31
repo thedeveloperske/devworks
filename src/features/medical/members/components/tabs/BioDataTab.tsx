@@ -149,10 +149,10 @@ export function BioDataTab({
   return (
     <section className="space-y-1.5">
       <div>
-        <h3 className="text-[12px] font-bold uppercase text-slate-700">
+        <h3 className="text-[11px] font-bold uppercase text-slate-700">
           Bio Data
         </h3>
-        <p className="text-[12px] text-slate-500">
+        <p className="text-[11px] text-slate-500">
           Capture bio data information.
         </p>
       </div>
@@ -178,7 +178,7 @@ export function BioDataTab({
                   labelClassName={fieldLabelClass}
                 />
                 {photoAvailed ? (
-                  <div className="mt-1 flex min-w-0 items-center gap-2 text-[12px] text-slate-600">
+                  <div className="mt-1 flex min-w-0 items-center gap-2 text-[11px] text-slate-600">
                     <span className="min-w-0 truncate">
                       {cardDateSummary || (
                         <span className="text-slate-400">
@@ -278,7 +278,7 @@ export function BioDataTab({
           >
             <h3
               id="bio-card-modal-title"
-              className="text-[12px] font-bold uppercase text-slate-900"
+              className="text-[11px] font-bold uppercase text-slate-900"
             >
               Card Information
             </h3>

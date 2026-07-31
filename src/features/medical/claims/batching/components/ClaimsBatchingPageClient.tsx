@@ -32,13 +32,13 @@ type ClaimsBatchingPageClientProps = {
 };
 
 const compactThClass =
-  "whitespace-nowrap px-2.5 py-1.5 text-[12px] font-bold uppercase tracking-wide text-slate-500";
+  "whitespace-nowrap px-2.5 py-1.5 text-[11px] font-bold uppercase tracking-wide text-slate-500";
 const compactTdClass =
-  "whitespace-nowrap border-b border-slate-200 px-2.5 py-1.5 text-[12px] text-slate-600";
+  "whitespace-nowrap border-b border-slate-200 px-2.5 py-1.5 text-[11px] text-slate-600";
 const emptyCellClass =
-  "border-b border-slate-200 px-2.5 py-4 text-center text-[12px] text-slate-500";
+  "border-b border-slate-200 px-2.5 py-4 text-center text-[11px] text-slate-500";
 const searchInputClass =
-  "w-44 border border-slate-300 bg-white px-2 py-1 text-[12px] text-slate-900 placeholder:text-slate-400 focus:border-maroon focus:outline-none";
+  "w-44 border border-slate-300 bg-white px-2 py-1 text-[11px] text-slate-900 placeholder:text-slate-400 focus:border-maroon focus:outline-none";
 
 const manageTabs: BatchManageTab[] = [
   "edit",
@@ -280,7 +280,7 @@ export function ClaimsBatchingPageClient({
             </Button>
           </div>
           {actionNotice ? (
-            <p className="shrink-0 text-[12px] text-emerald-700">{actionNotice}</p>
+            <p className="shrink-0 text-[11px] text-emerald-700">{actionNotice}</p>
           ) : null}
           <div className="min-h-0 flex-1 overflow-y-auto">{batchesTable}</div>
         </div>
@@ -325,7 +325,7 @@ export function ClaimsBatchingPageClient({
             onUpdated={handleBatchUpdated}
           />
         ) : batchId ? (
-          <p className="text-[12px] text-red-600">Batch not found.</p>
+          <p className="text-[11px] text-red-600">Batch not found.</p>
         ) : null}
       </Modal>
 
@@ -352,7 +352,7 @@ export function ClaimsBatchingPageClient({
             onCancel={closeActionModal}
           />
         ) : batchId ? (
-          <p className="text-[12px] text-red-600">Batch not found.</p>
+          <p className="text-[11px] text-red-600">Batch not found.</p>
         ) : null}
       </Modal>
 
@@ -381,12 +381,12 @@ export function ClaimsBatchingPageClient({
               onCancel={closeActionModal}
             />
           ) : (
-            <p className="text-[12px] text-red-600">
+            <p className="text-[11px] text-red-600">
               This batch must be assigned to an entrant before a vetter can be assigned.
             </p>
           )
         ) : batchId ? (
-          <p className="text-[12px] text-red-600">Batch not found.</p>
+          <p className="text-[11px] text-red-600">Batch not found.</p>
         ) : null}
       </Modal>
 
@@ -417,12 +417,12 @@ export function ClaimsBatchingPageClient({
               onCancel={closeActionModal}
             />
           ) : (
-            <p className="text-[12px] text-red-600">
+            <p className="text-[11px] text-red-600">
               This batch must be assigned to a vetter before an authorizer can be assigned.
             </p>
           )
         ) : batchId ? (
-          <p className="text-[12px] text-red-600">Batch not found.</p>
+          <p className="text-[11px] text-red-600">Batch not found.</p>
         ) : null}
       </Modal>
 
@@ -451,13 +451,13 @@ export function ClaimsBatchingPageClient({
               onCancel={closeActionModal}
             />
           ) : (
-            <p className="text-[12px] text-red-600">
+            <p className="text-[11px] text-red-600">
               This batch must be assigned to an authorizer before finance can be
               assigned.
             </p>
           )
         ) : batchId ? (
-          <p className="text-[12px] text-red-600">Batch not found.</p>
+          <p className="text-[11px] text-red-600">Batch not found.</p>
         ) : null}
       </Modal>
 
@@ -474,7 +474,7 @@ export function ClaimsBatchingPageClient({
         {viewId && viewBatch ? (
           <ViewBatchDetails key={viewId} batch={viewBatch} onClose={closeViewModal} />
         ) : viewId ? (
-          <p className="text-[12px] text-red-600">Batch not found.</p>
+          <p className="text-[11px] text-red-600">Batch not found.</p>
         ) : null}
       </Modal>
     </div>

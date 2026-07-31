@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { CheckCircle2, RefreshCw } from "lucide-react";
 import type { CoverDateFormData } from "@/features/medical/corporates";
@@ -31,7 +31,7 @@ const tableMinWidth =
   actionsColumnWidth;
 
 const thClass =
-  "whitespace-nowrap border-b border-slate-200 px-2 py-1.5 text-left text-[12px] font-bold uppercase tracking-wider text-slate-500";
+  "whitespace-nowrap border-b border-slate-200 px-2 py-1.5 text-left text-[11px] font-bold uppercase tracking-wider text-slate-500";
 const tdClass = "border-b border-slate-200 px-1 py-1.5 align-middle";
 const iconActionClass =
   "inline-flex h-7 w-7 items-center justify-center text-slate-500 transition-colors hover:text-maroon focus:outline-none focus-visible:ring-1 focus-visible:ring-maroon";
@@ -133,8 +133,8 @@ export function CoverDatesForm({
     >
       {showHeader ? (
         <div>
-          <h3 className="text-[12px] font-bold uppercase text-slate-700">Cover Dates</h3>
-          <p className="text-[12px] text-slate-500">{description}</p>
+          <h3 className="text-[11px] font-bold uppercase text-slate-700">Cover Dates</h3>
+          <p className="text-[11px] text-slate-500">{description}</p>
         </div>
       ) : null}
       <div className="overflow-x-auto border border-slate-200">

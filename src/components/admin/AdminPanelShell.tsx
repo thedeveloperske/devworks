@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useSearchParams } from "next/navigation";
-import { UserAvatarMenu } from "@/components/auth/UserAvatarMenu";
+import { UserNavCard } from "@/components/auth/UserNavCard";
 import {
   ADMIN_SYSTEMS,
   type AdminSystemId,
@@ -355,13 +355,13 @@ function NavLink({
     <Link
       href={href}
       onClick={onNavigate}
-      className={`flex items-center gap-2.5 rounded px-2.5 py-2.5 text-[12px] font-semibold transition ${
+      className={`flex items-center gap-2 rounded px-2 py-1.5 text-[11px] font-medium transition ${
         active
           ? "bg-maroon/10 text-maroon"
           : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
       }`}
     >
-      {Icon ? <Icon className="h-4 w-4 shrink-0" /> : null}
+      {Icon ? <Icon className="h-3.5 w-3.5 shrink-0" /> : null}
       <span>{label}</span>
     </Link>
   );
@@ -400,22 +400,22 @@ function NavGroup({
           if (!hasChildren) return;
           setOpenGroupHref(open ? null : item.href);
         }}
-        className={`flex w-full items-center gap-2.5 rounded px-2.5 py-2.5 text-left text-[12px] font-semibold transition ${
+        className={`flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-[11px] font-medium transition ${
           groupActive
             ? "bg-maroon/10 text-maroon"
             : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
         }`}
       >
-        <Icon className="h-4 w-4 shrink-0" />
+        <Icon className="h-3.5 w-3.5 shrink-0" />
         <span className="min-w-0 flex-1">{item.label}</span>
         {hasChildren ? (
           <ChevronDown
-            className={`h-4 w-4 shrink-0 transition ${open ? "rotate-180" : ""}`}
+            className={`h-3.5 w-3.5 shrink-0 transition ${open ? "rotate-180" : ""}`}
           />
         ) : null}
       </button>
       {open && hasChildren ? (
-        <div className="mt-1 space-y-1 border-l border-slate-200 py-1 pl-3 ml-4">
+        <div className="mt-0.5 space-y-0.5 border-l border-slate-200 py-0.5 pl-2.5 ml-3">
           {item.children!.map((child) => {
             const active = child.match
               ? child.match(pathname, searchParams)
@@ -427,7 +427,7 @@ function NavGroup({
                 onClick={() => {
                   onNavigate?.();
                 }}
-                className={`block rounded px-2.5 py-2 text-[12px] font-medium transition ${
+                className={`block rounded px-2 py-1.5 text-[11px] font-normal transition ${
                   active
                     ? "bg-maroon/10 text-maroon"
                     : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
@@ -506,8 +506,16 @@ export function AdminPanelShell({
     return () => document.removeEventListener("keydown", onKey);
   }, []);
 
-  const navContent = (
-    <nav className="flex flex-col gap-1.5 p-3">
+  const renderUserCard = () => (
+    <UserNavCard
+      name={userName?.trim() || userEmail?.trim() || "User"}
+      email={userEmail}
+      layout="card"
+    />
+  );
+
+  const renderNavContent = () => (
+    <nav className="flex flex-col gap-0.5 p-2">
       {navItems.map((item) =>
         renderNavItem(item, openGroupHref, setOpenGroupHref, () =>
           setMobileNavOpen(false)
@@ -533,18 +541,17 @@ export function AdminPanelShell({
             </button>
             <AdminBrand homeHref={basePath} />
           </div>
-          <div className="relative z-[110] flex shrink-0 items-center">
-            <UserAvatarMenu
-              name={userName?.trim() || userEmail?.trim() || "User"}
-              email={userEmail}
-            />
-          </div>
         </div>
       </header>
 
-      <div className="relative flex min-h-0 flex-1">
-        <aside className="hidden w-56 shrink-0 self-stretch border-r border-slate-200 bg-white lg:flex lg:flex-col">
-          <div className="min-h-0 flex-1 overflow-y-auto">{navContent}</div>
+      <div className="relative flex min-h-0 flex-1 overflow-hidden">
+        <aside className="hidden h-full min-h-0 w-56 shrink-0 flex-col border-r border-slate-200 bg-white lg:flex">
+          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+            {renderNavContent()}
+          </div>
+          <div className="shrink-0 border-t border-slate-200 p-3">
+            {renderUserCard()}
+          </div>
         </aside>
 
         {mobileNavOpen ? (
@@ -556,17 +563,24 @@ export function AdminPanelShell({
               onClick={() => setMobileNavOpen(false)}
             />
             <aside className="fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-slate-200 bg-white shadow-lg lg:hidden">
-              <div className="flex items-center justify-between border-b border-slate-200 px-3 py-3">
-                <p className="text-[12px] font-semibold text-slate-700">Navigation</p>
+              <div className="flex shrink-0 items-center justify-between border-b border-slate-200 px-3 py-3">
+                <p className="text-[11px] font-semibold text-slate-700">
+                  Navigation
+                </p>
                 <button
                   type="button"
-                  className="text-[12px] font-semibold text-slate-500 hover:text-maroon"
+                  className="text-[11px] font-semibold text-slate-500 hover:text-maroon"
                   onClick={() => setMobileNavOpen(false)}
                 >
                   Close
                 </button>
               </div>
-              <div className="min-h-0 flex-1 overflow-y-auto">{navContent}</div>
+              <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+                {renderNavContent()}
+              </div>
+              <div className="shrink-0 border-t border-slate-200 p-3">
+                {renderUserCard()}
+              </div>
             </aside>
           </>
         ) : null}

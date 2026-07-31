@@ -1,4 +1,4 @@
-ï»¿"use client";
+"use client";
 
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -23,11 +23,11 @@ import type { LookupOption } from "@/features/medical/lookups/types";
 const tableBodyMaxHeight = 280;
 const tableMinWidth = 720;
 const thClass =
-  "whitespace-nowrap border-b border-slate-200 px-2 py-1.5 text-left text-[12px] font-bold uppercase tracking-wider text-slate-500";
+  "whitespace-nowrap border-b border-slate-200 px-2 py-1.5 text-left text-[11px] font-bold uppercase tracking-wider text-slate-500";
 const tdClass =
-  "border-b border-slate-200 px-2 py-1.5 align-middle text-[12px] text-slate-600";
+  "border-b border-slate-200 px-2 py-1.5 align-middle text-[11px] text-slate-600";
 const emptyCellClass =
-  "border-b border-slate-200 px-2 py-4 text-center text-[12px] text-slate-500";
+  "border-b border-slate-200 px-2 py-4 text-center text-[11px] text-slate-500";
 
 type CorporatesPageClientProps = {
   corporates: CorporateListItem[];
@@ -272,18 +272,18 @@ export function CorporatesPageClient({
                     {corporate.corporate}
                   </Link>
                 </td>
-                <td className={tdClass}>{corporate.corpId ?? "â€”"}</td>
-                <td className={tdClass}>{corporate.policyNo ?? "â€”"}</td>
+                <td className={tdClass}>{corporate.corpId ?? "—"}</td>
+                <td className={tdClass}>{corporate.policyNo ?? "—"}</td>
                 <td className={tdClass}>
                   {corporate.agentId
                     ? (agentLabelById[corporate.agentId] ?? corporate.agentId)
-                    : "â€”"}
+                    : "—"}
                 </td>
                 <td className={tdClass}>
                   {corporate.businessClass
                     ? (businessClassLabelByCode[corporate.businessClass] ??
                       corporate.businessClass)
-                    : "â€”"}
+                    : "—"}
                 </td>
                 <td className={tdClass}>
                   <Button
@@ -326,7 +326,7 @@ export function CorporatesPageClient({
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search..."
               aria-label="Search corporates"
-              className="w-40 border border-slate-300 bg-white px-2 py-1 text-[12px] text-slate-900 placeholder:text-slate-400 focus:border-maroon focus:outline-none"
+              className="w-40 border border-slate-300 bg-white px-2 py-1 text-[11px] text-slate-900 placeholder:text-slate-400 focus:border-maroon focus:outline-none"
             />
             <Button type="button" size="sm" onClick={openNewModal}>
               Add Corporate
@@ -360,9 +360,9 @@ export function CorporatesPageClient({
             onCancel={closeCorporateModal}
           />
         ) : editLoading ? (
-          <p className="text-[12px] text-slate-500">Loading corporate...</p>
+          <p className="text-[11px] text-slate-500">Loading corporate...</p>
         ) : editError ? (
-          <p className="text-[12px] text-red-600">{editError}</p>
+          <p className="text-[11px] text-red-600">{editError}</p>
         ) : editCorporate && editId ? (
           <CorporateForm
             key={`${editId}-${editName}`}

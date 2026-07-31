@@ -45,14 +45,14 @@ export function FormField({
   as = "input",
   rows = 3,
   options = [],
-  labelClassName = "mb-1.5 block text-[12px] font-medium text-slate-700",
-  inputClassName = "w-full border border-slate-300 bg-white px-3 py-2 text-[12px] text-slate-900 placeholder:text-slate-400 focus:border-maroon focus:outline-none",
+  labelClassName = "mb-1 block text-[11px] font-medium text-slate-600",
+  inputClassName = "w-full border border-slate-300 bg-white px-2.5 py-1.5 text-[11px] font-normal text-slate-900 placeholder:text-slate-400 focus:border-maroon focus:outline-none",
   selectClassName,
   disabled = false,
   min,
   max,
   hint,
-  hintClassName = "mt-0.5 text-[11px] text-slate-500",
+  hintClassName = "mt-0.5 text-[10px] text-slate-500",
 }: FormFieldProps) {
   return (
     <div>

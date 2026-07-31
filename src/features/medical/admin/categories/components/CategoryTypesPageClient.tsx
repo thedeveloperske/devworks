@@ -126,9 +126,9 @@ export function CategoryTypesPageClient({ categories }: CategoryTypesPageClientP
     : undefined;
 
   const compactThClass =
-    "px-2.5 py-1.5 text-[12px] font-bold uppercase tracking-wide text-slate-500";
-  const compactTdClass = "px-2.5 py-1.5 text-[12px] text-slate-600";
-  const compactEmptyCellClass = "px-2.5 py-4 text-center text-[12px] text-slate-500";
+    "px-2.5 py-1.5 text-[11px] font-bold uppercase tracking-wide text-slate-500";
+  const compactTdClass = "px-2.5 py-1.5 text-[11px] text-slate-600";
+  const compactEmptyCellClass = "px-2.5 py-4 text-center text-[11px] text-slate-500";
 
   const categoriesTable = (
     <div className={`${tableWrapperClass} overflow-y-auto`}>
@@ -206,9 +206,9 @@ export function CategoryTypesPageClient({ categories }: CategoryTypesPageClientP
         {isNew ? (
           <CategoryTypeForm embedded onSuccess={handleSaved} onCancel={closeCategoryModal} />
         ) : editLoading ? (
-          <p className="text-[12px] text-slate-500">Loading category...</p>
+          <p className="text-[11px] text-slate-500">Loading category...</p>
         ) : editError ? (
-          <p className="text-[12px] text-red-600">{editError}</p>
+          <p className="text-[11px] text-red-600">{editError}</p>
         ) : editCategory && editId ? (
           <CategoryTypeForm
             key={editId}

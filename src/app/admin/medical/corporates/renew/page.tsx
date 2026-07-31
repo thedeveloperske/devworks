@@ -28,7 +28,7 @@ export default function RenewCorporatePage() {
   return (
     <Suspense
       fallback={
-        <div className="text-[12px] text-slate-500">
+        <div className="text-[11px] text-slate-500">
           Loading corporates...
         </div>
       }
