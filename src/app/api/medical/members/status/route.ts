@@ -78,11 +78,35 @@ export async function POST(request: Request) {
     let memberNos: string[] = [];
 
     if (scope === "member") {
+      const info = await prisma.memberInfo.findUnique({
+        where: { memberNo },
+        select: { memberNo: true, cancelled: true },
+      });
+      if (!info) {
+        return NextResponse.json({ error: "Member not found" }, { status: 404 });
+      }
+      const isCancelled = info.cancelled === 1;
+      if (action === "cancel" && isCancelled) {
+        return NextResponse.json(
+          { error: "Member is already cancelled" },
+          { status: 400 }
+        );
+      }
+      if (action === "reinstate" && !isCancelled) {
+        return NextResponse.json(
+          { error: "Member is not cancelled" },
+          { status: 400 }
+        );
+      }
       memberNos = [memberNo];
     } else {
       const info = await prisma.memberInfo.findUnique({
         where: { memberNo },
-        select: { familyNo: true },
+        select: {
+          familyNo: true,
+          relationToPrincipal: true,
+          memberNo: true,
+        },
       });
       if (!info?.familyNo?.trim()) {
         return NextResponse.json(
@@ -90,11 +114,25 @@ export async function POST(request: Request) {
           { status: 404 }
         );
       }
+      const isPrincipal =
+        info.relationToPrincipal === 1 || info.memberNo.endsWith("-00");
+      if (!isPrincipal) {
+        return NextResponse.json(
+          { error: "Family actions must start from a principal member" },
+          { status: 400 }
+        );
+      }
       const family = await prisma.memberInfo.findMany({
         where: { familyNo: info.familyNo },
-        select: { memberNo: true },
+        select: { memberNo: true, cancelled: true },
       });
-      memberNos = family.map((member) => member.memberNo);
+      memberNos = family
+        .filter((member) =>
+          action === "cancel"
+            ? member.cancelled !== 1
+            : member.cancelled === 1
+        )
+        .map((member) => member.memberNo);
     }
 
     if (memberNos.length === 0) {

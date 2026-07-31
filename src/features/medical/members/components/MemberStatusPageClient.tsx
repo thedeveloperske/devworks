@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
+  ChevronRight,
   UserCheck,
   UserRoundCheck,
   UserRoundX,
@@ -130,6 +131,9 @@ export function MemberStatusPageClient({
   const [reason, setReason] = useState("");
   const [actionDate, setActionDate] = useState(todayIsoDate);
   const [dialogError, setDialogError] = useState("");
+  const [expandedFamilies, setExpandedFamilies] = useState<Set<string>>(
+    () => new Set()
+  );
 
   useEffect(() => {
     setMembersList(members);
@@ -141,6 +145,7 @@ export function MemberStatusPageClient({
     setActionNotice("");
     setPendingTarget(null);
     setDialogError("");
+    setExpandedFamilies(new Set());
   }, [selectedCorporateId]);
 
   useEffect(() => {
@@ -148,6 +153,7 @@ export function MemberStatusPageClient({
     setReason("");
     setActionDate(todayIsoDate());
     setDialogError("");
+    setExpandedFamilies(new Set());
   }, [action, scope]);
 
   const reasonOptions =
@@ -225,6 +231,37 @@ export function MemberStatusPageClient({
     memberSearchQuery,
     statusLabelById,
   ]);
+
+  const dependantsByFamilyNo = useMemo(() => {
+    if (!selectedCorporateId) return new Map<string, MemberStatusRow[]>();
+
+    const map = new Map<string, MemberStatusRow[]>();
+    for (const member of membersList) {
+      if (
+        member.corporateId !== selectedCorporateId ||
+        member.memberType !== "Dependant" ||
+        !member.familyNo
+      ) {
+        continue;
+      }
+      const isCancelled = member.cancelled === 1;
+      if (action === "cancel" && isCancelled) continue;
+      if (action === "reinstate" && !isCancelled) continue;
+      const list = map.get(member.familyNo) ?? [];
+      list.push(member);
+      map.set(member.familyNo, list);
+    }
+    return map;
+  }, [action, membersList, selectedCorporateId]);
+
+  const toggleFamily = useCallback((familyNo: string) => {
+    setExpandedFamilies((prev) => {
+      const next = new Set(prev);
+      if (next.has(familyNo)) next.delete(familyNo);
+      else next.add(familyNo);
+      return next;
+    });
+  }, []);
 
   const activeModeLabel =
     statusModeOptions.find(
@@ -464,9 +501,10 @@ export function MemberStatusPageClient({
         </div>
       </div>
       <p className="shrink-0 text-[12px] text-slate-500">
+        {activeModeLabel}. Showing principal members only
         {scope === "family"
-          ? "Action applies to the whole family under the selected principal."
-          : "Action applies to the selected principal only."}
+          ? " — action applies to the whole family."
+          : " — expand a principal to cancel or reinstate dependants."}
       </p>
       {actionError ? (
         <p className="shrink-0 text-[12px] text-red-600">{actionError}</p>
@@ -500,24 +538,52 @@ export function MemberStatusPageClient({
                 </td>
               </tr>
             ) : (
-              filteredMembers.map((member) => {
-                const hasCover = member.anniv !== "";
-                const rowSaving = savingKey === member.memberNo;
-                const rowDisabled =
-                  saving || (scope === "member" && !hasCover);
-                return (
+              filteredMembers.flatMap((member) => {
+                const familyNo = member.familyNo;
+                const dependants =
+                  scope === "member" && familyNo
+                    ? dependantsByFamilyNo.get(familyNo) ?? []
+                    : [];
+                const expanded =
+                  Boolean(familyNo) && expandedFamilies.has(familyNo);
+                const rows = [
                   <tr
                     key={member.memberNo}
                     className="bg-white hover:bg-slate-50"
                   >
-                    <td className={tdClass}>{member.memberNo}</td>
+                    <td className={tdClass}>
+                      <div className="flex items-center gap-1">
+                        {scope === "member" && dependants.length > 0 ? (
+                          <button
+                            type="button"
+                            aria-label={
+                              expanded
+                                ? `Hide dependants for ${member.name}`
+                                : `Show dependants for ${member.name}`
+                            }
+                            aria-expanded={expanded}
+                            onClick={() => toggleFamily(familyNo)}
+                            className="inline-flex size-5 items-center justify-center text-slate-500 hover:text-maroon"
+                          >
+                            <ChevronRight
+                              className={`size-3.5 transition ${
+                                expanded ? "rotate-90" : ""
+                              }`}
+                            />
+                          </button>
+                        ) : (
+                          <span className="inline-flex size-5" />
+                        )}
+                        <span>{member.memberNo}</span>
+                      </div>
+                    </td>
                     <td className={tdClass}>{member.familyNo || "—"}</td>
                     <td className={tdClass}>{member.name}</td>
                     <td className={tdClass}>{member.anniv || "—"}</td>
                     <td className={tdClass}>
                       {member.status
                         ? (statusLabelById[member.status] ?? member.status)
-                        : hasCover
+                        : member.anniv !== ""
                           ? "—"
                           : "No cover history"}
                     </td>
@@ -525,14 +591,67 @@ export function MemberStatusPageClient({
                       <button
                         type="button"
                         onClick={() => openConfirmDialog(member)}
-                        disabled={rowDisabled}
+                        disabled={
+                          saving || (scope === "member" && member.anniv === "")
+                        }
                         className={applyButtonClass}
                       >
-                        {rowSaving ? "Applying..." : rowActionLabel}
+                        {savingKey === member.memberNo
+                          ? "Applying..."
+                          : rowActionLabel}
                       </button>
                     </td>
-                  </tr>
-                );
+                  </tr>,
+                ];
+
+                if (expanded) {
+                  for (const dependant of dependants) {
+                    const hasCover = dependant.anniv !== "";
+                    rows.push(
+                      <tr
+                        key={dependant.memberNo}
+                        className="bg-slate-50/80 hover:bg-slate-100"
+                      >
+                        <td className={tdClass}>
+                          <div className="flex items-center gap-1 pl-5">
+                            <span className="inline-flex size-5" />
+                            <span>{dependant.memberNo}</span>
+                          </div>
+                        </td>
+                        <td className={tdClass}>{dependant.familyNo || "—"}</td>
+                        <td className={tdClass}>
+                          {dependant.name}
+                          <span className="ml-1 text-slate-400">
+                            · Dependant
+                          </span>
+                        </td>
+                        <td className={tdClass}>{dependant.anniv || "—"}</td>
+                        <td className={tdClass}>
+                          {dependant.status
+                            ? (statusLabelById[dependant.status] ??
+                              dependant.status)
+                            : hasCover
+                              ? "—"
+                              : "No cover history"}
+                        </td>
+                        <td className={tdClass}>
+                          <button
+                            type="button"
+                            onClick={() => openConfirmDialog(dependant)}
+                            disabled={saving || !hasCover}
+                            className={applyButtonClass}
+                          >
+                            {savingKey === dependant.memberNo
+                              ? "Applying..."
+                              : actionVerbs[action]}
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  }
+                }
+
+                return rows;
               })
             )}
           </tbody>
@@ -585,7 +704,11 @@ export function MemberStatusPageClient({
             <p className="mt-1 text-[12px] text-slate-600">
               {scope === "family"
                 ? `Whole family of ${pendingTarget.name}`
-                : pendingTarget.name}
+                : `${pendingTarget.name}${
+                    pendingTarget.memberType === "Dependant"
+                      ? " · Dependant"
+                      : ""
+                  }`}
             </p>
 
             <div className="mt-3 flex flex-col gap-2.5">
