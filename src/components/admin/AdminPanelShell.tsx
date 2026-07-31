@@ -85,10 +85,18 @@ function getMedicalNavItems(base: string): NavItem[] {
           href: `${members}?manage=1`,
           label: "Manage Members",
           match: (pathname, searchParams) => {
+            if (searchParams.get("status") === "1") return false;
             if (searchParams.get("manage") !== "1") return false;
             if (pathname !== members) return false;
             return true;
           },
+        },
+        {
+          href: `${members}/status`,
+          label: "Member Cancellation & Reinstate",
+          match: (pathname, searchParams) =>
+            pathname.startsWith(`${members}/status`) ||
+            (pathname === members && searchParams.get("status") === "1"),
         },
         {
           href: `${members}/renew`,
