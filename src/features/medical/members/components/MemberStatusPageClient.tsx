@@ -622,7 +622,7 @@ export function MemberStatusPageClient({
                         <td className={tdClass}>
                           {dependant.name}
                           <span className="ml-1 text-slate-400">
-                            · Dependant
+                            · {dependant.relationLabel}
                           </span>
                         </td>
                         <td className={tdClass}>{dependant.anniv || "—"}</td>
@@ -705,8 +705,8 @@ export function MemberStatusPageClient({
               {scope === "family"
                 ? `Whole family of ${pendingTarget.name}`
                 : `${pendingTarget.name}${
-                    pendingTarget.memberType === "Dependant"
-                      ? " · Dependant"
+                    pendingTarget.memberType !== "Principal"
+                      ? ` · ${pendingTarget.relationLabel}`
                       : ""
                   }`}
             </p>

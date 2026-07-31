@@ -97,6 +97,8 @@ export type MemberStatusRow = {
   corporateId: string;
   corporateName: string;
   memberType: "Principal" | "Dependant";
+  /** Display label from relation_to_principal (Spouse, Son, Daughter, etc.). */
+  relationLabel: string;
   /** Latest cover anniversary number, "" when the member has no cover history. */
   anniv: string;
   /** Current status code from member_anniversary.status, "" when unset. */

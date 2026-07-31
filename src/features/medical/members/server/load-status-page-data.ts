@@ -1,5 +1,12 @@
+import { FAMILY_RELATIONSHIPS } from "@/features/medical/lookups/family-relationships";
 import type { MemberStatusCorporate, MemberStatusRow } from "../types";
 import { prisma } from "@/lib/prisma";
+
+function relationshipLabel(value: number | null | undefined) {
+  if (value == null) return "—";
+  const match = FAMILY_RELATIONSHIPS.find((item) => item.key === value);
+  return match?.value ?? String(value);
+}
 
 /**
  * Loads every member (principals and dependants from member_info) with the
@@ -77,6 +84,9 @@ export async function loadMemberStatusPageData() {
       corporateId: corporate?.id ?? "",
       corporateName: corporate?.corporate ?? "—",
       memberType: isPrincipal ? "Principal" : "Dependant",
+      relationLabel: isPrincipal
+        ? "Principal"
+        : relationshipLabel(info.relationToPrincipal),
       anniv: latest ? String(latest.anniv) : "",
       status: latest?.status != null ? String(latest.status) : "",
       cancelled: info.cancelled,
