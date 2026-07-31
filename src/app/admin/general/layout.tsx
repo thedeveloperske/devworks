@@ -1,14 +1,18 @@
-import Link from "next/link";
-import { LogoutButton } from "@/components/auth/LogoutButton";
+import { UserAvatarMenu } from "@/components/auth/UserAvatarMenu";
 import { ADMIN_SYSTEMS } from "@/lib/admin-systems";
+import { getSession } from "@/lib/auth";
+import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
-export default function GeneralAdminLayout({
+export default async function GeneralAdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const session = await getSession();
+  if (!session) redirect("/login");
+
   const system = ADMIN_SYSTEMS.general;
 
   return (
@@ -19,15 +23,7 @@ export default function GeneralAdminLayout({
             <p className="text-[12px] font-semibold text-maroon">{system.label}</p>
             <p className="text-[12px] text-slate-500">Application workspace</p>
           </div>
-          <div className="flex items-center gap-4">
-            <Link
-              href="/applications"
-              className="text-[12px] font-semibold text-slate-600 hover:text-maroon"
-            >
-              Applications
-            </Link>
-            <LogoutButton />
-          </div>
+          <UserAvatarMenu name={session.name} email={session.email} />
         </div>
       </header>
       <main className="flex-1 p-4 sm:p-6 lg:p-8">{children}</main>

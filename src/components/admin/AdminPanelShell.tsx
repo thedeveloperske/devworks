@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useSearchParams } from "next/navigation";
-import { LogoutButton } from "@/components/auth/LogoutButton";
+import { UserAvatarMenu } from "@/components/auth/UserAvatarMenu";
 import {
   ADMIN_SYSTEMS,
   type AdminSystemId,
@@ -466,9 +466,13 @@ function renderNavItem(
 export function AdminPanelShell({
   children,
   system = "medical",
+  userName,
+  userEmail,
 }: {
   children: React.ReactNode;
   system?: AdminSystemId;
+  userName?: string;
+  userEmail?: string;
 }) {
   const pathname = usePathname();
   const basePath = ADMIN_SYSTEMS[system].basePath;
@@ -530,13 +534,10 @@ export function AdminPanelShell({
             <AdminBrand homeHref={basePath} />
           </div>
           <div className="flex items-center gap-4">
-            <Link
-              href="/applications"
-              className="text-[12px] font-semibold text-slate-600 hover:text-maroon"
-            >
-              Applications
-            </Link>
-            <LogoutButton />
+            <UserAvatarMenu
+              name={userName?.trim() || userEmail?.trim() || "User"}
+              email={userEmail}
+            />
           </div>
         </div>
       </header>

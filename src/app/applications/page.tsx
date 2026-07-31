@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { redirect } from "next/navigation";
 import { Plane, Shield, Stethoscope, type LucideIcon } from "lucide-react";
-import { LogoutButton } from "@/components/auth/LogoutButton";
+import { UserAvatarMenu } from "@/components/auth/UserAvatarMenu";
 import {
   ADMIN_SYSTEMS,
   type AdminSystemId,
@@ -40,16 +40,20 @@ export default async function ApplicationsPage() {
               <p className="text-[12px] font-semibold text-maroon">
                 Promed Web Experience
               </p>
-              <p className="text-[12px] text-slate-500">Signed in as {session.name}</p>
+              <p className="text-[12px] text-slate-500">
+                Signed in as {session.name}
+              </p>
             </div>
           </div>
-          <LogoutButton />
+          <UserAvatarMenu name={session.name} email={session.email} />
         </div>
       </header>
 
       <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <h1 className="text-[12px] font-bold text-slate-900">Choose an application</h1>
+          <h1 className="text-[12px] font-bold text-slate-900">
+            Choose an application
+          </h1>
           <p className="mt-1 text-[12px] text-slate-500">
             Only systems assigned to your account are shown.
           </p>
@@ -57,7 +61,8 @@ export default async function ApplicationsPage() {
 
         {availableSystems.length === 0 ? (
           <div className="border border-slate-200 bg-white p-6 text-[12px] text-slate-500">
-            Your account does not have access to any applications. Contact an administrator.
+            Your account does not have access to any applications. Contact an
+            administrator.
           </div>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -72,11 +77,15 @@ export default async function ApplicationsPage() {
                   <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-maroon">
                     <Icon className="h-5 w-5" />
                   </div>
-                  <h2 className="text-[12px] font-bold text-slate-900">{system.label}</h2>
+                  <h2 className="text-[12px] font-bold text-slate-900">
+                    {system.label}
+                  </h2>
                   <p className="mt-2 text-[12px] leading-relaxed text-slate-500">
                     {system.description}
                   </p>
-                  <p className="mt-4 text-[12px] font-semibold text-maroon">Open application →</p>
+                  <p className="mt-4 text-[12px] font-semibold text-maroon">
+                    Open application →
+                  </p>
                 </Link>
               );
             })}

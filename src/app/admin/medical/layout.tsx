@@ -1,11 +1,24 @@
 import { AdminPanelShell } from "@/components/admin/AdminPanelShell";
+import { getSession } from "@/lib/auth";
+import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
-export default function MedicalAdminLayout({
+export default async function MedicalAdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <AdminPanelShell system="medical">{children}</AdminPanelShell>;
+  const session = await getSession();
+  if (!session) redirect("/login");
+
+  return (
+    <AdminPanelShell
+      system="medical"
+      userName={session.name}
+      userEmail={session.email}
+    >
+      {children}
+    </AdminPanelShell>
+  );
 }
