@@ -1,17 +1,23 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useState, type ChangeEvent, type FormEvent } from "react";
 import { Button } from "@/components/admin/Button";
+import { defaultClaimDetailsForm } from "@/features/medical/claims/manage/claim-details-constants";
 import {
   defaultManageClaimsTab,
   manageClaimsTabs,
   type ManageClaimsTabId,
 } from "@/features/medical/claims/manage/constants";
+import type { ClaimDetailsFormData } from "@/features/medical/claims/manage/types";
+import type { LookupOption } from "@/features/medical/lookups/types";
+import { ClaimDetailsTab } from "./tabs/ClaimDetailsTab";
 import { ManageClaimsTabSkeleton } from "./tabs/ManageClaimsTabSkeleton";
 
 type ManageClaimsFormProps = {
   embedded?: boolean;
   claimId?: string;
+  initialDetails?: Partial<ClaimDetailsFormData>;
+  providerOptions?: LookupOption[];
   onCancel?: () => void;
   onSuccess?: () => void;
 };
@@ -19,24 +25,56 @@ type ManageClaimsFormProps = {
 export function ManageClaimsForm({
   embedded = false,
   claimId,
+  initialDetails,
+  providerOptions = [],
   onCancel,
   onSuccess: _onSuccess,
 }: ManageClaimsFormProps) {
   const [activeTab, setActiveTab] = useState<ManageClaimsTabId>(
     defaultManageClaimsTab
   );
+  const [details, setDetails] = useState<ClaimDetailsFormData>({
+    ...defaultClaimDetailsForm,
+    ...initialDetails,
+  });
 
-  const activeTabMeta =
-    manageClaimsTabs.find((tab) => tab.id === activeTab) ?? manageClaimsTabs[0];
+  const handleDetailsChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setDetails((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    // Skeleton only — save wiring comes with the first real tab.
+    // Save wiring comes once remaining tabs and API are ready.
   };
+
+  const activeTabPanel = (() => {
+    switch (activeTab) {
+      case "claimDetails":
+        return (
+          <ClaimDetailsTab
+            value={details}
+            onChange={handleDetailsChange}
+            providerOptions={providerOptions}
+          />
+        );
+      case "claimForm":
+        return <ManageClaimsTabSkeleton title="Claim Form" />;
+      case "clinicalDiagnosis":
+        return <ManageClaimsTabSkeleton title="Clinical Diagnosis" />;
+      case "claimStatus":
+        return <ManageClaimsTabSkeleton title="Claim Status" />;
+    }
+  })();
 
   const formBody = embedded ? (
     <div className="flex min-h-0 flex-1 flex-col overflow-hidden border border-slate-200 md:flex-row">
-      <div className="flex shrink-0 overflow-x-auto border-b border-slate-200 bg-slate-50 p-1 md:block md:w-32 md:overflow-visible md:border-b-0 md:border-r">
+      <div className="flex shrink-0 overflow-x-auto border-b border-slate-200 bg-slate-50 p-1 md:block md:w-36 md:overflow-visible md:border-b-0 md:border-r">
         {manageClaimsTabs.map((tab) => (
           <button
             key={tab.id}
@@ -53,11 +91,11 @@ export function ManageClaimsForm({
         ))}
       </div>
       <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden p-2">
-        <ManageClaimsTabSkeleton title={activeTabMeta.label} />
+        {activeTabPanel}
       </div>
     </div>
   ) : (
-    <ManageClaimsTabSkeleton title={activeTabMeta.label} />
+    activeTabPanel
   );
 
   const formActions = (

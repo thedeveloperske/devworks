@@ -6,6 +6,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/admin/Button";
 import { Modal } from "@/components/admin/Modal";
 import { PageHeader } from "@/components/admin/PageHeader";
+import type { ManageClaimsListItem } from "@/features/medical/claims/manage/types";
+import type { LookupOption } from "@/features/medical/lookups/types";
 import { ManageClaimsForm } from "./ManageClaimsForm";
 
 const tableBodyMaxHeight = 280;
@@ -17,21 +19,14 @@ const tdClass =
 const emptyCellClass =
   "border-b border-slate-200 px-2 py-4 text-center text-[11px] text-slate-500";
 
-export type ManageClaimsListItem = {
-  id: string;
-  claimNo: string;
-  memberNo: string;
-  memberName: string;
-  providerName: string;
-  claimDate: string;
-};
-
 type ManageClaimsPageClientProps = {
   claims?: ManageClaimsListItem[];
+  providerOptions?: LookupOption[];
 };
 
 export function ManageClaimsPageClient({
   claims = [],
+  providerOptions = [],
 }: ManageClaimsPageClientProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -223,6 +218,7 @@ export function ManageClaimsPageClient({
         {isNew ? (
           <ManageClaimsForm
             embedded
+            providerOptions={providerOptions}
             onSuccess={handleSaved}
             onCancel={closeClaimModal}
           />
@@ -231,6 +227,7 @@ export function ManageClaimsPageClient({
             key={editId}
             embedded
             claimId={editId}
+            providerOptions={providerOptions}
             onSuccess={handleSaved}
             onCancel={closeClaimModal}
           />
