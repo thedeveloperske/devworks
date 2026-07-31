@@ -427,14 +427,14 @@ export function RenewCorporateModal({
                               {corporate.corporate}
                             </a>
                           </td>
-                          <td className={tdClass}>{corporate.corpId ?? "—"}</td>
+                          <td className={tdClass}>{corporate.corpId ?? "â€”"}</td>
                           <td className={tdClass}>
-                            {corporate.policyNo ?? "—"}
+                            {corporate.policyNo ?? "â€”"}
                           </td>
                           <td className={tdClass}>
                             {corporate.corpStartDate && corporate.corpEndDate
                               ? `${corporate.corpStartDate} to ${corporate.corpEndDate}`
-                              : "—"}
+                              : "â€”"}
                           </td>
                         </tr>
                       );

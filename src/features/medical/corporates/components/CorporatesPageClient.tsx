@@ -272,18 +272,18 @@ export function CorporatesPageClient({
                     {corporate.corporate}
                   </Link>
                 </td>
-                <td className={tdClass}>{corporate.corpId ?? "—"}</td>
-                <td className={tdClass}>{corporate.policyNo ?? "—"}</td>
+                <td className={tdClass}>{corporate.corpId ?? "â€”"}</td>
+                <td className={tdClass}>{corporate.policyNo ?? "â€”"}</td>
                 <td className={tdClass}>
                   {corporate.agentId
                     ? (agentLabelById[corporate.agentId] ?? corporate.agentId)
-                    : "—"}
+                    : "â€”"}
                 </td>
                 <td className={tdClass}>
                   {corporate.businessClass
                     ? (businessClassLabelByCode[corporate.businessClass] ??
                       corporate.businessClass)
-                    : "—"}
+                    : "â€”"}
                 </td>
                 <td className={tdClass}>
                   <Button
