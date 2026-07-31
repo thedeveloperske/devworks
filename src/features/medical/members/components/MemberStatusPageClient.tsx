@@ -419,21 +419,18 @@ export function MemberStatusPageClient({
   const membersTable = (
     <section className="flex min-h-0 flex-1 flex-col gap-1.5">
       <div className="flex shrink-0 flex-wrap items-center justify-between gap-2">
-        <div className="flex min-w-0 flex-wrap items-center gap-2">
-          <Button
-            type="button"
-            variant="secondary"
-            size="sm"
-            onClick={backToCorporates}
-            disabled={saving}
-          >
-            Back
-          </Button>
-          <p className="min-w-0 truncate text-[12px] text-slate-600">
-            {selectedCorporate?.corporate ?? "Principals"}
-          </p>
-        </div>
+        <button
+          type="button"
+          onClick={backToCorporates}
+          disabled={saving}
+          className="min-w-0 truncate text-left text-[12px] font-semibold text-maroon hover:underline disabled:cursor-not-allowed disabled:no-underline disabled:opacity-60"
+        >
+          {selectedCorporate?.corporate ?? "All corporates"}
+        </button>
         <div className="flex flex-wrap items-center justify-end gap-1.5">
+          <span className="text-[12px] font-medium text-slate-700">
+            {activeModeLabel}
+          </span>
           {statusModeOptions.map((option) => {
             const active =
               action === option.action && scope === option.scope;
@@ -467,10 +464,9 @@ export function MemberStatusPageClient({
         </div>
       </div>
       <p className="shrink-0 text-[12px] text-slate-500">
-        {activeModeLabel}. Showing principal members only
         {scope === "family"
-          ? " — action applies to the whole family."
-          : " — action applies to the principal only."}
+          ? "Action applies to the whole family under the selected principal."
+          : "Action applies to the selected principal only."}
       </p>
       {actionError ? (
         <p className="shrink-0 text-[12px] text-red-600">{actionError}</p>
@@ -588,8 +584,8 @@ export function MemberStatusPageClient({
             </h3>
             <p className="mt-1 text-[12px] text-slate-600">
               {scope === "family"
-                ? `Family ${pendingTarget.familyNo || pendingTarget.memberNo}`
-                : `${pendingTarget.memberNo} — ${pendingTarget.name}`}
+                ? `Whole family of ${pendingTarget.name}`
+                : pendingTarget.name}
             </p>
 
             <div className="mt-3 flex flex-col gap-2.5">
