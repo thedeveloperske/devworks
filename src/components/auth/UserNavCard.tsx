@@ -283,24 +283,22 @@ export function UserNavCard({
 
   return (
     <>
-      <div className="border border-slate-200 bg-slate-50 p-2">
-        <div className="flex items-start gap-2">
-          <span
-            aria-hidden
-            className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-maroon text-[10px] font-medium text-white"
-          >
-            {initials}
-          </span>
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-[11px] font-medium text-slate-800">
-              {displayName}
-            </p>
-            <p className="truncate text-[10px] font-normal text-slate-500">
-              {username}
-            </p>
-          </div>
-          {moreButton}
+      <div className="flex items-center gap-2">
+        <span
+          aria-hidden
+          className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-maroon text-[10px] font-medium text-white"
+        >
+          {initials}
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-[11px] font-medium text-slate-800">
+            {displayName}
+          </p>
+          <p className="truncate text-[10px] font-normal text-slate-500">
+            {username}
+          </p>
         </div>
+        {moreButton}
       </div>
       {mounted && menu ? createPortal(menu, document.body) : null}
       {dialogs}

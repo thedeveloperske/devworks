@@ -549,9 +549,9 @@ export function AdminPanelShell({
           <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
             {renderNavContent()}
           </div>
-          <div className="shrink-0 border-t border-slate-200 p-3">
+          <footer className="mt-auto shrink-0 border-t border-slate-200 bg-white p-2.5">
             {renderUserCard()}
-          </div>
+          </footer>
         </aside>
 
         {mobileNavOpen ? (
@@ -578,9 +578,9 @@ export function AdminPanelShell({
               <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
                 {renderNavContent()}
               </div>
-              <div className="shrink-0 border-t border-slate-200 p-3">
+              <footer className="mt-auto shrink-0 border-t border-slate-200 bg-white p-2">
                 {renderUserCard()}
-              </div>
+              </footer>
             </aside>
           </>
         ) : null}

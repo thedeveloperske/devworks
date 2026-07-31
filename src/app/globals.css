@@ -62,3 +62,10 @@ html {
 [data-admin] :is(a, button).bg-red-600:hover {
   color: #ffffff;
 }
+
+/* Leave the left-nav user footer clear of the site copyright bar */
+@media (min-width: 1024px) {
+  body:has([data-admin]) .app-site-footer {
+    left: 14rem; /* matches aside w-56 */
+  }
+}
