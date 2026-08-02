@@ -527,6 +527,22 @@ model Bill {
   @@map("bills")
 }
 
+model ClaimForm {
+  claimNo         String    @id @map("claim_no") @db.VarChar(20)
+  visitDate       DateTime  @map("visit_date") @db.Date
+  attendingDoc    Decimal?  @map("attending_doc") @db.Decimal(5, 0)
+  doctorSign      Decimal?  @map("doctor_sign") @db.Decimal(1, 0)
+  doctorDate      DateTime? @map("doctor_date") @db.Date
+  claimFormSigned Decimal?  @map("claim_form_signed") @db.Decimal(1, 0)
+  dateAdmitted    DateTime? @map("date_admitted") @db.Date
+  dateDischarged  DateTime? @map("date_discharged") @db.Date
+  userId          String?   @map("user_id") @db.VarChar(10)
+  dateEntered     DateTime? @map("date_entered") @db.Date
+  visitDays       Decimal?  @map("visit_days") @db.Decimal(5, 0)
+
+  @@map("claim_form")
+}
+
 model Claim {
   id             String      @id @default(cuid())
   claimNumber    String      @unique

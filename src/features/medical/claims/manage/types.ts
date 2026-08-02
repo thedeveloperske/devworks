@@ -47,6 +47,30 @@ export type ClaimDetailsField = {
   rows?: number;
 };
 
+export type ClaimFormTabData = {
+  claimNo: string;
+  visitDate: string;
+  attendingDoc: string;
+  doctorSign: string;
+  doctorDate: string;
+  claimFormSigned: string;
+  dateAdmitted: string;
+  dateDischarged: string;
+  userId: string;
+  dateEntered: string;
+  visitDays: string;
+};
+
+export type ClaimFormTabField = {
+  name: keyof ClaimFormTabData;
+  label: string;
+  type?: "text" | "number" | "date";
+  as?: "input" | "select" | "textarea";
+  required?: boolean;
+  className?: string;
+  rows?: number;
+};
+
 export type ManageClaimsListItem = {
   id: string;
   claimNo: string;

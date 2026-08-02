@@ -1,22 +1,28 @@
 "use client";
 
-import { useState, type ChangeEvent, type FormEvent } from "react";
+import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
 import { Button } from "@/components/admin/Button";
 import { defaultClaimDetailsForm } from "@/features/medical/claims/manage/claim-details-constants";
+import { defaultClaimFormTab } from "@/features/medical/claims/manage/claim-form-constants";
 import {
   defaultManageClaimsTab,
   manageClaimsTabs,
   type ManageClaimsTabId,
 } from "@/features/medical/claims/manage/constants";
-import type { ClaimDetailsFormData } from "@/features/medical/claims/manage/types";
+import type {
+  ClaimDetailsFormData,
+  ClaimFormTabData,
+} from "@/features/medical/claims/manage/types";
 import type { LookupOption } from "@/features/medical/lookups/types";
 import { ClaimDetailsTab } from "./tabs/ClaimDetailsTab";
+import { ClaimFormTab } from "./tabs/ClaimFormTab";
 import { ManageClaimsTabSkeleton } from "./tabs/ManageClaimsTabSkeleton";
 
 type ManageClaimsFormProps = {
   embedded?: boolean;
   claimId?: string;
   initialDetails?: Partial<ClaimDetailsFormData>;
+  initialClaimForm?: Partial<ClaimFormTabData>;
   providerOptions?: LookupOption[];
   onCancel?: () => void;
   onSuccess?: () => void;
@@ -26,6 +32,7 @@ export function ManageClaimsForm({
   embedded = false,
   claimId,
   initialDetails,
+  initialClaimForm,
   providerOptions = [],
   onCancel,
   onSuccess: _onSuccess,
@@ -37,12 +44,34 @@ export function ManageClaimsForm({
     ...defaultClaimDetailsForm,
     ...initialDetails,
   });
+  const [claimForm, setClaimForm] = useState<ClaimFormTabData>({
+    ...defaultClaimFormTab,
+    ...initialClaimForm,
+  });
+
+  useEffect(() => {
+    const claimNo = details.claimNo.trim();
+    if (!claimNo) return;
+    setClaimForm((prev) =>
+      prev.claimNo === claimNo ? prev : { ...prev, claimNo }
+    );
+  }, [details.claimNo]);
 
   const handleDetailsChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
     setDetails((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleClaimFormChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setClaimForm((prev) => ({
       ...prev,
       [name]: value,
     }));
@@ -64,7 +93,9 @@ export function ManageClaimsForm({
           />
         );
       case "claimForm":
-        return <ManageClaimsTabSkeleton title="Claim Form" />;
+        return (
+          <ClaimFormTab value={claimForm} onChange={handleClaimFormChange} />
+        );
       case "clinicalDiagnosis":
         return <ManageClaimsTabSkeleton title="Clinical Diagnosis" />;
       case "claimStatus":
