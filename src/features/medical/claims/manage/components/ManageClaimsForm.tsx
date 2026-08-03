@@ -226,7 +226,7 @@ export function ManageClaimsForm({
   }, [details.preAuthNo, matchingPreAuths]);
 
   const openPreAuthModal = () => {
-    if (!details.claimNature.trim()) return;
+    if (matchingPreAuths.length === 0) return;
     setPreAuthModalOpen(true);
   };
 
@@ -261,7 +261,15 @@ export function ManageClaimsForm({
     });
 
     if (name === "claimNature" && value.trim()) {
-      setPreAuthModalOpen(true);
+      const matches = filterMatchingPreAuths(memberPreAuths, {
+        memberNo: details.memberNo,
+        provider: details.provider,
+        anniv: details.anniv,
+        claimNature: value,
+      });
+      if (matches.length > 0) {
+        setPreAuthModalOpen(true);
+      }
     }
   };
 
@@ -323,6 +331,7 @@ export function ManageClaimsForm({
             invoiceDateMin={invoiceDateBounds.min}
             invoiceDateMax={invoiceDateBounds.max}
             onManagePreAuth={openPreAuthModal}
+            hasMatchingPreAuths={matchingPreAuths.length > 0}
           />
         );
       case "claimForm":

@@ -24,6 +24,7 @@ type ClaimDetailsTabProps = {
   invoiceDateMin?: string;
   invoiceDateMax?: string;
   onManagePreAuth?: () => void;
+  hasMatchingPreAuths?: boolean;
 };
 
 export function ClaimDetailsTab({
@@ -35,10 +36,12 @@ export function ClaimDetailsTab({
   invoiceDateMin = "",
   invoiceDateMax = "",
   onManagePreAuth,
+  hasMatchingPreAuths = false,
 }: ClaimDetailsTabProps) {
   const proxyPayeeEnabled = value.refund === CLAIM_PAY_TO_PROXY;
   const canManagePreAuth = Boolean(
-    value.claimNature.trim() &&
+    hasMatchingPreAuths &&
+      value.claimNature.trim() &&
       value.provider.trim() &&
       value.anniv.trim() &&
       value.memberNo.trim()
@@ -140,7 +143,7 @@ export function ClaimDetailsTab({
                         : "cursor-not-allowed bg-slate-50 text-slate-400"
                     }`}
                   >
-                    {attached || "Select preauth"}
+                    {attached || (canManagePreAuth ? "Select preauth" : "—")}
                   </button>
                 ) : (
                   <input
