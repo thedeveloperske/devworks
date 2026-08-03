@@ -46,6 +46,17 @@ export const defaultClaimDetailsForm: ClaimDetailsFormData = {
   proxyPayee: "",
 };
 
+/** Pay-to options stored in bills.refund */
+export const claimPayToOptions = [
+  { value: "0", label: "Provider" },
+  { value: "1", label: "Reimburse Corporate" },
+  { value: "2", label: "Reimburse Member" },
+  { value: "3", label: "Reimburse Proxy" },
+  { value: "4", label: "Reimburse Agent" },
+] as const;
+
+export const CLAIM_PAY_TO_PROXY = "3";
+
 /** Field defs for Claim Details (visible + hidden). */
 export const claimDetailsFields: ClaimDetailsField[] = [
   {
@@ -135,9 +146,9 @@ export const claimDetailsFields: ClaimDetailsField[] = [
   },
   {
     name: "refund",
-    label: "Refund",
-    as: "switch",
-    className: "sm:col-span-1",
+    label: "Pay to",
+    as: "select",
+    className: "sm:col-span-2",
   },
   {
     name: "fund",
@@ -148,7 +159,7 @@ export const claimDetailsFields: ClaimDetailsField[] = [
   {
     name: "proxyPayee",
     label: "Proxy Payee",
-    className: "sm:col-span-4",
+    className: "sm:col-span-3",
   },
   // Hidden from UI — still in defaultClaimDetailsForm for DB persistence
   {
