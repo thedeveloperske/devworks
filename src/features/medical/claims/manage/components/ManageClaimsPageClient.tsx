@@ -215,9 +215,6 @@ export function ManageClaimsPageClient({
                   <span className="font-semibold text-slate-900">
                     {provider.providerName}
                   </span>
-                  <span className="ml-2 text-slate-400">
-                    ({provider.providerCode})
-                  </span>
                 </td>
                 <td
                   className={`${tdClass} text-right font-semibold text-slate-900`}
