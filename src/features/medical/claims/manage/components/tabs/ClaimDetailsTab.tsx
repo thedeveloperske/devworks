@@ -2,7 +2,6 @@
 
 import type { ChangeEvent } from "react";
 import { Fragment } from "react";
-import { Button } from "@/components/admin/Button";
 import { FormField } from "@/components/admin/FormField";
 import { Switch } from "@/components/admin/Switch";
 import {
@@ -120,39 +119,39 @@ export function ClaimDetailsTab({
               : undefined;
 
           if (field.name === "preAuthNo") {
+            const attached = value.preAuthNo.trim();
             return (
               <div
                 key={field.name}
                 className={field.className ?? "sm:col-span-2"}
               >
-                <FormField
-                  id={`claim-details-${field.name}`}
-                  name={field.name}
-                  label={field.label}
-                  value={value[field.name]}
-                  onChange={handleChange}
-                  required={field.required}
-                  type="text"
-                  as="input"
-                  disabled
-                  labelClassName={labelClass}
-                  inputClassName={inputClass}
-                />
+                <span className={labelClass}>{field.label}</span>
                 {onManagePreAuth ? (
-                  <div className="mt-1">
-                    <Button
-                      type="button"
-                      variant="secondary"
-                      size="sm"
-                      disabled={!canManagePreAuth}
-                      onClick={onManagePreAuth}
-                    >
-                      {value.preAuthNo.trim()
-                        ? "Manage Preauth"
-                        : "Attach Preauth"}
-                    </Button>
-                  </div>
-                ) : null}
+                  <button
+                    type="button"
+                    id={`claim-details-${field.name}`}
+                    disabled={!canManagePreAuth}
+                    onClick={onManagePreAuth}
+                    className={`block w-full border border-slate-300 px-2.5 py-1.5 text-left text-[11px] transition ${
+                      canManagePreAuth
+                        ? attached
+                          ? "bg-white font-semibold text-maroon underline underline-offset-2 hover:bg-slate-50"
+                          : "bg-white text-maroon underline underline-offset-2 hover:bg-slate-50"
+                        : "cursor-not-allowed bg-slate-50 text-slate-400"
+                    }`}
+                  >
+                    {attached || "Select preauth"}
+                  </button>
+                ) : (
+                  <input
+                    id={`claim-details-${field.name}`}
+                    name={field.name}
+                    value={attached}
+                    disabled
+                    readOnly
+                    className={inputClass}
+                  />
+                )}
               </div>
             );
           }
