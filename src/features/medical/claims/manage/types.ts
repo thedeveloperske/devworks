@@ -65,10 +65,25 @@ export type ClaimFormTabField = {
   name: keyof ClaimFormTabData;
   label: string;
   type?: "text" | "number" | "date";
-  as?: "input" | "select" | "textarea";
+  as?: "input" | "select" | "textarea" | "switch";
   required?: boolean;
   className?: string;
   rows?: number;
+};
+
+export type ClaimLineItemFormData = {
+  service: string;
+  description: string;
+  quantity: string;
+  amount: string;
+  notes: string;
+};
+
+export type ClaimLineItemField = {
+  name: keyof ClaimLineItemFormData;
+  label: string;
+  type?: "text" | "number";
+  required?: boolean;
 };
 
 export type ManageClaimsListItem = {
@@ -78,4 +93,28 @@ export type ManageClaimsListItem = {
   memberName: string;
   providerName: string;
   claimDate: string;
+};
+
+export type ManageClaimsProviderSummary = {
+  providerCode: string;
+  providerName: string;
+  claimsCount: number;
+};
+
+export type ManageClaimsCorporateOption = {
+  id: string;
+  corporate: string;
+  corpId: string | null;
+  policyNo: string | null;
+};
+
+export type ManageClaimsMemberOption = {
+  memberNo: string;
+  familyNo: string;
+  name: string;
+  corporateId: string;
+  corpId: string;
+  memberType: "Principal" | "Dependant";
+  anniv: string;
+  cancelled: number | null;
 };

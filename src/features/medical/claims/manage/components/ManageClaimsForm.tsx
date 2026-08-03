@@ -4,25 +4,28 @@ import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
 import { Button } from "@/components/admin/Button";
 import { defaultClaimDetailsForm } from "@/features/medical/claims/manage/claim-details-constants";
 import { defaultClaimFormTab } from "@/features/medical/claims/manage/claim-form-constants";
+import { defaultClaimLineItem } from "@/features/medical/claims/manage/claim-line-item-constants";
 import {
   defaultManageClaimsTab,
-  manageClaimsTabs,
+  visibleManageClaimsTabs,
   type ManageClaimsTabId,
 } from "@/features/medical/claims/manage/constants";
 import type {
   ClaimDetailsFormData,
   ClaimFormTabData,
+  ClaimLineItemFormData,
 } from "@/features/medical/claims/manage/types";
 import type { LookupOption } from "@/features/medical/lookups/types";
 import { ClaimDetailsTab } from "./tabs/ClaimDetailsTab";
 import { ClaimFormTab } from "./tabs/ClaimFormTab";
-import { ManageClaimsTabSkeleton } from "./tabs/ManageClaimsTabSkeleton";
+import { MemberClaimHistoryTab } from "./tabs/MemberClaimHistoryTab";
 
 type ManageClaimsFormProps = {
   embedded?: boolean;
   claimId?: string;
   initialDetails?: Partial<ClaimDetailsFormData>;
   initialClaimForm?: Partial<ClaimFormTabData>;
+  initialLineItems?: ClaimLineItemFormData[];
   providerOptions?: LookupOption[];
   onCancel?: () => void;
   onSuccess?: () => void;
@@ -33,6 +36,7 @@ export function ManageClaimsForm({
   claimId,
   initialDetails,
   initialClaimForm,
+  initialLineItems,
   providerOptions = [],
   onCancel,
   onSuccess: _onSuccess,
@@ -48,6 +52,9 @@ export function ManageClaimsForm({
     ...defaultClaimFormTab,
     ...initialClaimForm,
   });
+  const [lineItems, setLineItems] = useState<ClaimLineItemFormData[]>(
+    initialLineItems ?? [defaultClaimLineItem()]
+  );
 
   useEffect(() => {
     const claimNo = details.claimNo.trim();
@@ -77,6 +84,26 @@ export function ManageClaimsForm({
     }));
   };
 
+  const handleLineItemChange = (
+    index: number,
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setLineItems((prev) =>
+      prev.map((row, rowIndex) =>
+        rowIndex === index ? { ...row, [name]: value } : row
+      )
+    );
+  };
+
+  const handleAddLineItem = () => {
+    setLineItems((prev) => [...prev, defaultClaimLineItem()]);
+  };
+
+  const handleRemoveLineItem = (index: number) => {
+    setLineItems((prev) => prev.filter((_, rowIndex) => rowIndex !== index));
+  };
+
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     // Save wiring comes once remaining tabs and API are ready.
@@ -94,19 +121,26 @@ export function ManageClaimsForm({
         );
       case "claimForm":
         return (
-          <ClaimFormTab value={claimForm} onChange={handleClaimFormChange} />
+          <ClaimFormTab
+            value={claimForm}
+            onChange={handleClaimFormChange}
+            lineItems={lineItems}
+            onLineItemChange={handleLineItemChange}
+            onAddLineItem={handleAddLineItem}
+            onRemoveLineItem={handleRemoveLineItem}
+          />
         );
-      case "clinicalDiagnosis":
-        return <ManageClaimsTabSkeleton title="Clinical Diagnosis" />;
-      case "claimStatus":
-        return <ManageClaimsTabSkeleton title="Claim Status" />;
+      case "memberClaimHistory":
+        return <MemberClaimHistoryTab />;
+      default:
+        return null;
     }
   })();
 
   const formBody = embedded ? (
     <div className="flex min-h-0 flex-1 flex-col overflow-hidden border border-slate-200 md:flex-row">
-      <div className="flex shrink-0 overflow-x-auto border-b border-slate-200 bg-slate-50 p-1 md:block md:w-36 md:overflow-visible md:border-b-0 md:border-r">
-        {manageClaimsTabs.map((tab) => (
+      <div className="flex shrink-0 overflow-x-auto border-b border-slate-200 bg-slate-50 p-1 md:block md:w-44 md:overflow-visible md:border-b-0 md:border-r">
+        {visibleManageClaimsTabs.map((tab) => (
           <button
             key={tab.id}
             type="button"

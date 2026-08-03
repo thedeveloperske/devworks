@@ -4,9 +4,9 @@ export const defaultClaimFormTab: ClaimFormTabData = {
   claimNo: "",
   visitDate: "",
   attendingDoc: "",
-  doctorSign: "",
+  doctorSign: "0",
   doctorDate: "",
-  claimFormSigned: "",
+  claimFormSigned: "0",
   dateAdmitted: "",
   dateDischarged: "",
   userId: "",
@@ -14,6 +14,7 @@ export const defaultClaimFormTab: ClaimFormTabData = {
   visitDays: "",
 };
 
+/** All claim_form columns kept for persistence (including hidden UI fields). */
 export const claimFormTabFields: ClaimFormTabField[] = [
   {
     name: "claimNo",
@@ -29,33 +30,21 @@ export const claimFormTabFields: ClaimFormTabField[] = [
     className: "sm:col-span-2",
   },
   {
-    name: "visitDays",
-    label: "Visit Days",
-    type: "number",
-    className: "sm:col-span-2",
-  },
-  {
-    name: "attendingDoc",
-    label: "Attending Doctor",
-    type: "number",
-    className: "sm:col-span-2",
-  },
-  {
     name: "doctorSign",
-    label: "Doctor Signed",
-    type: "number",
-    className: "sm:col-span-2",
+    label: "Doctor Sign",
+    as: "switch",
+    className: "sm:col-span-1",
+  },
+  {
+    name: "claimFormSigned",
+    label: "Patient Sign",
+    as: "switch",
+    className: "sm:col-span-1",
   },
   {
     name: "doctorDate",
     label: "Doctor Date",
     type: "date",
-    className: "sm:col-span-2",
-  },
-  {
-    name: "claimFormSigned",
-    label: "Claim Form Signed",
-    type: "number",
     className: "sm:col-span-2",
   },
   {
@@ -71,6 +60,18 @@ export const claimFormTabFields: ClaimFormTabField[] = [
     className: "sm:col-span-2",
   },
   {
+    name: "visitDays",
+    label: "Visit Days",
+    type: "number",
+    className: "sm:col-span-2",
+  },
+  {
+    name: "attendingDoc",
+    label: "Attending Doctor",
+    type: "number",
+    className: "sm:col-span-2",
+  },
+  {
     name: "userId",
     label: "User ID",
     className: "sm:col-span-2",
@@ -82,3 +83,18 @@ export const claimFormTabFields: ClaimFormTabField[] = [
     className: "sm:col-span-2",
   },
 ];
+
+const visibleClaimFormFieldNames = new Set<keyof ClaimFormTabData>([
+  "claimNo",
+  "visitDate",
+  "doctorSign",
+  "claimFormSigned",
+  "doctorDate",
+  "dateAdmitted",
+  "dateDischarged",
+]);
+
+/** Fields shown on the Claim Form tab UI. */
+export const visibleClaimFormTabFields = claimFormTabFields.filter((field) =>
+  visibleClaimFormFieldNames.has(field.name)
+);
