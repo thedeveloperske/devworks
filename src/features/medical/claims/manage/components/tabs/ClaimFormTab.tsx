@@ -73,7 +73,11 @@ export function ClaimFormTab({
                   onChange={onChange}
                   required={field.required}
                   type={field.type ?? "text"}
-                  as={field.as ?? "input"}
+                  as={
+                    field.as === "select" || field.as === "textarea"
+                      ? field.as
+                      : "input"
+                  }
                   rows={field.rows}
                   disabled={disabled}
                   min={min}

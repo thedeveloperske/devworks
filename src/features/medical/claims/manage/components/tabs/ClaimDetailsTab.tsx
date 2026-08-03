@@ -177,7 +177,7 @@ export function ClaimDetailsTab({
                   onChange={handleChange}
                   required={field.required}
                   type={field.type ?? "text"}
-                  as={field.as ?? "input"}
+                  as={field.as === "select" || field.as === "textarea" ? field.as : "input"}
                   rows={field.rows}
                   options={options}
                   disabled={disabled}
@@ -193,25 +193,7 @@ export function ClaimDetailsTab({
           if (field.name === "refund") {
             return (
               <Fragment key={field.name}>
-                <div className={field.className ?? "sm:col-span-2"}>
-                  <FormField
-                    id={`claim-details-${field.name}`}
-                    name={field.name}
-                    label={field.label}
-                    value={value[field.name]}
-                    onChange={handleChange}
-                    required={field.required}
-                    type={field.type ?? "text"}
-                    as={field.as ?? "input"}
-                    rows={field.rows}
-                    options={options}
-                    disabled={disabled}
-                    min={min}
-                    max={max}
-                    labelClassName={labelClass}
-                    inputClassName={inputClass}
-                  />
-                </div>
+                {fieldCell}
                 {/* Former Fund slot — leave blank */}
                 <div className="hidden sm:col-span-1 sm:block" aria-hidden />
               </Fragment>
