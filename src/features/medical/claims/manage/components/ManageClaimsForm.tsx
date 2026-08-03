@@ -14,6 +14,7 @@ import type {
   ClaimDetailsFormData,
   ClaimFormTabData,
   ClaimLineItemFormData,
+  ManageClaimsBatchOption,
   ManageClaimsMemberAnniversary,
   ManageClaimsMemberBenefitOption,
 } from "@/features/medical/claims/manage/types";
@@ -31,6 +32,7 @@ type ManageClaimsFormProps = {
   initialLineItems?: ClaimLineItemFormData[];
   memberAnniversaries?: ManageClaimsMemberAnniversary[];
   memberBenefits?: ManageClaimsMemberBenefitOption[];
+  entrantBatches?: ManageClaimsBatchOption[];
   providerOptions?: LookupOption[];
   onCancel?: () => void;
   onSuccess?: () => void;
@@ -44,6 +46,7 @@ export function ManageClaimsForm({
   initialLineItems,
   memberAnniversaries = [],
   memberBenefits = [],
+  entrantBatches = [],
   providerOptions = [],
   onCancel,
   onSuccess: _onSuccess,
@@ -73,6 +76,17 @@ export function ManageClaimsForm({
         label: benefit.label,
       }));
   }, [details.anniv, memberBenefits]);
+
+  const batchNoOptions = useMemo(() => {
+    const provider = details.provider.trim();
+    if (!provider) return [];
+    return entrantBatches
+      .filter((batch) => batch.providerCode === provider)
+      .map((batch) => ({
+        value: batch.batchNo,
+        label: batch.batchNo,
+      }));
+  }, [details.provider, entrantBatches]);
 
   const invoiceDateBounds = useMemo(
     () => getInvoiceDateBounds(memberAnniversaries),
@@ -112,10 +126,23 @@ export function ManageClaimsForm({
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-    setDetails((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setDetails((prev) => {
+      if (name === "provider") {
+        const stillValid = entrantBatches.some(
+          (batch) =>
+            batch.providerCode === value && batch.batchNo === prev.batchNo
+        );
+        return {
+          ...prev,
+          provider: value,
+          batchNo: stillValid ? prev.batchNo : "",
+        };
+      }
+      return {
+        ...prev,
+        [name]: value,
+      };
+    });
   };
 
   const handleClaimFormChange = (
@@ -162,6 +189,7 @@ export function ManageClaimsForm({
             onChange={handleDetailsChange}
             providerOptions={providerOptions}
             claimNatureOptions={claimNatureOptions}
+            batchNoOptions={batchNoOptions}
             invoiceDateMin={invoiceDateBounds.min}
             invoiceDateMax={invoiceDateBounds.max}
           />

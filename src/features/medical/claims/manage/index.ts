@@ -31,6 +31,7 @@ export type {
   ClaimFormTabField,
   ClaimLineItemField,
   ClaimLineItemFormData,
+  ManageClaimsBatchOption,
   ManageClaimsCorporateOption,
   ManageClaimsListItem,
   ManageClaimsMemberAnniversary,

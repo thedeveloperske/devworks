@@ -10,6 +10,7 @@ async function ManageClaimsContent() {
     members,
     memberAnniversaries,
     memberBenefits,
+    entrantBatches,
   } = await loadManageClaimsPageData();
   return (
     <ManageClaimsPageClient
@@ -19,6 +20,7 @@ async function ManageClaimsContent() {
       members={members}
       memberAnniversaries={memberAnniversaries}
       memberBenefits={memberBenefits}
+      entrantBatches={entrantBatches}
     />
   );
 }

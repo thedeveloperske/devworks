@@ -6,6 +6,7 @@ import { Button } from "@/components/admin/Button";
 import { Modal } from "@/components/admin/Modal";
 import { PageHeader } from "@/components/admin/PageHeader";
 import type {
+  ManageClaimsBatchOption,
   ManageClaimsCorporateOption,
   ManageClaimsMemberAnniversary,
   ManageClaimsMemberBenefitOption,
@@ -44,6 +45,7 @@ type ManageClaimsPageClientProps = {
   members?: ManageClaimsMemberOption[];
   memberAnniversaries?: ManageClaimsMemberAnniversary[];
   memberBenefits?: ManageClaimsMemberBenefitOption[];
+  entrantBatches?: ManageClaimsBatchOption[];
 };
 
 export function ManageClaimsPageClient({
@@ -53,6 +55,7 @@ export function ManageClaimsPageClient({
   members = [],
   memberAnniversaries = [],
   memberBenefits = [],
+  entrantBatches = [],
 }: ManageClaimsPageClientProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -377,6 +380,7 @@ export function ManageClaimsPageClient({
         providerOptions={providerOptions}
         memberAnniversaries={selectedMemberAnniversaries}
         memberBenefits={selectedMemberBenefits}
+        entrantBatches={entrantBatches}
         initialDetails={{
           memberNo: selectedMember.memberNo,
           corpId: selectedMember.corpId,

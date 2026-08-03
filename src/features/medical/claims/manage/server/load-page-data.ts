@@ -1,8 +1,11 @@
+import { cookies } from "next/headers";
 import { loadBenefitOptions } from "@/features/medical/admin/benefits/server/load-page-data";
 import { loadProviderOptions } from "@/features/medical/admin/providers/server/load-page-data";
 import type { LookupOption } from "@/features/medical/lookups/types";
+import { SESSION_COOKIE, verifySessionToken } from "@/lib/auth-session";
 import { prisma } from "@/lib/prisma";
 import type {
+  ManageClaimsBatchOption,
   ManageClaimsCorporateOption,
   ManageClaimsMemberAnniversary,
   ManageClaimsMemberBenefitOption,
@@ -15,6 +18,25 @@ function formatDateValue(value: Date | null | undefined): string {
   return value.toISOString().slice(0, 10);
 }
 
+async function resolveCurrentUsername(): Promise<string> {
+  const cookieStore = await cookies();
+  const session = await verifySessionToken(
+    cookieStore.get(SESSION_COOKIE)?.value
+  );
+  if (session?.userId) {
+    const userId = Number.parseInt(session.userId, 10);
+    if (!Number.isNaN(userId)) {
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { username: true },
+      });
+      const username = user?.username?.trim() ?? "";
+      if (username) return username;
+    }
+  }
+  return session?.email?.trim() ?? "";
+}
+
 export async function loadManageClaimsPageData(): Promise<{
   providers: ManageClaimsProviderSummary[];
   providerOptions: LookupOption[];
@@ -22,7 +44,10 @@ export async function loadManageClaimsPageData(): Promise<{
   members: ManageClaimsMemberOption[];
   memberAnniversaries: ManageClaimsMemberAnniversary[];
   memberBenefits: ManageClaimsMemberBenefitOption[];
+  entrantBatches: ManageClaimsBatchOption[];
 }> {
+  const currentUsername = await resolveCurrentUsername();
+
   const [
     providerOptions,
     benefitOptions,
@@ -31,6 +56,7 @@ export async function loadManageClaimsPageData(): Promise<{
     memberInfos,
     anniversaries,
     memberBenefitRows,
+    entrantBatchRows,
   ] = await Promise.all([
     loadProviderOptions(),
     loadBenefitOptions(),
@@ -71,6 +97,25 @@ export async function loadManageClaimsPageData(): Promise<{
       },
       orderBy: [{ memberNo: "asc" }, { benefit: "asc" }],
     }),
+    currentUsername
+      ? prisma.claimsBatch.findMany({
+          where: {
+            dataEntryUser: {
+              equals: currentUsername,
+              mode: "insensitive",
+            },
+            dateEntryDate: { not: null },
+            batchNo: { not: null },
+            provider: { not: null },
+          },
+          select: {
+            idx: true,
+            batchNo: true,
+            provider: true,
+          },
+          orderBy: [{ batchDate: "desc" }, { idx: "desc" }],
+        })
+      : Promise.resolve([]),
   ]);
 
   const countByProvider = new Map(
@@ -158,6 +203,22 @@ export async function loadManageClaimsPageData(): Promise<{
       };
     });
 
+  const entrantBatches: ManageClaimsBatchOption[] = [];
+  const seenBatchKeys = new Set<string>();
+  for (const row of entrantBatchRows) {
+    const batchNo = row.batchNo?.trim() ?? "";
+    if (!batchNo || row.provider == null) continue;
+    const providerCode = String(row.provider);
+    const key = `${batchNo}:${providerCode}`;
+    if (seenBatchKeys.has(key)) continue;
+    seenBatchKeys.add(key);
+    entrantBatches.push({
+      id: String(row.idx),
+      batchNo,
+      providerCode,
+    });
+  }
+
   return {
     providers,
     providerOptions,
@@ -165,5 +226,6 @@ export async function loadManageClaimsPageData(): Promise<{
     members,
     memberAnniversaries,
     memberBenefits,
+    entrantBatches,
   };
 }

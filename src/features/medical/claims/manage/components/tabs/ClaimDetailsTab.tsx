@@ -19,6 +19,7 @@ type ClaimDetailsTabProps = {
   ) => void;
   providerOptions: LookupOption[];
   claimNatureOptions: LookupOption[];
+  batchNoOptions: LookupOption[];
   invoiceDateMin?: string;
   invoiceDateMax?: string;
 };
@@ -28,6 +29,7 @@ export function ClaimDetailsTab({
   onChange,
   providerOptions,
   claimNatureOptions,
+  batchNoOptions,
   invoiceDateMin = "",
   invoiceDateMax = "",
 }: ClaimDetailsTabProps) {
@@ -66,9 +68,21 @@ export function ClaimDetailsTab({
                     },
                     ...claimNatureOptions,
                   ]
-                : field.name === "refund"
-                  ? [...claimPayToOptions]
-                  : undefined;
+                : field.name === "batchNo"
+                  ? [
+                      {
+                        value: "",
+                        label: value.provider
+                          ? batchNoOptions.length > 0
+                            ? "Select batch"
+                            : "No batches for this provider"
+                          : "Select provider first",
+                      },
+                      ...batchNoOptions,
+                    ]
+                  : field.name === "refund"
+                    ? [...claimPayToOptions]
+                    : undefined;
 
           const disabled =
             field.name === "proxyPayee"
@@ -77,7 +91,9 @@ export function ClaimDetailsTab({
                 ? true
                 : field.name === "claimNature"
                   ? !value.anniv || claimNatureOptions.length === 0
-                  : false;
+                  : field.name === "batchNo"
+                    ? !value.provider || batchNoOptions.length === 0
+                    : false;
 
           const min =
             field.name === "invoiceDate" ? invoiceDateMin || undefined : undefined;

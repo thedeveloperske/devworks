@@ -134,3 +134,9 @@ export type ManageClaimsMemberBenefitOption = {
   label: string;
   anniv: string;
 };
+
+export type ManageClaimsBatchOption = {
+  id: string;
+  batchNo: string;
+  providerCode: string;
+};

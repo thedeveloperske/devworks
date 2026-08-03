@@ -126,6 +126,7 @@ export const claimDetailsFields: ClaimDetailsField[] = [
   {
     name: "batchNo",
     label: "Batch No",
+    as: "select",
     className: "sm:col-span-2",
   },
   {
