@@ -31,6 +31,7 @@ import {
 } from "@/features/medical/claims/manage/resolve-anniv";
 import type { LookupOption } from "@/features/medical/lookups/types";
 import { AttachPreAuthModal } from "./AttachPreAuthModal";
+import { ViewPreAuthModal } from "./ViewPreAuthModal";
 import { ClaimDetailsTab } from "./tabs/ClaimDetailsTab";
 import { ClaimFormTab } from "./tabs/ClaimFormTab";
 import { MemberClaimHistoryTab } from "./tabs/MemberClaimHistoryTab";
@@ -103,6 +104,7 @@ export function ManageClaimsForm({
     initialLineItems ?? [defaultClaimLineItem()]
   );
   const [preAuthModalOpen, setPreAuthModalOpen] = useState(false);
+  const [viewPreAuthCode, setViewPreAuthCode] = useState<string | null>(null);
 
   const claimNatureOptions = useMemo(() => {
     const anniv = details.anniv.trim();
@@ -154,6 +156,31 @@ export function ManageClaimsForm({
     );
     return option?.label ?? details.claimNature;
   }, [claimNatureOptions, details.claimNature]);
+
+  const viewMemberBenefits = useMemo(
+    () =>
+      memberBenefits.map((benefit) => ({
+        benefit: benefit.benefit,
+        label: benefit.label,
+        anniv: benefit.anniv,
+        policyLimit: "",
+        bedLimit: "",
+        hospitalWard: "",
+        sharing: "",
+        utilisationLimit: "",
+      })),
+    [memberBenefits]
+  );
+
+  const viewCoverPeriods = useMemo(
+    () =>
+      memberAnniversaries.map((period) => ({
+        anniv: period.anniv,
+        startDate: period.startDate,
+        endDate: period.endDate,
+      })),
+    [memberAnniversaries]
+  );
 
   useEffect(() => {
     const claimNo = details.claimNo.trim();
@@ -283,6 +310,10 @@ export function ManageClaimsForm({
     setPreAuthModalOpen(false);
   };
 
+  const handleViewPreAuth = (code: string) => {
+    setViewPreAuthCode(code);
+  };
+
   const handleClaimFormChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
@@ -398,10 +429,8 @@ export function ManageClaimsForm({
     </div>
   );
 
-  const formContent = (
+  const preAuthModals = (
     <>
-      {formBody}
-      {formActions}
       <AttachPreAuthModal
         open={preAuthModalOpen}
         onClose={() => setPreAuthModalOpen(false)}
@@ -409,7 +438,16 @@ export function ManageClaimsForm({
         attachedCode={details.preAuthNo}
         onAttach={handleAttachPreAuth}
         onDetach={handleDetachPreAuth}
+        onView={handleViewPreAuth}
         claimNatureLabel={claimNatureLabel}
+      />
+      <ViewPreAuthModal
+        open={Boolean(viewPreAuthCode)}
+        code={viewPreAuthCode}
+        onClose={() => setViewPreAuthCode(null)}
+        providerOptions={providerOptions}
+        memberBenefits={viewMemberBenefits}
+        coverPeriods={viewCoverPeriods}
       />
     </>
   );
@@ -424,22 +462,16 @@ export function ManageClaimsForm({
           {formBody}
         </div>
         {formActions}
-        <AttachPreAuthModal
-          open={preAuthModalOpen}
-          onClose={() => setPreAuthModalOpen(false)}
-          matches={matchingPreAuths}
-          attachedCode={details.preAuthNo}
-          onAttach={handleAttachPreAuth}
-          onDetach={handleDetachPreAuth}
-          claimNatureLabel={claimNatureLabel}
-        />
+        {preAuthModals}
       </form>
     );
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {formContent}
+      {formBody}
+      {formActions}
+      {preAuthModals}
     </form>
   );
 }

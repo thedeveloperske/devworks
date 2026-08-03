@@ -1,6 +1,7 @@
 export { ManageClaimsPageClient } from "./components/ManageClaimsPageClient";
 export { ManageClaimsForm } from "./components/ManageClaimsForm";
 export { AttachPreAuthModal } from "./components/AttachPreAuthModal";
+export { ViewPreAuthModal } from "./components/ViewPreAuthModal";
 export { ClaimDetailsTab } from "./components/tabs/ClaimDetailsTab";
 export { ClaimFormTab } from "./components/tabs/ClaimFormTab";
 export { MemberClaimHistoryTab } from "./components/tabs/MemberClaimHistoryTab";

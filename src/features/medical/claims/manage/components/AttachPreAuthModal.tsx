@@ -3,7 +3,6 @@
 import { MoreVertical } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { Button } from "@/components/admin/Button";
 import { Modal } from "@/components/admin/Modal";
 import type { ManageClaimsPreAuthOption } from "@/features/medical/claims/manage/types";
 
@@ -14,6 +13,7 @@ type AttachPreAuthModalProps = {
   attachedCode: string;
   onAttach: (code: string) => void;
   onDetach: () => void;
+  onView: (code: string) => void;
   claimNatureLabel?: string;
 };
 
@@ -61,11 +61,13 @@ function PreAuthRowActions({
   isAttached,
   onAttach,
   onDetach,
+  onView,
 }: {
   code: string;
   isAttached: boolean;
   onAttach: (code: string) => void;
   onDetach: () => void;
+  onView: (code: string) => void;
 }) {
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -149,15 +151,7 @@ function PreAuthRowActions({
         type="button"
         role="menuitem"
         className={menuItemClass}
-        onClick={() =>
-          runAction(() => {
-            window.open(
-              `/admin/medical/care/pre-authorization?manage=1&view=${encodeURIComponent(code)}`,
-              "_blank",
-              "noopener,noreferrer"
-            );
-          })
-        }
+        onClick={() => runAction(() => onView(code))}
       >
         View Preauth
       </button>
@@ -189,6 +183,7 @@ export function AttachPreAuthModal({
   attachedCode,
   onAttach,
   onDetach,
+  onView,
   claimNatureLabel,
 }: AttachPreAuthModalProps) {
   const attached = attachedCode.trim();
@@ -206,66 +201,59 @@ export function AttachPreAuthModal({
       variant="popup"
       size="xl"
     >
-      <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-hidden">
-        <div className="min-h-0 flex-1 overflow-auto border border-slate-200">
-          <table className="w-full min-w-[640px] border-collapse">
-            <thead className="sticky top-0 z-10 bg-slate-50">
+      <div className="min-h-0 flex-1 overflow-auto border border-slate-200">
+        <table className="w-full min-w-[640px] border-collapse">
+          <thead className="sticky top-0 z-10 bg-slate-50">
+            <tr>
+              <th className={thClass}>Preauth No</th>
+              <th className={thClass}>Authorized</th>
+              <th className={thClass}>Validity</th>
+              <th className={`${thClass} text-right`}>Reserve</th>
+              <th className={thClass}>Diagnosis</th>
+              <th className={thClass}>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {matches.length === 0 ? (
               <tr>
-                <th className={thClass}>Preauth No</th>
-                <th className={thClass}>Authorized</th>
-                <th className={thClass}>Validity</th>
-                <th className={`${thClass} text-right`}>Reserve</th>
-                <th className={thClass}>Diagnosis</th>
-                <th className={thClass}>Actions</th>
+                <td colSpan={6} className={emptyCellClass}>
+                  No matching preauthorizations found.
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {matches.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className={emptyCellClass}>
-                    No matching preauthorizations found.
-                  </td>
-                </tr>
-              ) : (
-                matches.map((row) => {
-                  const isAttached = attached === row.code;
-                  return (
-                    <tr
-                      key={row.code}
-                      className={`bg-white hover:bg-slate-50 ${
-                        isAttached ? "bg-maroon/5" : ""
-                      }`}
-                    >
-                      <td className={`${tdClass} font-semibold text-slate-900`}>
-                        {row.code}
-                      </td>
-                      <td className={tdClass}>{row.dateAuthorized || "—"}</td>
-                      <td className={tdClass}>{row.validityDate || "—"}</td>
-                      <td className={`${tdClass} text-right`}>
-                        {row.reserve || "—"}
-                      </td>
-                      <td className={tdClass}>{row.preDiagnosis || "—"}</td>
-                      <td className={tdClass}>
-                        <PreAuthRowActions
-                          code={row.code}
-                          isAttached={isAttached}
-                          onAttach={onAttach}
-                          onDetach={onDetach}
-                        />
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        <div className="flex shrink-0 justify-end border-t border-slate-200 pt-2">
-          <Button type="button" variant="secondary" size="sm" onClick={onClose}>
-            Done
-          </Button>
-        </div>
+            ) : (
+              matches.map((row) => {
+                const isAttached = attached === row.code;
+                return (
+                  <tr
+                    key={row.code}
+                    className={`bg-white hover:bg-slate-50 ${
+                      isAttached ? "bg-maroon/5" : ""
+                    }`}
+                  >
+                    <td className={`${tdClass} font-semibold text-slate-900`}>
+                      {row.code}
+                    </td>
+                    <td className={tdClass}>{row.dateAuthorized || "—"}</td>
+                    <td className={tdClass}>{row.validityDate || "—"}</td>
+                    <td className={`${tdClass} text-right`}>
+                      {row.reserve || "—"}
+                    </td>
+                    <td className={tdClass}>{row.preDiagnosis || "—"}</td>
+                    <td className={tdClass}>
+                      <PreAuthRowActions
+                        code={row.code}
+                        isAttached={isAttached}
+                        onAttach={onAttach}
+                        onDetach={onDetach}
+                        onView={onView}
+                      />
+                    </td>
+                  </tr>
+                );
+              })
+            )}
+          </tbody>
+        </table>
       </div>
     </Modal>
   );
