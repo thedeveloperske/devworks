@@ -118,6 +118,12 @@ export const claimDetailsFields: ClaimDetailsField[] = [
     className: "sm:col-span-2",
   },
   {
+    name: "fund",
+    label: "Fund",
+    as: "switch",
+    className: "sm:col-span-1",
+  },
+  {
     name: "invoicedAmount",
     label: "Invoiced Amount *",
     required: true,
@@ -144,12 +150,6 @@ export const claimDetailsFields: ClaimDetailsField[] = [
     label: "Pay to",
     as: "select",
     className: "sm:col-span-2",
-  },
-  {
-    name: "fund",
-    label: "Fund",
-    as: "switch",
-    className: "sm:col-span-1",
   },
   {
     name: "proxyPayee",
@@ -287,26 +287,26 @@ export const claimDetailsFields: ClaimDetailsField[] = [
   },
 ];
 
-const visibleClaimDetailsFieldNames = new Set<keyof ClaimDetailsFormData>([
+const visibleClaimDetailsFieldNames = [
   "claimNo",
   "invoiceNo",
   "memberNo",
   "provider",
   "service",
-  "claimNature",
-  "anniv",
   "invoiceDate",
+  "anniv",
+  "claimNature",
   "dateReceived",
+  "fund",
   "invoicedAmount",
   "batchNo",
   "preAuthNo",
   "claimSource",
   "refund",
-  "fund",
   "proxyPayee",
-]);
+] as const satisfies readonly (keyof ClaimDetailsFormData)[];
 
-/** Fields shown on the Claim Details tab UI. */
-export const visibleClaimDetailsFields = claimDetailsFields.filter((field) =>
-  visibleClaimDetailsFieldNames.has(field.name)
-);
+/** Fields shown on the Claim Details tab UI (order preserved). */
+export const visibleClaimDetailsFields = visibleClaimDetailsFieldNames
+  .map((name) => claimDetailsFields.find((field) => field.name === name))
+  .filter((field): field is ClaimDetailsField => Boolean(field));

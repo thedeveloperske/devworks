@@ -1,6 +1,7 @@
 "use client";
 
 import type { ChangeEvent } from "react";
+import { Fragment } from "react";
 import { Button } from "@/components/admin/Button";
 import { FormField } from "@/components/admin/FormField";
 import { Switch } from "@/components/admin/Switch";
@@ -156,7 +157,7 @@ export function ClaimDetailsTab({
             );
           }
 
-          return (
+          const fieldCell = (
             <div key={field.name} className={field.className ?? "sm:col-span-2"}>
               {field.as === "switch" ? (
                 <Switch
@@ -188,6 +189,36 @@ export function ClaimDetailsTab({
               )}
             </div>
           );
+
+          if (field.name === "refund") {
+            return (
+              <Fragment key={field.name}>
+                <div className={field.className ?? "sm:col-span-2"}>
+                  <FormField
+                    id={`claim-details-${field.name}`}
+                    name={field.name}
+                    label={field.label}
+                    value={value[field.name]}
+                    onChange={handleChange}
+                    required={field.required}
+                    type={field.type ?? "text"}
+                    as={field.as ?? "input"}
+                    rows={field.rows}
+                    options={options}
+                    disabled={disabled}
+                    min={min}
+                    max={max}
+                    labelClassName={labelClass}
+                    inputClassName={inputClass}
+                  />
+                </div>
+                {/* Former Fund slot — leave blank */}
+                <div className="hidden sm:col-span-1 sm:block" aria-hidden />
+              </Fragment>
+            );
+          }
+
+          return fieldCell;
         })}
       </div>
     </div>
