@@ -19,6 +19,8 @@ type ClaimDetailsTabProps = {
   ) => void;
   providerOptions: LookupOption[];
   claimNatureOptions: LookupOption[];
+  invoiceDateMin?: string;
+  invoiceDateMax?: string;
 };
 
 export function ClaimDetailsTab({
@@ -26,6 +28,8 @@ export function ClaimDetailsTab({
   onChange,
   providerOptions,
   claimNatureOptions,
+  invoiceDateMin = "",
+  invoiceDateMax = "",
 }: ClaimDetailsTabProps) {
   const proxyPayeeEnabled = value.refund === CLAIM_PAY_TO_PROXY;
 
@@ -75,6 +79,11 @@ export function ClaimDetailsTab({
                   ? !value.anniv || claimNatureOptions.length === 0
                   : false;
 
+          const min =
+            field.name === "invoiceDate" ? invoiceDateMin || undefined : undefined;
+          const max =
+            field.name === "invoiceDate" ? invoiceDateMax || undefined : undefined;
+
           return (
             <div key={field.name} className={field.className ?? "sm:col-span-2"}>
               {field.as === "switch" ? (
@@ -99,6 +108,8 @@ export function ClaimDetailsTab({
                   rows={field.rows}
                   options={options}
                   disabled={disabled}
+                  min={min}
+                  max={max}
                   labelClassName={labelClass}
                   inputClassName={inputClass}
                 />

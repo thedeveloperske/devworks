@@ -17,7 +17,7 @@ import type {
   ManageClaimsMemberAnniversary,
   ManageClaimsMemberBenefitOption,
 } from "@/features/medical/claims/manage/types";
-import { resolveAnnivForInvoiceDate } from "@/features/medical/claims/manage/resolve-anniv";
+import { resolveAnnivForInvoiceDate, getInvoiceDateBounds } from "@/features/medical/claims/manage/resolve-anniv";
 import type { LookupOption } from "@/features/medical/lookups/types";
 import { ClaimDetailsTab } from "./tabs/ClaimDetailsTab";
 import { ClaimFormTab } from "./tabs/ClaimFormTab";
@@ -73,6 +73,11 @@ export function ManageClaimsForm({
         label: benefit.label,
       }));
   }, [details.anniv, memberBenefits]);
+
+  const invoiceDateBounds = useMemo(
+    () => getInvoiceDateBounds(memberAnniversaries),
+    [memberAnniversaries]
+  );
 
   useEffect(() => {
     const claimNo = details.claimNo.trim();
@@ -157,6 +162,8 @@ export function ManageClaimsForm({
             onChange={handleDetailsChange}
             providerOptions={providerOptions}
             claimNatureOptions={claimNatureOptions}
+            invoiceDateMin={invoiceDateBounds.min}
+            invoiceDateMax={invoiceDateBounds.max}
           />
         );
       case "claimForm":

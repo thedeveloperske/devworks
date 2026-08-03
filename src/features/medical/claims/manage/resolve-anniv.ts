@@ -30,3 +30,20 @@ export function resolveAnnivForInvoiceDate(
 
   return bestAnniv ?? "";
 }
+
+/** Earliest startDate and latest endDate across member cover periods. */
+export function getInvoiceDateBounds(
+  periods: ManageClaimsMemberAnniversary[]
+): { min: string; max: string } {
+  let min = "";
+  let max = "";
+
+  for (const period of periods) {
+    const start = period.startDate.trim();
+    const end = period.endDate.trim();
+    if (start && (!min || start < min)) min = start;
+    if (end && (!max || end > max)) max = end;
+  }
+
+  return { min, max };
+}
