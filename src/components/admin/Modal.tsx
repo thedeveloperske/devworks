@@ -91,22 +91,24 @@ export function Modal({
 
   if (variant === "popup") {
     const popup = (
-      <div className="fixed inset-0 z-60 flex items-center justify-center p-4">
+      <div className="fixed inset-0 z-[60] overflow-y-auto overscroll-contain p-4">
         <button
           type="button"
           aria-label="Close dialog"
-          className="absolute inset-0 bg-slate-900/40"
+          className="fixed inset-0 bg-slate-900/40"
           onClick={onClose}
         />
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="modal-title"
-          className={`relative flex max-h-[min(85vh,820px)] w-full flex-col overflow-hidden border border-slate-200 bg-white text-[11px] shadow-xl ${popupSizeClass[size]}`}
-        >
-          {header}
-          <div className="flex min-h-0 flex-1 flex-col overflow-hidden px-4 py-2 sm:px-5">
-            {children}
+        <div className="flex min-h-full items-center justify-center py-4">
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="modal-title"
+            className={`relative flex max-h-[min(85vh,820px)] w-full flex-col overflow-hidden border border-slate-200 bg-white text-[11px] shadow-xl ${popupSizeClass[size]}`}
+          >
+            {header}
+            <div className="flex min-h-0 flex-1 flex-col overflow-hidden px-4 py-2 sm:px-5">
+              {children}
+            </div>
           </div>
         </div>
       </div>
