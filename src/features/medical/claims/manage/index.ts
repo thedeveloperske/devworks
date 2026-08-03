@@ -6,6 +6,7 @@ export { MemberClaimHistoryTab } from "./components/tabs/MemberClaimHistoryTab";
 export {
   defaultClaimDetailsForm,
   claimDetailsFields,
+  visibleClaimDetailsFields,
 } from "./claim-details-constants";
 export {
   defaultClaimFormTab,

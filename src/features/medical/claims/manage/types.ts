@@ -35,13 +35,16 @@ export type ClaimDetailsFormData = {
   batched: string;
   claimSource: string;
   billSerialNo: string;
+  refund: string;
+  fund: string;
+  proxyPayee: string;
 };
 
 export type ClaimDetailsField = {
   name: keyof ClaimDetailsFormData;
   label: string;
   type?: "text" | "number" | "date";
-  as?: "input" | "select" | "textarea";
+  as?: "input" | "select" | "textarea" | "switch";
   required?: boolean;
   className?: string;
   rows?: number;

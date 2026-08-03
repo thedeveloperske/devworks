@@ -3,6 +3,7 @@ import type {
   ClaimDetailsFormData,
 } from "./types";
 
+/** All bills columns kept for persistence (including hidden UI fields). */
 export const defaultClaimDetailsForm: ClaimDetailsFormData = {
   claimNo: "",
   invoiceNo: "",
@@ -40,9 +41,12 @@ export const defaultClaimDetailsForm: ClaimDetailsFormData = {
   batched: "",
   claimSource: "",
   billSerialNo: "",
+  refund: "0",
+  fund: "0",
+  proxyPayee: "",
 };
 
-/** Fields shown on the Claim Details tab (capture / entry). */
+/** Field defs for Claim Details (visible + hidden). */
 export const claimDetailsFields: ClaimDetailsField[] = [
   {
     name: "claimNo",
@@ -53,12 +57,6 @@ export const claimDetailsFields: ClaimDetailsField[] = [
   {
     name: "invoiceNo",
     label: "Invoice No *",
-    required: true,
-    className: "sm:col-span-2",
-  },
-  {
-    name: "claimFormNo",
-    label: "Claim Form No *",
     required: true,
     className: "sm:col-span-2",
   },
@@ -109,15 +107,59 @@ export const claimDetailsFields: ClaimDetailsField[] = [
     className: "sm:col-span-2",
   },
   {
-    name: "lossDate",
-    label: "Loss Date",
-    type: "date",
-    className: "sm:col-span-2",
-  },
-  {
     name: "invoicedAmount",
     label: "Invoiced Amount *",
     required: true,
+    className: "sm:col-span-2",
+  },
+  {
+    name: "batchNo",
+    label: "Batch No",
+    className: "sm:col-span-2",
+  },
+  {
+    name: "preAuthNo",
+    label: "Preauth No",
+    type: "number",
+    className: "sm:col-span-2",
+  },
+  {
+    name: "billSerialNo",
+    label: "Bill Serial No",
+    className: "sm:col-span-2",
+  },
+  {
+    name: "claimSource",
+    label: "Claim Source",
+    className: "sm:col-span-2",
+  },
+  {
+    name: "refund",
+    label: "Refund",
+    as: "switch",
+    className: "sm:col-span-1",
+  },
+  {
+    name: "fund",
+    label: "Fund",
+    as: "switch",
+    className: "sm:col-span-1",
+  },
+  {
+    name: "proxyPayee",
+    label: "Proxy Payee",
+    className: "sm:col-span-4",
+  },
+  // Hidden from UI — still in defaultClaimDetailsForm for DB persistence
+  {
+    name: "claimFormNo",
+    label: "Claim Form No",
+    className: "sm:col-span-2",
+  },
+  {
+    name: "lossDate",
+    label: "Loss Date",
+    type: "date",
     className: "sm:col-span-2",
   },
   {
@@ -152,17 +194,6 @@ export const claimDetailsFields: ClaimDetailsField[] = [
     className: "sm:col-span-2",
   },
   {
-    name: "batchNo",
-    label: "Batch No",
-    className: "sm:col-span-2",
-  },
-  {
-    name: "preAuthNo",
-    label: "Preauth No",
-    type: "number",
-    className: "sm:col-span-2",
-  },
-  {
     name: "corpId",
     label: "Corp ID",
     className: "sm:col-span-2",
@@ -188,16 +219,6 @@ export const claimDetailsFields: ClaimDetailsField[] = [
     name: "ipDoctor",
     label: "IP Doctor",
     type: "number",
-    className: "sm:col-span-2",
-  },
-  {
-    name: "billSerialNo",
-    label: "Bill Serial No",
-    className: "sm:col-span-2",
-  },
-  {
-    name: "claimSource",
-    label: "Claim Source",
     className: "sm:col-span-2",
   },
   {
@@ -254,3 +275,28 @@ export const claimDetailsFields: ClaimDetailsField[] = [
     className: "sm:col-span-3",
   },
 ];
+
+const visibleClaimDetailsFieldNames = new Set<keyof ClaimDetailsFormData>([
+  "claimNo",
+  "invoiceNo",
+  "memberNo",
+  "provider",
+  "service",
+  "claimNature",
+  "anniv",
+  "invoiceDate",
+  "dateReceived",
+  "invoicedAmount",
+  "batchNo",
+  "preAuthNo",
+  "billSerialNo",
+  "claimSource",
+  "refund",
+  "fund",
+  "proxyPayee",
+]);
+
+/** Fields shown on the Claim Details tab UI. */
+export const visibleClaimDetailsFields = claimDetailsFields.filter((field) =>
+  visibleClaimDetailsFieldNames.has(field.name)
+);
