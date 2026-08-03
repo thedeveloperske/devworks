@@ -135,11 +135,6 @@ export const claimDetailsFields: ClaimDetailsField[] = [
     className: "sm:col-span-2",
   },
   {
-    name: "billSerialNo",
-    label: "Bill Serial No",
-    className: "sm:col-span-2",
-  },
-  {
     name: "claimSource",
     label: "Claim Source",
     className: "sm:col-span-2",
@@ -162,6 +157,11 @@ export const claimDetailsFields: ClaimDetailsField[] = [
     className: "sm:col-span-3",
   },
   // Hidden from UI — still in defaultClaimDetailsForm for DB persistence
+  {
+    name: "billSerialNo",
+    label: "Bill Serial No",
+    className: "sm:col-span-2",
+  },
   {
     name: "claimFormNo",
     label: "Claim Form No",
@@ -300,7 +300,6 @@ const visibleClaimDetailsFieldNames = new Set<keyof ClaimDetailsFormData>([
   "invoicedAmount",
   "batchNo",
   "preAuthNo",
-  "billSerialNo",
   "claimSource",
   "refund",
   "fund",
