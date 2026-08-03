@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
+import { useEffect, useMemo, useState, type ChangeEvent, type FormEvent } from "react";
 import { Button } from "@/components/admin/Button";
 import { defaultClaimDetailsForm } from "@/features/medical/claims/manage/claim-details-constants";
 import { defaultClaimFormTab } from "@/features/medical/claims/manage/claim-form-constants";
@@ -15,6 +15,7 @@ import type {
   ClaimFormTabData,
   ClaimLineItemFormData,
   ManageClaimsMemberAnniversary,
+  ManageClaimsMemberBenefitOption,
 } from "@/features/medical/claims/manage/types";
 import { resolveAnnivForInvoiceDate } from "@/features/medical/claims/manage/resolve-anniv";
 import type { LookupOption } from "@/features/medical/lookups/types";
@@ -29,6 +30,7 @@ type ManageClaimsFormProps = {
   initialClaimForm?: Partial<ClaimFormTabData>;
   initialLineItems?: ClaimLineItemFormData[];
   memberAnniversaries?: ManageClaimsMemberAnniversary[];
+  memberBenefits?: ManageClaimsMemberBenefitOption[];
   providerOptions?: LookupOption[];
   onCancel?: () => void;
   onSuccess?: () => void;
@@ -41,6 +43,7 @@ export function ManageClaimsForm({
   initialClaimForm,
   initialLineItems,
   memberAnniversaries = [],
+  memberBenefits = [],
   providerOptions = [],
   onCancel,
   onSuccess: _onSuccess,
@@ -60,6 +63,17 @@ export function ManageClaimsForm({
     initialLineItems ?? [defaultClaimLineItem()]
   );
 
+  const claimNatureOptions = useMemo(() => {
+    const anniv = details.anniv.trim();
+    if (!anniv) return [];
+    return memberBenefits
+      .filter((benefit) => benefit.anniv === anniv)
+      .map((benefit) => ({
+        value: benefit.benefit,
+        label: benefit.label,
+      }));
+  }, [details.anniv, memberBenefits]);
+
   useEffect(() => {
     const claimNo = details.claimNo.trim();
     if (!claimNo) return;
@@ -73,10 +87,21 @@ export function ManageClaimsForm({
       memberAnniversaries,
       details.invoiceDate
     );
-    setDetails((prev) =>
-      prev.anniv === nextAnniv ? prev : { ...prev, anniv: nextAnniv }
-    );
-  }, [details.invoiceDate, memberAnniversaries]);
+    setDetails((prev) => {
+      if (prev.anniv === nextAnniv) return prev;
+      const annivBenefits = memberBenefits.filter(
+        (benefit) => benefit.anniv === nextAnniv
+      );
+      const claimNatureStillValid = annivBenefits.some(
+        (benefit) => benefit.benefit === prev.claimNature
+      );
+      return {
+        ...prev,
+        anniv: nextAnniv,
+        claimNature: claimNatureStillValid ? prev.claimNature : "",
+      };
+    });
+  }, [details.invoiceDate, memberAnniversaries, memberBenefits]);
 
   const handleDetailsChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -131,6 +156,7 @@ export function ManageClaimsForm({
             value={details}
             onChange={handleDetailsChange}
             providerOptions={providerOptions}
+            claimNatureOptions={claimNatureOptions}
           />
         );
       case "claimForm":

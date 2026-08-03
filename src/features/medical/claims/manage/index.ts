@@ -34,6 +34,7 @@ export type {
   ManageClaimsCorporateOption,
   ManageClaimsListItem,
   ManageClaimsMemberAnniversary,
+  ManageClaimsMemberBenefitOption,
   ManageClaimsMemberOption,
   ManageClaimsProviderSummary,
 } from "./types";

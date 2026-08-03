@@ -18,12 +18,14 @@ type ClaimDetailsTabProps = {
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => void;
   providerOptions: LookupOption[];
+  claimNatureOptions: LookupOption[];
 };
 
 export function ClaimDetailsTab({
   value,
   onChange,
   providerOptions,
+  claimNatureOptions,
 }: ClaimDetailsTabProps) {
   const proxyPayeeEnabled = value.refund === CLAIM_PAY_TO_PROXY;
 
@@ -48,14 +50,30 @@ export function ClaimDetailsTab({
                   { value: "", label: "Select provider" },
                   ...providerOptions,
                 ]
-              : field.name === "refund"
-                ? [...claimPayToOptions]
-                : undefined;
+              : field.name === "claimNature"
+                ? [
+                    {
+                      value: "",
+                      label: value.anniv
+                        ? claimNatureOptions.length > 0
+                          ? "Select claim nature"
+                          : "No benefits for this anniversary"
+                        : "Set invoice date first",
+                    },
+                    ...claimNatureOptions,
+                  ]
+                : field.name === "refund"
+                  ? [...claimPayToOptions]
+                  : undefined;
 
           const disabled =
             field.name === "proxyPayee"
               ? !proxyPayeeEnabled
-              : field.name === "anniv";
+              : field.name === "anniv"
+                ? true
+                : field.name === "claimNature"
+                  ? !value.anniv || claimNatureOptions.length === 0
+                  : false;
 
           return (
             <div key={field.name} className={field.className ?? "sm:col-span-2"}>

@@ -8,6 +8,7 @@ import { PageHeader } from "@/components/admin/PageHeader";
 import type {
   ManageClaimsCorporateOption,
   ManageClaimsMemberAnniversary,
+  ManageClaimsMemberBenefitOption,
   ManageClaimsMemberOption,
   ManageClaimsProviderSummary,
 } from "@/features/medical/claims/manage/types";
@@ -42,6 +43,7 @@ type ManageClaimsPageClientProps = {
   corporates?: ManageClaimsCorporateOption[];
   members?: ManageClaimsMemberOption[];
   memberAnniversaries?: ManageClaimsMemberAnniversary[];
+  memberBenefits?: ManageClaimsMemberBenefitOption[];
 };
 
 export function ManageClaimsPageClient({
@@ -50,6 +52,7 @@ export function ManageClaimsPageClient({
   corporates = [],
   members = [],
   memberAnniversaries = [],
+  memberBenefits = [],
 }: ManageClaimsPageClientProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -81,6 +84,11 @@ export function ManageClaimsPageClient({
       (row) => row.memberNo === selectedMemberNo
     );
   }, [memberAnniversaries, selectedMemberNo]);
+
+  const selectedMemberBenefits = useMemo(() => {
+    if (!selectedMemberNo) return [];
+    return memberBenefits.filter((row) => row.memberNo === selectedMemberNo);
+  }, [memberBenefits, selectedMemberNo]);
 
   const memberCountByCorporateId = useMemo(() => {
     const counts: Record<string, number> = {};
@@ -368,6 +376,7 @@ export function ManageClaimsPageClient({
         embedded
         providerOptions={providerOptions}
         memberAnniversaries={selectedMemberAnniversaries}
+        memberBenefits={selectedMemberBenefits}
         initialDetails={{
           memberNo: selectedMember.memberNo,
           corpId: selectedMember.corpId,

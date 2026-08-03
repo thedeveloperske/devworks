@@ -1,9 +1,11 @@
+import { loadBenefitOptions } from "@/features/medical/admin/benefits/server/load-page-data";
 import { loadProviderOptions } from "@/features/medical/admin/providers/server/load-page-data";
 import type { LookupOption } from "@/features/medical/lookups/types";
 import { prisma } from "@/lib/prisma";
 import type {
   ManageClaimsCorporateOption,
   ManageClaimsMemberAnniversary,
+  ManageClaimsMemberBenefitOption,
   ManageClaimsMemberOption,
   ManageClaimsProviderSummary,
 } from "../types";
@@ -19,43 +21,64 @@ export async function loadManageClaimsPageData(): Promise<{
   corporates: ManageClaimsCorporateOption[];
   members: ManageClaimsMemberOption[];
   memberAnniversaries: ManageClaimsMemberAnniversary[];
+  memberBenefits: ManageClaimsMemberBenefitOption[];
 }> {
-  const [providerOptions, claimCounts, corporates, memberInfos, anniversaries] =
-    await Promise.all([
-      loadProviderOptions(),
-      prisma.bill.groupBy({
-        by: ["provider"],
-        _count: { _all: true },
-      }),
-      prisma.corporate.findMany({
-        select: { id: true, corporate: true, corpId: true, policyNo: true },
-        orderBy: { corporate: "asc" },
-      }),
-      prisma.memberInfo.findMany({
-        select: {
-          memberNo: true,
-          familyNo: true,
-          surname: true,
-          firstName: true,
-          relationToPrincipal: true,
-          corpId: true,
-          cancelled: true,
-        },
-        orderBy: [{ familyNo: "asc" }, { memberNo: "asc" }],
-      }),
-      prisma.memberAnniversary.findMany({
-        select: {
-          memberNo: true,
-          anniv: true,
-          startDate: true,
-          endDate: true,
-        },
-        orderBy: [{ memberNo: "asc" }, { anniv: "desc" }],
-      }),
-    ]);
+  const [
+    providerOptions,
+    benefitOptions,
+    claimCounts,
+    corporates,
+    memberInfos,
+    anniversaries,
+    memberBenefitRows,
+  ] = await Promise.all([
+    loadProviderOptions(),
+    loadBenefitOptions(),
+    prisma.bill.groupBy({
+      by: ["provider"],
+      _count: { _all: true },
+    }),
+    prisma.corporate.findMany({
+      select: { id: true, corporate: true, corpId: true, policyNo: true },
+      orderBy: { corporate: "asc" },
+    }),
+    prisma.memberInfo.findMany({
+      select: {
+        memberNo: true,
+        familyNo: true,
+        surname: true,
+        firstName: true,
+        relationToPrincipal: true,
+        corpId: true,
+        cancelled: true,
+      },
+      orderBy: [{ familyNo: "asc" }, { memberNo: "asc" }],
+    }),
+    prisma.memberAnniversary.findMany({
+      select: {
+        memberNo: true,
+        anniv: true,
+        startDate: true,
+        endDate: true,
+      },
+      orderBy: [{ memberNo: "asc" }, { anniv: "desc" }],
+    }),
+    prisma.memberBenefit.findMany({
+      select: {
+        memberNo: true,
+        benefit: true,
+        anniv: true,
+      },
+      orderBy: [{ memberNo: "asc" }, { benefit: "asc" }],
+    }),
+  ]);
 
   const countByProvider = new Map(
     claimCounts.map((row) => [String(row.provider), row._count._all])
+  );
+
+  const benefitLabelByCode = new Map(
+    benefitOptions.map((option) => [option.value, option.label])
   );
 
   const providers: ManageClaimsProviderSummary[] = providerOptions
@@ -124,11 +147,23 @@ export async function loadManageClaimsPageData(): Promise<{
     })
   );
 
+  const memberBenefits: ManageClaimsMemberBenefitOption[] =
+    memberBenefitRows.map((row) => {
+      const benefit = String(row.benefit);
+      return {
+        memberNo: row.memberNo,
+        benefit,
+        label: benefitLabelByCode.get(benefit) ?? `Benefit ${benefit}`,
+        anniv: String(row.anniv),
+      };
+    });
+
   return {
     providers,
     providerOptions,
     corporates: corporateList,
     members,
     memberAnniversaries,
+    memberBenefits,
   };
 }

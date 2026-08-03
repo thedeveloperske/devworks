@@ -127,3 +127,10 @@ export type ManageClaimsMemberAnniversary = {
   startDate: string;
   endDate: string;
 };
+
+export type ManageClaimsMemberBenefitOption = {
+  memberNo: string;
+  benefit: string;
+  label: string;
+  anniv: string;
+};

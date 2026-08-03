@@ -95,7 +95,7 @@ export const claimDetailsFields: ClaimDetailsField[] = [
     name: "claimNature",
     label: "Claim Nature *",
     required: true,
-    type: "number",
+    as: "select",
     className: "sm:col-span-2",
   },
   {
