@@ -132,7 +132,6 @@ export const claimDetailsFields: ClaimDetailsField[] = [
   {
     name: "preAuthNo",
     label: "Preauth No",
-    type: "number",
     className: "sm:col-span-2",
   },
   {

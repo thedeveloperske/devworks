@@ -10,6 +10,7 @@ import type {
   ManageClaimsMemberAnniversary,
   ManageClaimsMemberBenefitOption,
   ManageClaimsMemberOption,
+  ManageClaimsPreAuthOption,
   ManageClaimsProviderSummary,
 } from "../types";
 
@@ -45,6 +46,7 @@ export async function loadManageClaimsPageData(): Promise<{
   memberAnniversaries: ManageClaimsMemberAnniversary[];
   memberBenefits: ManageClaimsMemberBenefitOption[];
   entrantBatches: ManageClaimsBatchOption[];
+  memberPreAuths: ManageClaimsPreAuthOption[];
 }> {
   const currentUsername = await resolveCurrentUsername();
 
@@ -57,6 +59,7 @@ export async function loadManageClaimsPageData(): Promise<{
     anniversaries,
     memberBenefitRows,
     entrantBatchRows,
+    preAuthRows,
   ] = await Promise.all([
     loadProviderOptions(),
     loadBenefitOptions(),
@@ -116,6 +119,20 @@ export async function loadManageClaimsPageData(): Promise<{
           orderBy: [{ batchDate: "desc" }, { idx: "desc" }],
         })
       : Promise.resolve([]),
+    prisma.preAuthorization.findMany({
+      select: {
+        code: true,
+        memberNo: true,
+        provider: true,
+        anniv: true,
+        authorityType: true,
+        dateAuthorized: true,
+        validityDate: true,
+        reserve: true,
+        preDiagnosis: true,
+      },
+      orderBy: { code: "desc" },
+    }),
   ]);
 
   const countByProvider = new Map(
@@ -219,6 +236,24 @@ export async function loadManageClaimsPageData(): Promise<{
     });
   }
 
+  const memberPreAuths: ManageClaimsPreAuthOption[] = preAuthRows.map((row) => ({
+    code: String(row.code),
+    memberNo: row.memberNo,
+    providerCode: String(row.provider),
+    anniv: row.anniv != null ? String(row.anniv) : "",
+    authorityType: row.authorityType != null ? String(row.authorityType) : "",
+    dateAuthorized: formatDateValue(row.dateAuthorized),
+    validityDate: formatDateValue(row.validityDate),
+    reserve:
+      row.reserve != null
+        ? Number(row.reserve).toLocaleString(undefined, {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })
+        : "",
+    preDiagnosis: row.preDiagnosis?.trim() ?? "",
+  }));
+
   return {
     providers,
     providerOptions,
@@ -227,5 +262,6 @@ export async function loadManageClaimsPageData(): Promise<{
     memberAnniversaries,
     memberBenefits,
     entrantBatches,
+    memberPreAuths,
   };
 }

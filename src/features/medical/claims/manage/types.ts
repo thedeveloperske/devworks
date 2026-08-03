@@ -140,3 +140,15 @@ export type ManageClaimsBatchOption = {
   batchNo: string;
   providerCode: string;
 };
+
+export type ManageClaimsPreAuthOption = {
+  code: string;
+  memberNo: string;
+  providerCode: string;
+  anniv: string;
+  authorityType: string;
+  dateAuthorized: string;
+  validityDate: string;
+  reserve: string;
+  preDiagnosis: string;
+};

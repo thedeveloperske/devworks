@@ -1,6 +1,7 @@
 "use client";
 
 import type { ChangeEvent } from "react";
+import { Button } from "@/components/admin/Button";
 import { FormField } from "@/components/admin/FormField";
 import { Switch } from "@/components/admin/Switch";
 import {
@@ -22,6 +23,7 @@ type ClaimDetailsTabProps = {
   batchNoOptions: LookupOption[];
   invoiceDateMin?: string;
   invoiceDateMax?: string;
+  onManagePreAuth?: () => void;
 };
 
 export function ClaimDetailsTab({
@@ -32,8 +34,15 @@ export function ClaimDetailsTab({
   batchNoOptions,
   invoiceDateMin = "",
   invoiceDateMax = "",
+  onManagePreAuth,
 }: ClaimDetailsTabProps) {
   const proxyPayeeEnabled = value.refund === CLAIM_PAY_TO_PROXY;
+  const canManagePreAuth = Boolean(
+    value.claimNature.trim() &&
+      value.provider.trim() &&
+      value.anniv.trim() &&
+      value.memberNo.trim()
+  );
 
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -87,7 +96,7 @@ export function ClaimDetailsTab({
           const disabled =
             field.name === "proxyPayee"
               ? !proxyPayeeEnabled
-              : field.name === "anniv"
+              : field.name === "anniv" || field.name === "preAuthNo"
                 ? true
                 : field.name === "claimNature"
                   ? !value.anniv || claimNatureOptions.length === 0
@@ -96,9 +105,51 @@ export function ClaimDetailsTab({
                     : false;
 
           const min =
-            field.name === "invoiceDate" ? invoiceDateMin || undefined : undefined;
+            field.name === "invoiceDate"
+              ? invoiceDateMin || undefined
+              : undefined;
           const max =
-            field.name === "invoiceDate" ? invoiceDateMax || undefined : undefined;
+            field.name === "invoiceDate"
+              ? invoiceDateMax || undefined
+              : undefined;
+
+          if (field.name === "preAuthNo") {
+            return (
+              <div
+                key={field.name}
+                className={field.className ?? "sm:col-span-2"}
+              >
+                <FormField
+                  id={`claim-details-${field.name}`}
+                  name={field.name}
+                  label={field.label}
+                  value={value[field.name]}
+                  onChange={handleChange}
+                  required={field.required}
+                  type="text"
+                  as="input"
+                  disabled
+                  labelClassName={labelClass}
+                  inputClassName={inputClass}
+                />
+                {onManagePreAuth ? (
+                  <div className="mt-1">
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="sm"
+                      disabled={!canManagePreAuth}
+                      onClick={onManagePreAuth}
+                    >
+                      {value.preAuthNo.trim()
+                        ? "Manage Preauth"
+                        : "Attach Preauth"}
+                    </Button>
+                  </div>
+                ) : null}
+              </div>
+            );
+          }
 
           return (
             <div key={field.name} className={field.className ?? "sm:col-span-2"}>

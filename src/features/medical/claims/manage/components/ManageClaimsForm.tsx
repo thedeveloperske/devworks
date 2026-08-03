@@ -1,6 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useState, type ChangeEvent, type FormEvent } from "react";
+import {
+  useEffect,
+  useMemo,
+  useState,
+  type ChangeEvent,
+  type FormEvent,
+} from "react";
 import { Button } from "@/components/admin/Button";
 import { defaultClaimDetailsForm } from "@/features/medical/claims/manage/claim-details-constants";
 import { defaultClaimFormTab } from "@/features/medical/claims/manage/claim-form-constants";
@@ -17,12 +23,41 @@ import type {
   ManageClaimsBatchOption,
   ManageClaimsMemberAnniversary,
   ManageClaimsMemberBenefitOption,
+  ManageClaimsPreAuthOption,
 } from "@/features/medical/claims/manage/types";
-import { resolveAnnivForInvoiceDate, getInvoiceDateBounds } from "@/features/medical/claims/manage/resolve-anniv";
+import {
+  getInvoiceDateBounds,
+  resolveAnnivForInvoiceDate,
+} from "@/features/medical/claims/manage/resolve-anniv";
 import type { LookupOption } from "@/features/medical/lookups/types";
+import { AttachPreAuthModal } from "./AttachPreAuthModal";
 import { ClaimDetailsTab } from "./tabs/ClaimDetailsTab";
 import { ClaimFormTab } from "./tabs/ClaimFormTab";
 import { MemberClaimHistoryTab } from "./tabs/MemberClaimHistoryTab";
+
+function filterMatchingPreAuths(
+  preAuths: ManageClaimsPreAuthOption[],
+  criteria: {
+    memberNo: string;
+    provider: string;
+    anniv: string;
+    claimNature: string;
+  }
+): ManageClaimsPreAuthOption[] {
+  const memberNo = criteria.memberNo.trim();
+  const provider = criteria.provider.trim();
+  const anniv = criteria.anniv.trim();
+  const claimNature = criteria.claimNature.trim();
+  if (!memberNo || !provider || !anniv || !claimNature) return [];
+
+  return preAuths.filter((row) => {
+    if (row.memberNo !== memberNo) return false;
+    if (row.providerCode !== provider) return false;
+    if (Number(row.anniv) !== Number(anniv)) return false;
+    if (Number(row.authorityType) !== Number(claimNature)) return false;
+    return true;
+  });
+}
 
 type ManageClaimsFormProps = {
   embedded?: boolean;
@@ -33,6 +68,7 @@ type ManageClaimsFormProps = {
   memberAnniversaries?: ManageClaimsMemberAnniversary[];
   memberBenefits?: ManageClaimsMemberBenefitOption[];
   entrantBatches?: ManageClaimsBatchOption[];
+  memberPreAuths?: ManageClaimsPreAuthOption[];
   providerOptions?: LookupOption[];
   onCancel?: () => void;
   onSuccess?: () => void;
@@ -47,6 +83,7 @@ export function ManageClaimsForm({
   memberAnniversaries = [],
   memberBenefits = [],
   entrantBatches = [],
+  memberPreAuths = [],
   providerOptions = [],
   onCancel,
   onSuccess: _onSuccess,
@@ -65,6 +102,7 @@ export function ManageClaimsForm({
   const [lineItems, setLineItems] = useState<ClaimLineItemFormData[]>(
     initialLineItems ?? [defaultClaimLineItem()]
   );
+  const [preAuthModalOpen, setPreAuthModalOpen] = useState(false);
 
   const claimNatureOptions = useMemo(() => {
     const anniv = details.anniv.trim();
@@ -93,6 +131,30 @@ export function ManageClaimsForm({
     [memberAnniversaries]
   );
 
+  const matchingPreAuths = useMemo(
+    () =>
+      filterMatchingPreAuths(memberPreAuths, {
+        memberNo: details.memberNo,
+        provider: details.provider,
+        anniv: details.anniv,
+        claimNature: details.claimNature,
+      }),
+    [
+      details.anniv,
+      details.claimNature,
+      details.memberNo,
+      details.provider,
+      memberPreAuths,
+    ]
+  );
+
+  const claimNatureLabel = useMemo(() => {
+    const option = claimNatureOptions.find(
+      (row) => row.value === details.claimNature
+    );
+    return option?.label ?? details.claimNature;
+  }, [claimNatureOptions, details.claimNature]);
+
   useEffect(() => {
     const claimNo = details.claimNo.trim();
     if (!claimNo) return;
@@ -118,9 +180,26 @@ export function ManageClaimsForm({
         ...prev,
         anniv: nextAnniv,
         claimNature: claimNatureStillValid ? prev.claimNature : "",
+        preAuthNo: claimNatureStillValid ? prev.preAuthNo : "",
       };
     });
   }, [details.invoiceDate, memberAnniversaries, memberBenefits]);
+
+  useEffect(() => {
+    if (!details.preAuthNo.trim()) return;
+    const stillValid = matchingPreAuths.some(
+      (row) => row.code === details.preAuthNo.trim()
+    );
+    if (stillValid) return;
+    setDetails((prev) =>
+      prev.preAuthNo ? { ...prev, preAuthNo: "" } : prev
+    );
+  }, [details.preAuthNo, matchingPreAuths]);
+
+  const openPreAuthModal = () => {
+    if (!details.claimNature.trim()) return;
+    setPreAuthModalOpen(true);
+  };
 
   const handleDetailsChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -136,6 +215,14 @@ export function ManageClaimsForm({
           ...prev,
           provider: value,
           batchNo: stillValid ? prev.batchNo : "",
+          preAuthNo: "",
+        };
+      }
+      if (name === "claimNature") {
+        return {
+          ...prev,
+          claimNature: value,
+          preAuthNo: "",
         };
       }
       return {
@@ -143,6 +230,18 @@ export function ManageClaimsForm({
         [name]: value,
       };
     });
+
+    if (name === "claimNature" && value.trim()) {
+      setPreAuthModalOpen(true);
+    }
+  };
+
+  const handleAttachPreAuth = (code: string) => {
+    setDetails((prev) => ({ ...prev, preAuthNo: code }));
+  };
+
+  const handleDetachPreAuth = () => {
+    setDetails((prev) => ({ ...prev, preAuthNo: "" }));
   };
 
   const handleClaimFormChange = (
@@ -192,6 +291,7 @@ export function ManageClaimsForm({
             batchNoOptions={batchNoOptions}
             invoiceDateMin={invoiceDateBounds.min}
             invoiceDateMax={invoiceDateBounds.max}
+            onManagePreAuth={openPreAuthModal}
           />
         );
       case "claimForm":
@@ -257,6 +357,22 @@ export function ManageClaimsForm({
     </div>
   );
 
+  const formContent = (
+    <>
+      {formBody}
+      {formActions}
+      <AttachPreAuthModal
+        open={preAuthModalOpen}
+        onClose={() => setPreAuthModalOpen(false)}
+        matches={matchingPreAuths}
+        attachedCode={details.preAuthNo}
+        onAttach={handleAttachPreAuth}
+        onDetach={handleDetachPreAuth}
+        claimNatureLabel={claimNatureLabel}
+      />
+    </>
+  );
+
   if (embedded) {
     return (
       <form
@@ -267,14 +383,22 @@ export function ManageClaimsForm({
           {formBody}
         </div>
         {formActions}
+        <AttachPreAuthModal
+          open={preAuthModalOpen}
+          onClose={() => setPreAuthModalOpen(false)}
+          matches={matchingPreAuths}
+          attachedCode={details.preAuthNo}
+          onAttach={handleAttachPreAuth}
+          onDetach={handleDetachPreAuth}
+          claimNatureLabel={claimNatureLabel}
+        />
       </form>
     );
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {formBody}
-      {formActions}
+      {formContent}
     </form>
   );
 }

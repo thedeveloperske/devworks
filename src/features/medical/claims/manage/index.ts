@@ -1,5 +1,6 @@
 export { ManageClaimsPageClient } from "./components/ManageClaimsPageClient";
 export { ManageClaimsForm } from "./components/ManageClaimsForm";
+export { AttachPreAuthModal } from "./components/AttachPreAuthModal";
 export { ClaimDetailsTab } from "./components/tabs/ClaimDetailsTab";
 export { ClaimFormTab } from "./components/tabs/ClaimFormTab";
 export { MemberClaimHistoryTab } from "./components/tabs/MemberClaimHistoryTab";
@@ -37,5 +38,6 @@ export type {
   ManageClaimsMemberAnniversary,
   ManageClaimsMemberBenefitOption,
   ManageClaimsMemberOption,
+  ManageClaimsPreAuthOption,
   ManageClaimsProviderSummary,
 } from "./types";
