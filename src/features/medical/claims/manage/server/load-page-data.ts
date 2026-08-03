@@ -3,15 +3,22 @@ import type { LookupOption } from "@/features/medical/lookups/types";
 import { prisma } from "@/lib/prisma";
 import type {
   ManageClaimsCorporateOption,
+  ManageClaimsMemberAnniversary,
   ManageClaimsMemberOption,
   ManageClaimsProviderSummary,
 } from "../types";
+
+function formatDateValue(value: Date | null | undefined): string {
+  if (!value || Number.isNaN(value.getTime())) return "";
+  return value.toISOString().slice(0, 10);
+}
 
 export async function loadManageClaimsPageData(): Promise<{
   providers: ManageClaimsProviderSummary[];
   providerOptions: LookupOption[];
   corporates: ManageClaimsCorporateOption[];
   members: ManageClaimsMemberOption[];
+  memberAnniversaries: ManageClaimsMemberAnniversary[];
 }> {
   const [providerOptions, claimCounts, corporates, memberInfos, anniversaries] =
     await Promise.all([
@@ -37,8 +44,13 @@ export async function loadManageClaimsPageData(): Promise<{
         orderBy: [{ familyNo: "asc" }, { memberNo: "asc" }],
       }),
       prisma.memberAnniversary.findMany({
-        select: { memberNo: true, anniv: true },
-        orderBy: { anniv: "desc" },
+        select: {
+          memberNo: true,
+          anniv: true,
+          startDate: true,
+          endDate: true,
+        },
+        orderBy: [{ memberNo: "asc" }, { anniv: "desc" }],
       }),
     ]);
 
@@ -80,13 +92,6 @@ export async function loadManageClaimsPageData(): Promise<{
     }
   }
 
-  const latestAnnivByMemberNo = new Map<string, string>();
-  for (const row of anniversaries) {
-    if (!latestAnnivByMemberNo.has(row.memberNo)) {
-      latestAnnivByMemberNo.set(row.memberNo, String(row.anniv));
-    }
-  }
-
   const members: ManageClaimsMemberOption[] = memberInfos.map((info) => {
     const corpId =
       info.corpId?.trim() ||
@@ -106,15 +111,24 @@ export async function loadManageClaimsPageData(): Promise<{
       corporateId: corporate?.id ?? "",
       corpId,
       memberType: isPrincipal ? "Principal" : "Dependant",
-      anniv: latestAnnivByMemberNo.get(info.memberNo) ?? "",
       cancelled: info.cancelled,
     };
   });
+
+  const memberAnniversaries: ManageClaimsMemberAnniversary[] = anniversaries.map(
+    (row) => ({
+      memberNo: row.memberNo,
+      anniv: String(row.anniv),
+      startDate: formatDateValue(row.startDate),
+      endDate: formatDateValue(row.endDate),
+    })
+  );
 
   return {
     providers,
     providerOptions,
     corporates: corporateList,
     members,
+    memberAnniversaries,
   };
 }

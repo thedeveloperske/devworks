@@ -3,7 +3,7 @@ import { ManageClaimsPageClient } from "@/features/medical/claims/manage";
 import { loadManageClaimsPageData } from "@/features/medical/claims/manage/server/load-page-data";
 
 async function ManageClaimsContent() {
-  const { providers, providerOptions, corporates, members } =
+  const { providers, providerOptions, corporates, members, memberAnniversaries } =
     await loadManageClaimsPageData();
   return (
     <ManageClaimsPageClient
@@ -11,6 +11,7 @@ async function ManageClaimsContent() {
       providerOptions={providerOptions}
       corporates={corporates}
       members={members}
+      memberAnniversaries={memberAnniversaries}
     />
   );
 }

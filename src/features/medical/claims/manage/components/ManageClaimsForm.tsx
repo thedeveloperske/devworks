@@ -14,7 +14,9 @@ import type {
   ClaimDetailsFormData,
   ClaimFormTabData,
   ClaimLineItemFormData,
+  ManageClaimsMemberAnniversary,
 } from "@/features/medical/claims/manage/types";
+import { resolveAnnivForInvoiceDate } from "@/features/medical/claims/manage/resolve-anniv";
 import type { LookupOption } from "@/features/medical/lookups/types";
 import { ClaimDetailsTab } from "./tabs/ClaimDetailsTab";
 import { ClaimFormTab } from "./tabs/ClaimFormTab";
@@ -26,6 +28,7 @@ type ManageClaimsFormProps = {
   initialDetails?: Partial<ClaimDetailsFormData>;
   initialClaimForm?: Partial<ClaimFormTabData>;
   initialLineItems?: ClaimLineItemFormData[];
+  memberAnniversaries?: ManageClaimsMemberAnniversary[];
   providerOptions?: LookupOption[];
   onCancel?: () => void;
   onSuccess?: () => void;
@@ -37,6 +40,7 @@ export function ManageClaimsForm({
   initialDetails,
   initialClaimForm,
   initialLineItems,
+  memberAnniversaries = [],
   providerOptions = [],
   onCancel,
   onSuccess: _onSuccess,
@@ -63,6 +67,16 @@ export function ManageClaimsForm({
       prev.claimNo === claimNo ? prev : { ...prev, claimNo }
     );
   }, [details.claimNo]);
+
+  useEffect(() => {
+    const nextAnniv = resolveAnnivForInvoiceDate(
+      memberAnniversaries,
+      details.invoiceDate
+    );
+    setDetails((prev) =>
+      prev.anniv === nextAnniv ? prev : { ...prev, anniv: nextAnniv }
+    );
+  }, [details.invoiceDate, memberAnniversaries]);
 
   const handleDetailsChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>

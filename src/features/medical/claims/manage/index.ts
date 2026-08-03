@@ -33,6 +33,7 @@ export type {
   ClaimLineItemFormData,
   ManageClaimsCorporateOption,
   ManageClaimsListItem,
+  ManageClaimsMemberAnniversary,
   ManageClaimsMemberOption,
   ManageClaimsProviderSummary,
 } from "./types";

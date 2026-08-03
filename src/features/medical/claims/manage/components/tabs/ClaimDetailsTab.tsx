@@ -53,7 +53,9 @@ export function ClaimDetailsTab({
                 : undefined;
 
           const disabled =
-            field.name === "proxyPayee" ? !proxyPayeeEnabled : false;
+            field.name === "proxyPayee"
+              ? !proxyPayeeEnabled
+              : field.name === "anniv";
 
           return (
             <div key={field.name} className={field.className ?? "sm:col-span-2"}>

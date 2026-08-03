@@ -118,6 +118,12 @@ export type ManageClaimsMemberOption = {
   corporateId: string;
   corpId: string;
   memberType: "Principal" | "Dependant";
-  anniv: string;
   cancelled: number | null;
+};
+
+export type ManageClaimsMemberAnniversary = {
+  memberNo: string;
+  anniv: string;
+  startDate: string;
+  endDate: string;
 };
