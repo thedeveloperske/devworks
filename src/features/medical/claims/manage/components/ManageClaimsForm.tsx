@@ -164,6 +164,35 @@ export function ManageClaimsForm({
   }, [details.claimNo]);
 
   useEffect(() => {
+    const invoiceDate = details.invoiceDate.trim();
+    setDetails((prev) => {
+      if (!prev.dateReceived.trim()) return prev;
+      if (invoiceDate && prev.dateReceived >= invoiceDate) return prev;
+      return { ...prev, dateReceived: "" };
+    });
+    setClaimForm((prev) => {
+      const clearIfBefore = (value: string) =>
+        value && (!invoiceDate || value < invoiceDate) ? "" : value;
+      const doctorDate = clearIfBefore(prev.doctorDate);
+      const dateAdmitted = clearIfBefore(prev.dateAdmitted);
+      const dateDischarged = clearIfBefore(prev.dateDischarged);
+      if (
+        doctorDate === prev.doctorDate &&
+        dateAdmitted === prev.dateAdmitted &&
+        dateDischarged === prev.dateDischarged
+      ) {
+        return prev;
+      }
+      return {
+        ...prev,
+        doctorDate,
+        dateAdmitted,
+        dateDischarged,
+      };
+    });
+  }, [details.invoiceDate]);
+
+  useEffect(() => {
     const nextAnniv = resolveAnnivForInvoiceDate(
       memberAnniversaries,
       details.invoiceDate
@@ -303,6 +332,7 @@ export function ManageClaimsForm({
             onLineItemChange={handleLineItemChange}
             onAddLineItem={handleAddLineItem}
             onRemoveLineItem={handleRemoveLineItem}
+            invoiceDate={details.invoiceDate}
           />
         );
       case "memberClaimHistory":

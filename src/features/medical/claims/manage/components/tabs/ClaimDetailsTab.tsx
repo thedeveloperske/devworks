@@ -93,6 +93,9 @@ export function ClaimDetailsTab({
                     ? [...claimPayToOptions]
                     : undefined;
 
+          const dateReceivedDisabled =
+            field.name === "dateReceived" && !value.invoiceDate.trim();
+
           const disabled =
             field.name === "proxyPayee"
               ? !proxyPayeeEnabled
@@ -102,12 +105,14 @@ export function ClaimDetailsTab({
                   ? !value.anniv || claimNatureOptions.length === 0
                   : field.name === "batchNo"
                     ? !value.provider || batchNoOptions.length === 0
-                    : false;
+                    : dateReceivedDisabled;
 
           const min =
             field.name === "invoiceDate"
               ? invoiceDateMin || undefined
-              : undefined;
+              : field.name === "dateReceived"
+                ? value.invoiceDate.trim() || undefined
+                : undefined;
           const max =
             field.name === "invoiceDate"
               ? invoiceDateMax || undefined
