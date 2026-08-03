@@ -267,10 +267,12 @@ export function ManageClaimsForm({
 
   const handleAttachPreAuth = (code: string) => {
     setDetails((prev) => ({ ...prev, preAuthNo: code }));
+    setPreAuthModalOpen(false);
   };
 
   const handleDetachPreAuth = () => {
     setDetails((prev) => ({ ...prev, preAuthNo: "" }));
+    setPreAuthModalOpen(false);
   };
 
   const handleClaimFormChange = (

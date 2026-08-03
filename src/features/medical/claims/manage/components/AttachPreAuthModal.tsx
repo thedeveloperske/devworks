@@ -1,5 +1,8 @@
 "use client";
 
+import { MoreVertical } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { Button } from "@/components/admin/Button";
 import { Modal } from "@/components/admin/Modal";
 import type { ManageClaimsPreAuthOption } from "@/features/medical/claims/manage/types";
@@ -20,6 +23,164 @@ const tdClass =
   "border-b border-slate-200 px-2 py-1.5 align-middle text-[11px] text-slate-600";
 const emptyCellClass =
   "border-b border-slate-200 px-2 py-4 text-center text-[11px] text-slate-500";
+
+const menuWidth = 160;
+const menuHeight = 72;
+const menuButtonClass =
+  "flex h-7 w-7 items-center justify-center text-slate-500 hover:text-maroon";
+const menuPanelClass =
+  "fixed z-[70] min-w-[10rem] border border-slate-200 bg-white py-1 shadow-lg";
+const menuItemClass =
+  "block w-full px-3 py-1.5 text-left text-[11px] text-slate-700 hover:bg-slate-50";
+
+function getMenuPosition(button: HTMLButtonElement) {
+  const rect = button.getBoundingClientRect();
+  const viewportPadding = 8;
+
+  let top = rect.bottom + 4;
+  let left = rect.right - menuWidth;
+
+  if (top + menuHeight > window.innerHeight - viewportPadding) {
+    top = rect.top - menuHeight - 4;
+  }
+
+  left = Math.max(
+    viewportPadding,
+    Math.min(left, window.innerWidth - menuWidth - viewportPadding)
+  );
+  top = Math.max(
+    viewportPadding,
+    Math.min(top, window.innerHeight - menuHeight - viewportPadding)
+  );
+
+  return { top, left };
+}
+
+function PreAuthRowActions({
+  code,
+  isAttached,
+  onAttach,
+  onDetach,
+}: {
+  code: string;
+  isAttached: boolean;
+  onAttach: (code: string) => void;
+  onDetach: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const [position, setPosition] = useState({ top: 0, left: 0 });
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!open || !buttonRef.current) return;
+
+    const updatePosition = () => {
+      if (!buttonRef.current) return;
+      setPosition(getMenuPosition(buttonRef.current));
+    };
+
+    updatePosition();
+    window.addEventListener("scroll", updatePosition, true);
+    window.addEventListener("resize", updatePosition);
+    return () => {
+      window.removeEventListener("scroll", updatePosition, true);
+      window.removeEventListener("resize", updatePosition);
+    };
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
+
+    const handlePointerDown = (event: MouseEvent) => {
+      const target = event.target as Node;
+      if (
+        buttonRef.current?.contains(target) ||
+        menuRef.current?.contains(target)
+      ) {
+        return;
+      }
+      setOpen(false);
+    };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpen(false);
+    };
+
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [open]);
+
+  const runAction = (action: () => void) => {
+    setOpen(false);
+    action();
+  };
+
+  const menu = open ? (
+    <div
+      ref={menuRef}
+      role="menu"
+      className={menuPanelClass}
+      style={{ top: position.top, left: position.left }}
+    >
+      <button
+        type="button"
+        role="menuitem"
+        className={menuItemClass}
+        onClick={() =>
+          runAction(() => {
+            if (isAttached) onDetach();
+            else onAttach(code);
+          })
+        }
+      >
+        {isAttached ? "Detach" : "Attach"}
+      </button>
+      <button
+        type="button"
+        role="menuitem"
+        className={menuItemClass}
+        onClick={() =>
+          runAction(() => {
+            window.open(
+              `/admin/medical/care/pre-authorization?manage=1&view=${encodeURIComponent(code)}`,
+              "_blank",
+              "noopener,noreferrer"
+            );
+          })
+        }
+      >
+        View Preauth
+      </button>
+    </div>
+  ) : null;
+
+  return (
+    <>
+      <button
+        ref={buttonRef}
+        type="button"
+        aria-label={`Actions for preauth ${code}`}
+        aria-expanded={open}
+        aria-haspopup="menu"
+        onClick={() => setOpen((current) => !current)}
+        className={menuButtonClass}
+      >
+        <MoreVertical className="h-4 w-4" />
+      </button>
+      {mounted && menu ? createPortal(menu, document.body) : null}
+    </>
+  );
+}
 
 export function AttachPreAuthModal({
   open,
@@ -46,24 +207,6 @@ export function AttachPreAuthModal({
       size="xl"
     >
       <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-hidden">
-        <div className="flex shrink-0 items-center justify-between gap-2 border border-slate-200 bg-slate-50 px-2.5 py-1.5">
-          <p className="text-[11px] text-slate-600">
-            Attached:{" "}
-            <span className="font-semibold text-slate-900">
-              {attached || "None"}
-            </span>
-          </p>
-          <Button
-            type="button"
-            variant="secondary"
-            size="sm"
-            disabled={!attached}
-            onClick={onDetach}
-          >
-            Detach
-          </Button>
-        </div>
-
         <div className="min-h-0 flex-1 overflow-auto border border-slate-200">
           <table className="w-full min-w-[640px] border-collapse">
             <thead className="sticky top-0 z-10 bg-slate-50">
@@ -73,7 +216,7 @@ export function AttachPreAuthModal({
                 <th className={thClass}>Validity</th>
                 <th className={`${thClass} text-right`}>Reserve</th>
                 <th className={thClass}>Diagnosis</th>
-                <th className={thClass}>Action</th>
+                <th className={thClass}>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -103,24 +246,12 @@ export function AttachPreAuthModal({
                       </td>
                       <td className={tdClass}>{row.preDiagnosis || "—"}</td>
                       <td className={tdClass}>
-                        {isAttached ? (
-                          <Button
-                            type="button"
-                            variant="secondary"
-                            size="sm"
-                            onClick={onDetach}
-                          >
-                            Detach
-                          </Button>
-                        ) : (
-                          <Button
-                            type="button"
-                            size="sm"
-                            onClick={() => onAttach(row.code)}
-                          >
-                            Attach
-                          </Button>
-                        )}
+                        <PreAuthRowActions
+                          code={row.code}
+                          isAttached={isAttached}
+                          onAttach={onAttach}
+                          onDetach={onDetach}
+                        />
                       </td>
                     </tr>
                   );
