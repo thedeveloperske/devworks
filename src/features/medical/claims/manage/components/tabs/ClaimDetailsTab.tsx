@@ -109,7 +109,9 @@ export function ClaimDetailsTab({
           const disabled =
             field.name === "proxyPayee"
               ? !proxyPayeeEnabled
-              : field.name === "anniv" || field.name === "preAuthNo"
+              : field.name === "anniv" ||
+                  field.name === "preAuthNo" ||
+                  field.name === "fund"
                 ? true
                 : field.name === "claimNature"
                   ? !value.anniv || claimNatureOptions.length === 0
@@ -175,6 +177,7 @@ export function ClaimDetailsTab({
                   label={field.label}
                   checked={value[field.name] === "1"}
                   onChange={handleChange}
+                  disabled={disabled}
                   labelClassName={labelClass}
                 />
               ) : (

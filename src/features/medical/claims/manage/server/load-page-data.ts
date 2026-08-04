@@ -101,6 +101,7 @@ export async function loadManageClaimsPageData(): Promise<{
         memberNo: true,
         benefit: true,
         anniv: true,
+        fund: true,
       },
       orderBy: [{ memberNo: "asc" }, { benefit: "asc" }],
     }),
@@ -221,6 +222,7 @@ export async function loadManageClaimsPageData(): Promise<{
         benefit,
         label: benefitLabelByCode.get(benefit) ?? `Benefit ${benefit}`,
         anniv: String(row.anniv),
+        fund: Number(row.fund) === 1 ? "1" : "0",
       };
     });
 

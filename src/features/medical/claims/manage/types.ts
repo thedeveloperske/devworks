@@ -133,6 +133,7 @@ export type ManageClaimsMemberBenefitOption = {
   benefit: string;
   label: string;
   anniv: string;
+  fund: string;
 };
 
 export type ManageClaimsBatchOption = {

@@ -61,6 +61,20 @@ function filterMatchingPreAuths(
   });
 }
 
+function resolveFundFromMemberBenefit(
+  memberBenefits: ManageClaimsMemberBenefitOption[],
+  anniv: string,
+  claimNature: string
+): string {
+  const annivKey = anniv.trim();
+  const benefitKey = claimNature.trim();
+  if (!annivKey || !benefitKey) return "0";
+  const match = memberBenefits.find(
+    (row) => row.anniv === annivKey && row.benefit === benefitKey
+  );
+  return match?.fund === "1" ? "1" : "0";
+}
+
 type ManageClaimsFormProps = {
   embedded?: boolean;
   claimId?: string;
@@ -235,14 +249,31 @@ export function ManageClaimsForm({
       const claimNatureStillValid = annivBenefits.some(
         (benefit) => benefit.benefit === prev.claimNature
       );
+      const nextClaimNature = claimNatureStillValid ? prev.claimNature : "";
       return {
         ...prev,
         anniv: nextAnniv,
-        claimNature: claimNatureStillValid ? prev.claimNature : "",
+        claimNature: nextClaimNature,
         preAuthNo: claimNatureStillValid ? prev.preAuthNo : "",
+        fund: resolveFundFromMemberBenefit(
+          memberBenefits,
+          nextAnniv,
+          nextClaimNature
+        ),
       };
     });
   }, [details.invoiceDate, memberAnniversaries, memberBenefits]);
+
+  useEffect(() => {
+    const nextFund = resolveFundFromMemberBenefit(
+      memberBenefits,
+      details.anniv,
+      details.claimNature
+    );
+    setDetails((prev) =>
+      prev.fund === nextFund ? prev : { ...prev, fund: nextFund }
+    );
+  }, [details.anniv, details.claimNature, memberBenefits]);
 
   useEffect(() => {
     if (!details.preAuthNo.trim()) return;
@@ -282,6 +313,11 @@ export function ManageClaimsForm({
           ...prev,
           claimNature: value,
           preAuthNo: "",
+          fund: resolveFundFromMemberBenefit(
+            memberBenefits,
+            prev.anniv,
+            value
+          ),
         };
       }
       return {
