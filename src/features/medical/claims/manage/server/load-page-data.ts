@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { loadBenefitOptions } from "@/features/medical/admin/benefits/server/load-page-data";
 import { loadProviderOptions } from "@/features/medical/admin/providers/server/load-page-data";
+import { loadServiceOptions } from "@/features/medical/admin/services/server/load-page-data";
 import type { LookupOption } from "@/features/medical/lookups/types";
 import { SESSION_COOKIE, verifySessionToken } from "@/lib/auth-session";
 import { prisma } from "@/lib/prisma";
@@ -41,6 +42,7 @@ async function resolveCurrentUsername(): Promise<string> {
 export async function loadManageClaimsPageData(): Promise<{
   providers: ManageClaimsProviderSummary[];
   providerOptions: LookupOption[];
+  serviceOptions: LookupOption[];
   corporates: ManageClaimsCorporateOption[];
   members: ManageClaimsMemberOption[];
   memberAnniversaries: ManageClaimsMemberAnniversary[];
@@ -52,6 +54,7 @@ export async function loadManageClaimsPageData(): Promise<{
 
   const [
     providerOptions,
+    serviceOptions,
     benefitOptions,
     claimCounts,
     corporates,
@@ -62,6 +65,7 @@ export async function loadManageClaimsPageData(): Promise<{
     preAuthRows,
   ] = await Promise.all([
     loadProviderOptions(),
+    loadServiceOptions(),
     loadBenefitOptions(),
     prisma.bill.groupBy({
       by: ["provider"],
@@ -257,6 +261,7 @@ export async function loadManageClaimsPageData(): Promise<{
   return {
     providers,
     providerOptions,
+    serviceOptions,
     corporates: corporateList,
     members,
     memberAnniversaries,

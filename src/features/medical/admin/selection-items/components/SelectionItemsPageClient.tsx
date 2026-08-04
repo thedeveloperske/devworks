@@ -85,7 +85,7 @@ const underwritingItems: SelectionItem[] = [
 
 const claimsItems: SelectionItem[] = [
   {
-    href: "/admin/medical/selection-items/service",
+    href: "/admin/medical/selection-items/service?manage=1",
     label: "Service",
     description: "Manage claim services",
     icon: Receipt,

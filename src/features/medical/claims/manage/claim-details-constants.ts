@@ -88,7 +88,7 @@ export const claimDetailsFields: ClaimDetailsField[] = [
     name: "service",
     label: "Service *",
     required: true,
-    type: "number",
+    as: "select",
     className: "sm:col-span-1",
   },
   {

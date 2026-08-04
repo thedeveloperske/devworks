@@ -19,6 +19,7 @@ type ClaimDetailsTabProps = {
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => void;
   providerOptions: LookupOption[];
+  serviceOptions: LookupOption[];
   claimNatureOptions: LookupOption[];
   batchNoOptions: LookupOption[];
   invoiceDateMin?: string;
@@ -31,6 +32,7 @@ export function ClaimDetailsTab({
   value,
   onChange,
   providerOptions,
+  serviceOptions,
   claimNatureOptions,
   batchNoOptions,
   invoiceDateMin = "",
@@ -68,7 +70,12 @@ export function ClaimDetailsTab({
                   { value: "", label: "Select provider" },
                   ...providerOptions,
                 ]
-              : field.name === "claimNature"
+              : field.name === "service"
+                ? [
+                    { value: "", label: "Select service" },
+                    ...serviceOptions,
+                  ]
+                : field.name === "claimNature"
                 ? [
                     {
                       value: "",

@@ -44,14 +44,14 @@ export function ClaimLineItemsTable({
   onRemoveRow,
 }: ClaimLineItemsTableProps) {
   return (
-    <section className="flex min-h-0 flex-col gap-1.5 border-t border-slate-200 pt-2">
+    <section className="flex min-h-0 flex-col gap-1.5">
       <div className="flex shrink-0 items-start justify-between gap-2">
         <div>
           <h3 className="text-[11px] font-bold uppercase text-slate-700">
-            Claim Line Items
+            Clinical Diagnosis
           </h3>
           <p className="text-[11px] text-slate-500">
-            Capture services and amounts for this claim
+            Capture clinical line items and amounts for this claim
           </p>
         </div>
         <Button type="button" size="sm" variant="secondary" onClick={onAddRow}>

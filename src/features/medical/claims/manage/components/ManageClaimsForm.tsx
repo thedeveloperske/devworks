@@ -34,6 +34,7 @@ import { AttachPreAuthModal } from "./AttachPreAuthModal";
 import { ViewPreAuthModal } from "./ViewPreAuthModal";
 import { ClaimDetailsTab } from "./tabs/ClaimDetailsTab";
 import { ClaimFormTab } from "./tabs/ClaimFormTab";
+import { ClinicalDiagnosisTab } from "./tabs/ClinicalDiagnosisTab";
 import { MemberClaimHistoryTab } from "./tabs/MemberClaimHistoryTab";
 
 function filterMatchingPreAuths(
@@ -71,6 +72,7 @@ type ManageClaimsFormProps = {
   entrantBatches?: ManageClaimsBatchOption[];
   memberPreAuths?: ManageClaimsPreAuthOption[];
   providerOptions?: LookupOption[];
+  serviceOptions?: LookupOption[];
   onCancel?: () => void;
   onSuccess?: () => void;
 };
@@ -86,6 +88,7 @@ export function ManageClaimsForm({
   entrantBatches = [],
   memberPreAuths = [],
   providerOptions = [],
+  serviceOptions = [],
   onCancel,
   onSuccess: _onSuccess,
 }: ManageClaimsFormProps) {
@@ -357,6 +360,7 @@ export function ManageClaimsForm({
             value={details}
             onChange={handleDetailsChange}
             providerOptions={providerOptions}
+            serviceOptions={serviceOptions}
             claimNatureOptions={claimNatureOptions}
             batchNoOptions={batchNoOptions}
             invoiceDateMin={invoiceDateBounds.min}
@@ -370,11 +374,16 @@ export function ManageClaimsForm({
           <ClaimFormTab
             value={claimForm}
             onChange={handleClaimFormChange}
+            invoiceDate={details.invoiceDate}
+          />
+        );
+      case "clinicalDiagnosis":
+        return (
+          <ClinicalDiagnosisTab
             lineItems={lineItems}
             onLineItemChange={handleLineItemChange}
             onAddLineItem={handleAddLineItem}
             onRemoveLineItem={handleRemoveLineItem}
-            invoiceDate={details.invoiceDate}
           />
         );
       case "memberClaimHistory":

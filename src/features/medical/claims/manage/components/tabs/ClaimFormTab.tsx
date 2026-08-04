@@ -4,12 +4,8 @@ import type { ChangeEvent } from "react";
 import { FormField } from "@/components/admin/FormField";
 import { Switch } from "@/components/admin/Switch";
 import { visibleClaimFormTabFields } from "@/features/medical/claims/manage/claim-form-constants";
-import type {
-  ClaimFormTabData,
-  ClaimLineItemFormData,
-} from "@/features/medical/claims/manage/types";
+import type { ClaimFormTabData } from "@/features/medical/claims/manage/types";
 import { inputClass, labelClass } from "@/lib/form-styles";
-import { ClaimLineItemsTable } from "./ClaimLineItemsTable";
 
 const datesOnOrAfterInvoice = new Set([
   "doctorDate",
@@ -22,23 +18,12 @@ type ClaimFormTabProps = {
   onChange: (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => void;
-  lineItems: ClaimLineItemFormData[];
-  onLineItemChange: (
-    index: number,
-    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => void;
-  onAddLineItem: () => void;
-  onRemoveLineItem: (index: number) => void;
   invoiceDate?: string;
 };
 
 export function ClaimFormTab({
   value,
   onChange,
-  lineItems,
-  onLineItemChange,
-  onAddLineItem,
-  onRemoveLineItem,
   invoiceDate = "",
 }: ClaimFormTabProps) {
   const invoiceDateMin = invoiceDate.trim();
@@ -89,13 +74,6 @@ export function ClaimFormTab({
           );
         })}
       </div>
-
-      <ClaimLineItemsTable
-        rows={lineItems}
-        onRowChange={onLineItemChange}
-        onAddRow={onAddLineItem}
-        onRemoveRow={onRemoveLineItem}
-      />
     </div>
   );
 }

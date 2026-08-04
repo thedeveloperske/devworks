@@ -42,6 +42,7 @@ const searchInputClass =
 type ManageClaimsPageClientProps = {
   providers?: ManageClaimsProviderSummary[];
   providerOptions?: LookupOption[];
+  serviceOptions?: LookupOption[];
   corporates?: ManageClaimsCorporateOption[];
   members?: ManageClaimsMemberOption[];
   memberAnniversaries?: ManageClaimsMemberAnniversary[];
@@ -53,6 +54,7 @@ type ManageClaimsPageClientProps = {
 export function ManageClaimsPageClient({
   providers = [],
   providerOptions = [],
+  serviceOptions = [],
   corporates = [],
   members = [],
   memberAnniversaries = [],
@@ -390,6 +392,7 @@ export function ManageClaimsPageClient({
         memberBenefits={selectedMemberBenefits}
         entrantBatches={entrantBatches}
         memberPreAuths={selectedMemberPreAuths}
+        serviceOptions={serviceOptions}
         initialDetails={{
           memberNo: selectedMember.memberNo,
           corpId: selectedMember.corpId,
@@ -478,6 +481,7 @@ export function ManageClaimsPageClient({
             embedded
             claimId={editId}
             providerOptions={providerOptions}
+            serviceOptions={serviceOptions}
             onSuccess={handleSaved}
             onCancel={closeClaimModal}
           />

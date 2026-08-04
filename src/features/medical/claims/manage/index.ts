@@ -4,6 +4,7 @@ export { AttachPreAuthModal } from "./components/AttachPreAuthModal";
 export { ViewPreAuthModal } from "./components/ViewPreAuthModal";
 export { ClaimDetailsTab } from "./components/tabs/ClaimDetailsTab";
 export { ClaimFormTab } from "./components/tabs/ClaimFormTab";
+export { ClinicalDiagnosisTab } from "./components/tabs/ClinicalDiagnosisTab";
 export { MemberClaimHistoryTab } from "./components/tabs/MemberClaimHistoryTab";
 export {
   defaultClaimDetailsForm,

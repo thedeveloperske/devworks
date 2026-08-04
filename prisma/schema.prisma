@@ -773,3 +773,10 @@ model THospitalWard {
 
   @@map("t_hospital_ward")
 }
+
+model Service {
+  code    Int    @id
+  service String @db.VarChar(100)
+
+  @@map("service")
+}

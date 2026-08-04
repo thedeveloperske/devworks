@@ -6,6 +6,7 @@ async function ManageClaimsContent() {
   const {
     providers,
     providerOptions,
+    serviceOptions,
     corporates,
     members,
     memberAnniversaries,
@@ -17,6 +18,7 @@ async function ManageClaimsContent() {
     <ManageClaimsPageClient
       providers={providers}
       providerOptions={providerOptions}
+      serviceOptions={serviceOptions}
       corporates={corporates}
       members={members}
       memberAnniversaries={memberAnniversaries}
