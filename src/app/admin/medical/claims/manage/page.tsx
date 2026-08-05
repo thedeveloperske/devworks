@@ -4,7 +4,6 @@ import { loadManageClaimsPageData } from "@/features/medical/claims/manage/serve
 
 async function ManageClaimsContent() {
   const {
-    providers,
     providerOptions,
     serviceOptions,
     corporates,
@@ -16,7 +15,6 @@ async function ManageClaimsContent() {
   } = await loadManageClaimsPageData();
   return (
     <ManageClaimsPageClient
-      providers={providers}
       providerOptions={providerOptions}
       serviceOptions={serviceOptions}
       corporates={corporates}

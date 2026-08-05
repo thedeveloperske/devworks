@@ -47,5 +47,4 @@ export type {
   ManageClaimsMemberBenefitOption,
   ManageClaimsMemberOption,
   ManageClaimsPreAuthOption,
-  ManageClaimsProviderSummary,
 } from "./types";

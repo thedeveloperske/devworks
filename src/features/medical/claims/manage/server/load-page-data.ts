@@ -12,7 +12,6 @@ import type {
   ManageClaimsMemberBenefitOption,
   ManageClaimsMemberOption,
   ManageClaimsPreAuthOption,
-  ManageClaimsProviderSummary,
 } from "../types";
 
 function formatDateValue(value: Date | null | undefined): string {
@@ -51,7 +50,6 @@ async function resolveCurrentUsername(): Promise<string> {
 }
 
 export async function loadManageClaimsPageData(): Promise<{
-  providers: ManageClaimsProviderSummary[];
   providerOptions: LookupOption[];
   serviceOptions: LookupOption[];
   corporates: ManageClaimsCorporateOption[];
@@ -67,7 +65,6 @@ export async function loadManageClaimsPageData(): Promise<{
     providerOptions,
     serviceOptions,
     benefitOptions,
-    claimCounts,
     corporates,
     memberInfos,
     principalApplicants,
@@ -79,10 +76,6 @@ export async function loadManageClaimsPageData(): Promise<{
     loadProviderOptions(),
     loadServiceOptions(),
     loadBenefitOptions(),
-    prisma.bill.groupBy({
-      by: ["provider"],
-      _count: { _all: true },
-    }),
     prisma.corporate.findMany({
       select: { id: true, corporate: true, corpId: true, policyNo: true },
       orderBy: { corporate: "asc" },
@@ -155,24 +148,9 @@ export async function loadManageClaimsPageData(): Promise<{
     }),
   ]);
 
-  const countByProvider = new Map(
-    claimCounts.map((row) => [String(row.provider), row._count._all])
-  );
-
   const benefitLabelByCode = new Map(
     benefitOptions.map((option) => [option.value, option.label])
   );
-
-  const providers: ManageClaimsProviderSummary[] = providerOptions
-    .map((option) => ({
-      providerCode: option.value,
-      providerName: option.label,
-      claimsCount: countByProvider.get(option.value) ?? 0,
-    }))
-    .sort((a, b) => {
-      if (b.claimsCount !== a.claimsCount) return b.claimsCount - a.claimsCount;
-      return a.providerName.localeCompare(b.providerName);
-    });
 
   const corporateList: ManageClaimsCorporateOption[] = corporates.map(
     (corporate) => ({
@@ -286,7 +264,6 @@ export async function loadManageClaimsPageData(): Promise<{
   }));
 
   return {
-    providers,
     providerOptions,
     serviceOptions,
     corporates: corporateList,

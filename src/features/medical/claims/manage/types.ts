@@ -112,12 +112,6 @@ export type ManageClaimsListItem = {
   claimDate: string;
 };
 
-export type ManageClaimsProviderSummary = {
-  providerCode: string;
-  providerName: string;
-  claimsCount: number;
-};
-
 export type ManageClaimsCorporateOption = {
   id: string;
   corporate: string;

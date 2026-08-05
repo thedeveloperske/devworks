@@ -12,7 +12,6 @@ import type {
   ManageClaimsMemberBenefitOption,
   ManageClaimsMemberOption,
   ManageClaimsPreAuthOption,
-  ManageClaimsProviderSummary,
 } from "@/features/medical/claims/manage/types";
 import type { LookupOption } from "@/features/medical/lookups/types";
 import {
@@ -22,14 +21,6 @@ import {
 } from "@/lib/form-styles";
 import { ManageClaimsForm } from "./ManageClaimsForm";
 
-const tableBodyMaxHeight = 280;
-const tableMinWidth = 480;
-const thClass =
-  "whitespace-nowrap border-b border-slate-200 px-2 py-1.5 text-left text-[11px] font-bold uppercase tracking-wider text-slate-500";
-const tdClass =
-  "border-b border-slate-200 px-2 py-1.5 align-middle text-[11px] text-slate-600";
-const emptyCellClass =
-  "border-b border-slate-200 px-2 py-4 text-center text-[11px] text-slate-500";
 const compactThClass =
   "whitespace-nowrap px-2.5 py-1.5 text-[11px] font-bold uppercase tracking-wide text-slate-500";
 const compactTdClass =
@@ -40,7 +31,6 @@ const searchInputClass =
   "w-44 border border-slate-300 bg-white px-2 py-1 text-[11px] text-slate-900 placeholder:text-slate-400 focus:border-maroon focus:outline-none";
 
 type ManageClaimsPageClientProps = {
-  providers?: ManageClaimsProviderSummary[];
   providerOptions?: LookupOption[];
   serviceOptions?: LookupOption[];
   corporates?: ManageClaimsCorporateOption[];
@@ -52,7 +42,6 @@ type ManageClaimsPageClientProps = {
 };
 
 export function ManageClaimsPageClient({
-  providers = [],
   providerOptions = [],
   serviceOptions = [],
   corporates = [],
@@ -71,7 +60,6 @@ export function ManageClaimsPageClient({
   const selectedCorporateId = searchParams.get("corporate") ?? "";
   const selectedMemberNo = searchParams.get("member") ?? "";
   const claimModalOpen = isNew || Boolean(editId);
-  const [searchQuery, setSearchQuery] = useState("");
   const [corporateSearchQuery, setCorporateSearchQuery] = useState("");
   const [memberSearchQuery, setMemberSearchQuery] = useState("");
   const modalOpen = manageOpen || claimModalOpen;
@@ -111,17 +99,6 @@ export function ManageClaimsPageClient({
     }
     return counts;
   }, [members]);
-
-  const filteredProviders = useMemo(() => {
-    const query = searchQuery.trim().toLowerCase();
-    if (!query) return providers;
-
-    return providers.filter((provider) =>
-      [provider.providerName, provider.providerCode, String(provider.claimsCount)]
-        .filter(Boolean)
-        .some((value) => String(value).toLowerCase().includes(query))
-    );
-  }, [providers, searchQuery]);
 
   const filteredCorporates = useMemo(() => {
     const query = corporateSearchQuery.trim().toLowerCase();
@@ -213,54 +190,6 @@ export function ManageClaimsPageClient({
     if (searchParams.get("manage") === "1") return;
     router.replace(`${pathname}?manage=1`, { scroll: false });
   }, [pathname, router, searchParams]);
-
-  const providersTable = (
-    <div
-      className="min-h-0 overflow-x-auto overflow-y-scroll border border-slate-200"
-      style={{ height: tableBodyMaxHeight }}
-    >
-      <table
-        className="w-full border-collapse"
-        style={{ minWidth: tableMinWidth }}
-      >
-        <thead className="sticky top-0 z-10 bg-slate-50">
-          <tr>
-            <th className={thClass}>Provider</th>
-            <th className={`${thClass} text-right`}>Claims</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredProviders.length === 0 ? (
-            <tr>
-              <td colSpan={2} className={emptyCellClass}>
-                {providers.length === 0
-                  ? "No providers found."
-                  : "No providers match your search."}
-              </td>
-            </tr>
-          ) : (
-            filteredProviders.map((provider) => (
-              <tr
-                key={provider.providerCode}
-                className="bg-white hover:bg-slate-50"
-              >
-                <td className={tdClass}>
-                  <span className="font-semibold text-slate-900">
-                    {provider.providerName}
-                  </span>
-                </td>
-                <td
-                  className={`${tdClass} text-right font-semibold text-slate-900`}
-                >
-                  {provider.claimsCount}
-                </td>
-              </tr>
-            ))
-          )}
-        </tbody>
-      </table>
-    </div>
-  );
 
   const corporatesStep = (
     <div className="flex min-h-0 flex-1 flex-col gap-3">
@@ -437,26 +366,74 @@ export function ManageClaimsPageClient({
       </div>
 
       <Modal
-        open={manageOpen}
+        open={manageOpen && !claimModalOpen}
         onClose={closeManageModal}
         title="Manage Claims"
-        description="Providers and their claim counts"
+        description="Select a corporate to add a claim, or use Add Claim"
       >
         <div className="flex min-h-0 flex-1 flex-col gap-3">
           <div className="flex shrink-0 items-center justify-end gap-2">
             <input
               type="search"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search providers..."
-              aria-label="Search providers"
+              value={corporateSearchQuery}
+              onChange={(e) => setCorporateSearchQuery(e.target.value)}
+              placeholder="Search corporates..."
+              aria-label="Search corporates"
               className={searchInputClass}
             />
             <Button type="button" size="sm" onClick={openNewModal}>
               Add Claim
             </Button>
           </div>
-          {providersTable}
+          <div className={`${tableWrapperClass} min-h-0 flex-1 overflow-auto`}>
+            <table className={tableClass}>
+              <thead className={tableHeadClass}>
+                <tr>
+                  <th className={compactThClass}>Corporate</th>
+                  <th className={compactThClass}>Corp ID</th>
+                  <th className={compactThClass}>Policy No</th>
+                  <th className={compactThClass}>Members</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-200">
+                {filteredCorporates.length === 0 ? (
+                  <tr>
+                    <td colSpan={4} className={compactEmptyCellClass}>
+                      {corporates.length === 0
+                        ? "No corporates found."
+                        : "No corporates match your search."}
+                    </td>
+                  </tr>
+                ) : (
+                  filteredCorporates.map((corporate) => (
+                    <tr
+                      key={corporate.id}
+                      className="transition-colors hover:bg-slate-50"
+                    >
+                      <td className={compactTdClass}>
+                        <button
+                          type="button"
+                          onClick={() => openMembersStep(corporate.id)}
+                          className="text-left font-semibold text-maroon hover:underline"
+                        >
+                          {corporate.corporate}
+                        </button>
+                      </td>
+                      <td className={compactTdClass}>
+                        {corporate.corpId ?? "—"}
+                      </td>
+                      <td className={compactTdClass}>
+                        {corporate.policyNo ?? "—"}
+                      </td>
+                      <td className={compactTdClass}>
+                        {memberCountByCorporateId[corporate.id] ?? 0}
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </Modal>
 
