@@ -20,6 +20,17 @@ function formatDateValue(value: Date | null | undefined): string {
   return value.toISOString().slice(0, 10);
 }
 
+/** Normalize corp ids so "0002" and "2" resolve to the same corporate. */
+function normalizeCorpId(value: string | null | undefined): string {
+  const trimmed = value?.trim() ?? "";
+  if (!trimmed) return "";
+  if (/^\d+$/.test(trimmed)) {
+    const normalized = String(Number.parseInt(trimmed, 10));
+    return Number.isNaN(Number(normalized)) ? trimmed : normalized;
+  }
+  return trimmed;
+}
+
 async function resolveCurrentUsername(): Promise<string> {
   const cookieStore = await cookies();
   const session = await verifySessionToken(
@@ -59,6 +70,7 @@ export async function loadManageClaimsPageData(): Promise<{
     claimCounts,
     corporates,
     memberInfos,
+    principalApplicants,
     anniversaries,
     memberBenefitRows,
     entrantBatchRows,
@@ -86,6 +98,9 @@ export async function loadManageClaimsPageData(): Promise<{
         cancelled: true,
       },
       orderBy: [{ familyNo: "asc" }, { memberNo: "asc" }],
+    }),
+    prisma.principalApplicant.findMany({
+      select: { familyNo: true, corpId: true },
     }),
     prisma.memberAnniversary.findMany({
       select: {
@@ -168,23 +183,33 @@ export async function loadManageClaimsPageData(): Promise<{
     })
   );
 
-  const corporateByCorpId = new Map(
-    corporates
-      .filter((corporate) => Boolean(corporate.corpId))
-      .map((corporate) => [corporate.corpId!, corporate])
-  );
+  const corporateByCorpId = new Map<
+    string,
+    (typeof corporates)[number]
+  >();
+  for (const corporate of corporates) {
+    const key = normalizeCorpId(corporate.corpId);
+    if (!key || corporateByCorpId.has(key)) continue;
+    corporateByCorpId.set(key, corporate);
+  }
 
   const corpIdByFamilyNo = new Map<string, string>();
   for (const info of memberInfos) {
-    const corpId = info.corpId?.trim();
+    const corpId = normalizeCorpId(info.corpId);
     if (corpId && info.familyNo && !corpIdByFamilyNo.has(info.familyNo)) {
       corpIdByFamilyNo.set(info.familyNo, corpId);
+    }
+  }
+  for (const principal of principalApplicants) {
+    const corpId = normalizeCorpId(principal.corpId);
+    if (corpId && principal.familyNo && !corpIdByFamilyNo.has(principal.familyNo)) {
+      corpIdByFamilyNo.set(principal.familyNo, corpId);
     }
   }
 
   const members: ManageClaimsMemberOption[] = memberInfos.map((info) => {
     const corpId =
-      info.corpId?.trim() ||
+      normalizeCorpId(info.corpId) ||
       (info.familyNo ? corpIdByFamilyNo.get(info.familyNo) : undefined) ||
       "";
     const corporate = corpId ? corporateByCorpId.get(corpId) : undefined;
@@ -199,7 +224,7 @@ export async function loadManageClaimsPageData(): Promise<{
           .filter(Boolean)
           .join(" ") || "—",
       corporateId: corporate?.id ?? "",
-      corpId,
+      corpId: corporate?.corpId ?? corpId,
       memberType: isPrincipal ? "Principal" : "Dependant",
       cancelled: info.cancelled,
     };
