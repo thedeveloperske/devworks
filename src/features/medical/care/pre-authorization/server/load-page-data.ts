@@ -23,6 +23,16 @@ function formatAmountString(
   return formatThousands(String(value));
 }
 
+/** Normalize corp ids so "0002" and "2" resolve to the same corporate. */
+function normalizeCorpId(value: string | null | undefined): string {
+  const trimmed = value?.trim() ?? "";
+  if (!trimmed) return "";
+  if (/^\d+$/.test(trimmed)) {
+    return String(Number.parseInt(trimmed, 10));
+  }
+  return trimmed;
+}
+
 export async function loadPreAuthorizationPageData() {
   const [
     rows,
@@ -31,6 +41,7 @@ export async function loadPreAuthorizationPageData() {
     benefitOptions,
     corporates,
     memberInfos,
+    principalApplicants,
     anniversaries,
     memberBenefits,
   ] = await Promise.all([
@@ -55,6 +66,9 @@ export async function loadPreAuthorizationPageData() {
         cancelled: true,
       },
       orderBy: [{ familyNo: "asc" }, { memberNo: "asc" }],
+    }),
+    prisma.principalApplicant.findMany({
+      select: { familyNo: true, corpId: true },
     }),
     prisma.memberAnniversary.findMany({
       select: {
@@ -122,11 +136,15 @@ export async function loadPreAuthorizationPageData() {
     })
   );
 
-  const corporateByCorpId = new Map(
-    corporates
-      .filter((corporate) => Boolean(corporate.corpId))
-      .map((corporate) => [corporate.corpId!, corporate])
-  );
+  const corporateByCorpId = new Map<
+    string,
+    (typeof corporates)[number]
+  >();
+  for (const corporate of corporates) {
+    const key = normalizeCorpId(corporate.corpId);
+    if (!key || corporateByCorpId.has(key)) continue;
+    corporateByCorpId.set(key, corporate);
+  }
 
   const latestAnnivByMemberNo = new Map<string, string>();
   const coverPeriodsByMemberNo = new Map<
@@ -204,18 +222,24 @@ export async function loadPreAuthorizationPageData() {
     benefitsByMemberNo.set(row.memberNo, list);
   }
 
-  // Dependants may miss corp_id; fall back to the family's principal corp.
+  // Dependants may miss corp_id; fall back to family / principal applicant corp.
   const corpIdByFamilyNo = new Map<string, string>();
   for (const info of memberInfos) {
-    const corpId = info.corpId?.trim();
+    const corpId = normalizeCorpId(info.corpId);
     if (corpId && info.familyNo && !corpIdByFamilyNo.has(info.familyNo)) {
       corpIdByFamilyNo.set(info.familyNo, corpId);
+    }
+  }
+  for (const principal of principalApplicants) {
+    const corpId = normalizeCorpId(principal.corpId);
+    if (corpId && principal.familyNo && !corpIdByFamilyNo.has(principal.familyNo)) {
+      corpIdByFamilyNo.set(principal.familyNo, corpId);
     }
   }
 
   const members: PreAuthorizationMemberOption[] = memberInfos.map((info) => {
     const corpId =
-      info.corpId?.trim() ||
+      normalizeCorpId(info.corpId) ||
       (info.familyNo ? corpIdByFamilyNo.get(info.familyNo) : undefined) ||
       "";
     const corporate = corpId ? corporateByCorpId.get(corpId) : undefined;
@@ -230,7 +254,7 @@ export async function loadPreAuthorizationPageData() {
           .filter(Boolean)
           .join(" ") || "—",
       corporateId: corporate?.id ?? "",
-      corpId,
+      corpId: corporate?.corpId ?? corpId,
       memberType: isPrincipal ? "Principal" : "Dependant",
       anniv: latestAnnivByMemberNo.get(info.memberNo) ?? "",
       cancelled: info.cancelled,

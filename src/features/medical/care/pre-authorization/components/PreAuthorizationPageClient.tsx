@@ -155,11 +155,13 @@ export function PreAuthorizationPageClient({
 
   const corporateMembers = useMemo(() => {
     if (!selectedCorporateId) return [];
-    return members.filter(
-      (member) =>
-        member.corporateId === selectedCorporateId && member.cancelled !== 1
-    );
-  }, [members, selectedCorporateId]);
+    const selectedCorpId = selectedCorporate?.corpId?.trim() ?? "";
+    return members.filter((member) => {
+      if (member.corporateId === selectedCorporateId) return true;
+      if (selectedCorpId && member.corpId.trim() === selectedCorpId) return true;
+      return false;
+    });
+  }, [members, selectedCorporate?.corpId, selectedCorporateId]);
 
   const filteredMembers = useMemo(() => {
     const query = memberSearchQuery.trim().toLowerCase();
