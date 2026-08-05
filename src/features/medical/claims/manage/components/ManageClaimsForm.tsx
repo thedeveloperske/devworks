@@ -9,6 +9,7 @@ import {
 } from "react";
 import { Button } from "@/components/admin/Button";
 import { defaultClaimDetailsForm } from "@/features/medical/claims/manage/claim-details-constants";
+import { defaultClaimDiagnosis } from "@/features/medical/claims/manage/claim-diagnosis-constants";
 import { defaultClaimFormTab } from "@/features/medical/claims/manage/claim-form-constants";
 import { defaultClaimLineItem } from "@/features/medical/claims/manage/claim-line-item-constants";
 import {
@@ -18,6 +19,7 @@ import {
 } from "@/features/medical/claims/manage/constants";
 import type {
   ClaimDetailsFormData,
+  ClaimDiagnosisFormData,
   ClaimFormTabData,
   ClaimLineItemFormData,
   ManageClaimsBatchOption,
@@ -81,6 +83,7 @@ type ManageClaimsFormProps = {
   initialDetails?: Partial<ClaimDetailsFormData>;
   initialClaimForm?: Partial<ClaimFormTabData>;
   initialLineItems?: ClaimLineItemFormData[];
+  initialDiagnoses?: ClaimDiagnosisFormData[];
   memberAnniversaries?: ManageClaimsMemberAnniversary[];
   memberBenefits?: ManageClaimsMemberBenefitOption[];
   entrantBatches?: ManageClaimsBatchOption[];
@@ -97,6 +100,7 @@ export function ManageClaimsForm({
   initialDetails,
   initialClaimForm,
   initialLineItems,
+  initialDiagnoses,
   memberAnniversaries = [],
   memberBenefits = [],
   entrantBatches = [],
@@ -119,6 +123,14 @@ export function ManageClaimsForm({
   });
   const [lineItems, setLineItems] = useState<ClaimLineItemFormData[]>(
     initialLineItems ?? [defaultClaimLineItem()]
+  );
+  const [diagnoses, setDiagnoses] = useState<ClaimDiagnosisFormData[]>(
+    initialDiagnoses ?? [
+      defaultClaimDiagnosis({
+        claimNo: initialDetails?.claimNo ?? defaultClaimDetailsForm.claimNo,
+        memberNo: initialDetails?.memberNo ?? defaultClaimDetailsForm.memberNo,
+      }),
+    ]
   );
   const [preAuthModalOpen, setPreAuthModalOpen] = useState(false);
   const [viewPreAuthCode, setViewPreAuthCode] = useState<string | null>(null);
@@ -276,6 +288,21 @@ export function ManageClaimsForm({
   }, [details.anniv, details.claimNature, memberBenefits]);
 
   useEffect(() => {
+    const claimNo = details.claimNo.trim();
+    const memberNo = details.memberNo.trim();
+    setDiagnoses((prev) => {
+      if (prev.length === 0) return prev;
+      let changed = false;
+      const next = prev.map((row) => {
+        if (row.claimNo === claimNo && row.memberNo === memberNo) return row;
+        changed = true;
+        return { ...row, claimNo, memberNo };
+      });
+      return changed ? next : prev;
+    });
+  }, [details.claimNo, details.memberNo]);
+
+  useEffect(() => {
     if (!details.preAuthNo.trim()) return;
     const stillValid = matchingPreAuths.some(
       (row) => row.code === details.preAuthNo.trim()
@@ -383,6 +410,33 @@ export function ManageClaimsForm({
     setLineItems((prev) => prev.filter((_, rowIndex) => rowIndex !== index));
   };
 
+  const handleDiagnosisChange = (
+    index: number,
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    if (name === "claimNo" || name === "memberNo") return;
+    setDiagnoses((prev) =>
+      prev.map((row, rowIndex) =>
+        rowIndex === index ? { ...row, [name]: value } : row
+      )
+    );
+  };
+
+  const handleAddDiagnosis = () => {
+    setDiagnoses((prev) => [
+      ...prev,
+      defaultClaimDiagnosis({
+        claimNo: details.claimNo,
+        memberNo: details.memberNo,
+      }),
+    ]);
+  };
+
+  const handleRemoveDiagnosis = (index: number) => {
+    setDiagnoses((prev) => prev.filter((_, rowIndex) => rowIndex !== index));
+  };
+
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     // Save wiring comes once remaining tabs and API are ready.
@@ -411,6 +465,10 @@ export function ManageClaimsForm({
             value={claimForm}
             onChange={handleClaimFormChange}
             invoiceDate={details.invoiceDate}
+            diagnoses={diagnoses}
+            onDiagnosisChange={handleDiagnosisChange}
+            onAddDiagnosis={handleAddDiagnosis}
+            onRemoveDiagnosis={handleRemoveDiagnosis}
           />
         );
       case "clinicalDiagnosis":

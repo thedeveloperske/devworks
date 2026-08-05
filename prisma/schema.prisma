@@ -780,3 +780,12 @@ model Service {
 
   @@map("service")
 }
+
+model MemberDiagnosis {
+  id         Int     @id @default(autoincrement())
+  claimNo    String  @map("claim_no") @db.VarChar(20)
+  memberNo   String  @map("member_no") @db.VarChar(20)
+  diagnosis  Decimal @db.Decimal(5, 0)
+
+  @@map("member_diagnosis")
+}

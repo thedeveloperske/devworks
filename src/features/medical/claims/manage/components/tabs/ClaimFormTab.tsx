@@ -4,8 +4,12 @@ import type { ChangeEvent } from "react";
 import { FormField } from "@/components/admin/FormField";
 import { Switch } from "@/components/admin/Switch";
 import { visibleClaimFormTabFields } from "@/features/medical/claims/manage/claim-form-constants";
-import type { ClaimFormTabData } from "@/features/medical/claims/manage/types";
+import type {
+  ClaimDiagnosisFormData,
+  ClaimFormTabData,
+} from "@/features/medical/claims/manage/types";
 import { inputClass, labelClass } from "@/lib/form-styles";
+import { ClaimDiagnosisTable } from "./ClaimDiagnosisTable";
 
 const datesOnOrAfterInvoice = new Set([
   "doctorDate",
@@ -19,12 +23,23 @@ type ClaimFormTabProps = {
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => void;
   invoiceDate?: string;
+  diagnoses: ClaimDiagnosisFormData[];
+  onDiagnosisChange: (
+    index: number,
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => void;
+  onAddDiagnosis: () => void;
+  onRemoveDiagnosis: (index: number) => void;
 };
 
 export function ClaimFormTab({
   value,
   onChange,
   invoiceDate = "",
+  diagnoses,
+  onDiagnosisChange,
+  onAddDiagnosis,
+  onRemoveDiagnosis,
 }: ClaimFormTabProps) {
   const invoiceDateMin = invoiceDate.trim();
 
@@ -74,6 +89,13 @@ export function ClaimFormTab({
           );
         })}
       </div>
+
+      <ClaimDiagnosisTable
+        rows={diagnoses}
+        onRowChange={onDiagnosisChange}
+        onAddRow={onAddDiagnosis}
+        onRemoveRow={onRemoveDiagnosis}
+      />
     </div>
   );
 }

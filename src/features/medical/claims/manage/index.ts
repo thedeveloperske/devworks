@@ -18,6 +18,10 @@ export {
   visibleClaimFormTabFields,
 } from "./claim-form-constants";
 export {
+  defaultClaimDiagnosis,
+  claimDiagnosisFields,
+} from "./claim-diagnosis-constants";
+export {
   defaultClaimLineItem,
   claimLineItemFields,
 } from "./claim-line-item-constants";
@@ -30,6 +34,8 @@ export {
 export type {
   ClaimDetailsField,
   ClaimDetailsFormData,
+  ClaimDiagnosisField,
+  ClaimDiagnosisFormData,
   ClaimFormTabData,
   ClaimFormTabField,
   ClaimLineItemField,

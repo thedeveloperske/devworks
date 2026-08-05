@@ -89,6 +89,20 @@ export type ClaimLineItemField = {
   required?: boolean;
 };
 
+export type ClaimDiagnosisFormData = {
+  claimNo: string;
+  memberNo: string;
+  diagnosis: string;
+};
+
+export type ClaimDiagnosisField = {
+  name: keyof ClaimDiagnosisFormData;
+  label: string;
+  type?: "text" | "number";
+  required?: boolean;
+  readOnly?: boolean;
+};
+
 export type ManageClaimsListItem = {
   id: string;
   claimNo: string;
