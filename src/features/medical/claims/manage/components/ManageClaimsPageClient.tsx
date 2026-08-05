@@ -106,7 +106,7 @@ export function ManageClaimsPageClient({
   const memberCountByCorporateId = useMemo(() => {
     const counts: Record<string, number> = {};
     for (const member of members) {
-      if (!member.corporateId || member.cancelled === 1) continue;
+      if (!member.corporateId) continue;
       counts[member.corporateId] = (counts[member.corporateId] ?? 0) + 1;
     }
     return counts;
@@ -136,8 +136,7 @@ export function ManageClaimsPageClient({
   const corporateMembers = useMemo(() => {
     if (!selectedCorporateId) return [];
     return members.filter(
-      (member) =>
-        member.corporateId === selectedCorporateId && member.cancelled !== 1
+      (member) => member.corporateId === selectedCorporateId
     );
   }, [members, selectedCorporateId]);
 
