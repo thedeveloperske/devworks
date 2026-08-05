@@ -1,7 +1,6 @@
 "use client";
 
 import type { ChangeEvent } from "react";
-import { Fragment } from "react";
 import { FormField } from "@/components/admin/FormField";
 import { Switch } from "@/components/admin/Switch";
 import {
@@ -62,8 +61,11 @@ export function ClaimDetailsTab({
 
   return (
     <div className="min-h-0 flex-1 overflow-y-auto">
-      <div className="grid grid-cols-1 gap-2 sm:grid-cols-6">
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
         {visibleClaimDetailsFields.map((field) => {
+          // Fund is rendered beside Anniv in one column.
+          if (field.name === "fund") return null;
+
           const options =
             field.name === "provider"
               ? [
@@ -130,12 +132,44 @@ export function ClaimDetailsTab({
               ? invoiceDateMax || undefined
               : undefined;
 
+          if (field.name === "anniv") {
+            return (
+              <div
+                key="anniv-fund"
+                className="grid grid-cols-2 gap-2 sm:col-span-1"
+              >
+                <FormField
+                  id="claim-details-anniv"
+                  name="anniv"
+                  label="Anniv"
+                  value={value.anniv}
+                  onChange={handleChange}
+                  type="number"
+                  disabled
+                  labelClassName={labelClass}
+                  inputClassName={inputClass}
+                />
+                <div className="flex flex-col justify-end">
+                  <Switch
+                    id="claim-details-fund"
+                    name="fund"
+                    label="Fund"
+                    checked={value.fund === "1"}
+                    onChange={handleChange}
+                    disabled
+                    labelClassName={labelClass}
+                  />
+                </div>
+              </div>
+            );
+          }
+
           if (field.name === "preAuthNo") {
             const attached = value.preAuthNo.trim();
             return (
               <div
                 key={field.name}
-                className={field.className ?? "sm:col-span-2"}
+                className={field.className ?? "sm:col-span-1"}
               >
                 <span className={labelClass}>{field.label}</span>
                 {onManagePreAuth ? (
@@ -168,8 +202,8 @@ export function ClaimDetailsTab({
             );
           }
 
-          const fieldCell = (
-            <div key={field.name} className={field.className ?? "sm:col-span-2"}>
+          return (
+            <div key={field.name} className={field.className ?? "sm:col-span-1"}>
               {field.as === "switch" ? (
                 <Switch
                   id={`claim-details-${field.name}`}
@@ -189,7 +223,11 @@ export function ClaimDetailsTab({
                   onChange={handleChange}
                   required={field.required}
                   type={field.type ?? "text"}
-                  as={field.as === "select" || field.as === "textarea" ? field.as : "input"}
+                  as={
+                    field.as === "select" || field.as === "textarea"
+                      ? field.as
+                      : "input"
+                  }
                   rows={field.rows}
                   options={options}
                   disabled={disabled}
@@ -201,18 +239,6 @@ export function ClaimDetailsTab({
               )}
             </div>
           );
-
-          if (field.name === "refund") {
-            return (
-              <Fragment key={field.name}>
-                {fieldCell}
-                {/* Former Fund slot — leave blank */}
-                <div className="hidden sm:col-span-1 sm:block" aria-hidden />
-              </Fragment>
-            );
-          }
-
-          return fieldCell;
         })}
       </div>
     </div>
