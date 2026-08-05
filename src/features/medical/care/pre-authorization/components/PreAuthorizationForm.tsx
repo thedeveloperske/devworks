@@ -9,7 +9,7 @@ import {
   defaultPreAuthorizationForm,
   getDateReportedCoverPeriodError,
   getPreAuthorizationFields,
-  preAuthorizationFormSections,
+  preAuthorizationFieldNames,
   type PreAuthorizationField,
   type PreAuthorizationFormData,
   type PreAuthorizationMemberBenefitOption,
@@ -192,9 +192,7 @@ export function PreAuthorizationForm({
     ? "flex h-full min-h-0 flex-col"
     : "w-full space-y-6 border border-slate-200 bg-white p-6";
 
-  const fieldGrid = embedded
-    ? "grid grid-cols-1 gap-2 sm:grid-cols-3"
-    : "grid grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-3";
+  const fieldGrid = "grid grid-cols-1 gap-2 sm:grid-cols-3";
 
   const fieldLabelClass = embedded
     ? "mb-0.5 block text-[11px] font-medium text-slate-700"
@@ -225,7 +223,10 @@ export function PreAuthorizationForm({
           : undefined;
 
     return (
-      <div key={field.name} className={`min-w-0 ${field.className ?? ""}`}>
+      <div
+        key={field.name}
+        className={`min-w-0 ${field.className ?? "sm:col-span-1"}`}
+      >
         <FormField
           id={field.name}
           name={field.name}
@@ -307,12 +308,16 @@ export function PreAuthorizationForm({
 
   const readOnlyValueClass = `${fieldInputClass} cursor-not-allowed bg-slate-50 text-right text-slate-600`;
 
-  const utilisationSection = (
-    <section className="min-w-0 space-y-1.5">
-      <h3 className="border-b border-slate-200 pb-1 text-[11px] font-bold uppercase tracking-wide text-slate-500">
-        Utilisation
-      </h3>
+  const captureFields = getPreAuthorizationFields(
+    preAuthorizationFieldNames.filter((name) => name !== "notes")
+  );
+  const notesField = getPreAuthorizationFields(["notes"])[0];
+
+  const formBody = (
+    <>
+      <FormError message={error} />
       <div className={fieldGrid}>
+        {captureFields.map(renderField)}
         {(
           [
             { key: "limit", label: "Limit", value: utilisationValues.limit },
@@ -342,31 +347,7 @@ export function PreAuthorizationForm({
             />
           </div>
         ))}
-      </div>
-    </section>
-  );
-
-  const formBody = (
-    <>
-      <FormError message={error} />
-      <div className="space-y-4">
-        {preAuthorizationFormSections.map((section) => {
-          const fields = getPreAuthorizationFields(section.fields);
-          if (fields.length === 0) return null;
-          return (
-            <div key={section.title} className="space-y-4">
-              <section className="min-w-0 space-y-1.5">
-                <h3 className="border-b border-slate-200 pb-1 text-[11px] font-bold uppercase tracking-wide text-slate-500">
-                  {section.title}
-                </h3>
-                <div className={fieldGrid}>{fields.map(renderField)}</div>
-              </section>
-              {section.title === "Clinical" && !readOnly
-                ? utilisationSection
-                : null}
-            </div>
-          );
-        })}
+        {notesField ? renderField(notesField) : null}
       </div>
     </>
   );
