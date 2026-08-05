@@ -8,6 +8,7 @@ import { prisma } from "@/lib/prisma";
 import type {
   ManageClaimsBatchOption,
   ManageClaimsCorporateOption,
+  ManageClaimsHistoryItem,
   ManageClaimsMemberAnniversary,
   ManageClaimsMemberBenefitOption,
   ManageClaimsMemberOption,
@@ -58,6 +59,7 @@ export async function loadManageClaimsPageData(): Promise<{
   memberBenefits: ManageClaimsMemberBenefitOption[];
   entrantBatches: ManageClaimsBatchOption[];
   memberPreAuths: ManageClaimsPreAuthOption[];
+  memberClaimHistory: ManageClaimsHistoryItem[];
 }> {
   const currentUsername = await resolveCurrentUsername();
 
@@ -72,6 +74,7 @@ export async function loadManageClaimsPageData(): Promise<{
     memberBenefitRows,
     entrantBatchRows,
     preAuthRows,
+    billRows,
   ] = await Promise.all([
     loadProviderOptions(),
     loadServiceOptions(),
@@ -145,6 +148,21 @@ export async function loadManageClaimsPageData(): Promise<{
         preDiagnosis: true,
       },
       orderBy: { code: "desc" },
+    }),
+    prisma.bill.findMany({
+      select: {
+        invoiceNo: true,
+        claimNo: true,
+        memberNo: true,
+        provider: true,
+        service: true,
+        claimNature: true,
+        invoiceDate: true,
+        dateReceived: true,
+        dateEntered: true,
+        invoicedAmount: true,
+      },
+      orderBy: [{ invoiceDate: "desc" }, { claimNo: "desc" }],
     }),
   ]);
 
@@ -263,6 +281,34 @@ export async function loadManageClaimsPageData(): Promise<{
     preDiagnosis: row.preDiagnosis?.trim() ?? "",
   }));
 
+  const providerLabelByCode = new Map(
+    providerOptions.map((option) => [option.value, option.label])
+  );
+  const serviceLabelByCode = new Map(
+    serviceOptions.map((option) => [option.value, option.label])
+  );
+
+  const memberClaimHistory: ManageClaimsHistoryItem[] = billRows.map((row) => {
+    const providerCode = String(row.provider);
+    const serviceCode = String(row.service);
+    const benefitCode = String(row.claimNature);
+    return {
+      id: row.invoiceNo,
+      memberNo: row.memberNo,
+      provider: providerLabelByCode.get(providerCode) ?? providerCode,
+      claimNo: row.claimNo,
+      service: serviceLabelByCode.get(serviceCode) ?? serviceCode,
+      benefit: benefitLabelByCode.get(benefitCode) ?? benefitCode,
+      invoiceDate: formatDateValue(row.invoiceDate),
+      dateReceived: formatDateValue(row.dateReceived),
+      dateEntered: formatDateValue(row.dateEntered),
+      invoicedAmount: Number(row.invoicedAmount).toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }),
+    };
+  });
+
   return {
     providerOptions,
     serviceOptions,
@@ -272,5 +318,6 @@ export async function loadManageClaimsPageData(): Promise<{
     memberBenefits,
     entrantBatches,
     memberPreAuths,
+    memberClaimHistory,
   };
 }

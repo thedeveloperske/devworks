@@ -161,3 +161,16 @@ export type ManageClaimsPreAuthOption = {
   reserve: string;
   preDiagnosis: string;
 };
+
+export type ManageClaimsHistoryItem = {
+  id: string;
+  memberNo: string;
+  provider: string;
+  claimNo: string;
+  service: string;
+  benefit: string;
+  invoiceDate: string;
+  dateReceived: string;
+  dateEntered: string;
+  invoicedAmount: string;
+};

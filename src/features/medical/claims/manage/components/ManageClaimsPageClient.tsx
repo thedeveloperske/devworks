@@ -8,6 +8,7 @@ import { PageHeader } from "@/components/admin/PageHeader";
 import type {
   ManageClaimsBatchOption,
   ManageClaimsCorporateOption,
+  ManageClaimsHistoryItem,
   ManageClaimsMemberAnniversary,
   ManageClaimsMemberBenefitOption,
   ManageClaimsMemberOption,
@@ -39,6 +40,7 @@ type ManageClaimsPageClientProps = {
   memberBenefits?: ManageClaimsMemberBenefitOption[];
   entrantBatches?: ManageClaimsBatchOption[];
   memberPreAuths?: ManageClaimsPreAuthOption[];
+  memberClaimHistory?: ManageClaimsHistoryItem[];
 };
 
 export function ManageClaimsPageClient({
@@ -50,6 +52,7 @@ export function ManageClaimsPageClient({
   memberBenefits = [],
   entrantBatches = [],
   memberPreAuths = [],
+  memberClaimHistory = [],
 }: ManageClaimsPageClientProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -90,6 +93,13 @@ export function ManageClaimsPageClient({
     if (!selectedMemberNo) return [];
     return memberPreAuths.filter((row) => row.memberNo === selectedMemberNo);
   }, [memberPreAuths, selectedMemberNo]);
+
+  const selectedMemberClaimHistory = useMemo(() => {
+    if (!selectedMemberNo) return [];
+    return memberClaimHistory.filter(
+      (row) => row.memberNo === selectedMemberNo
+    );
+  }, [memberClaimHistory, selectedMemberNo]);
 
   const memberCountByCorporateId = useMemo(() => {
     const counts: Record<string, number> = {};
@@ -323,6 +333,7 @@ export function ManageClaimsPageClient({
         memberBenefits={selectedMemberBenefits}
         entrantBatches={entrantBatches}
         memberPreAuths={selectedMemberPreAuths}
+        memberClaimHistory={selectedMemberClaimHistory}
         serviceOptions={serviceOptions}
         initialDetails={{
           memberNo: selectedMember.memberNo,

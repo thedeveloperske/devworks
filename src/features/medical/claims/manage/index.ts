@@ -42,6 +42,7 @@ export type {
   ClaimLineItemFormData,
   ManageClaimsBatchOption,
   ManageClaimsCorporateOption,
+  ManageClaimsHistoryItem,
   ManageClaimsListItem,
   ManageClaimsMemberAnniversary,
   ManageClaimsMemberBenefitOption,

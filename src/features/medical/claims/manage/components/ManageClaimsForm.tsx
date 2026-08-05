@@ -23,6 +23,7 @@ import type {
   ClaimFormTabData,
   ClaimLineItemFormData,
   ManageClaimsBatchOption,
+  ManageClaimsHistoryItem,
   ManageClaimsMemberAnniversary,
   ManageClaimsMemberBenefitOption,
   ManageClaimsPreAuthOption,
@@ -88,6 +89,7 @@ type ManageClaimsFormProps = {
   memberBenefits?: ManageClaimsMemberBenefitOption[];
   entrantBatches?: ManageClaimsBatchOption[];
   memberPreAuths?: ManageClaimsPreAuthOption[];
+  memberClaimHistory?: ManageClaimsHistoryItem[];
   providerOptions?: LookupOption[];
   serviceOptions?: LookupOption[];
   onCancel?: () => void;
@@ -105,6 +107,7 @@ export function ManageClaimsForm({
   memberBenefits = [],
   entrantBatches = [],
   memberPreAuths = [],
+  memberClaimHistory = [],
   providerOptions = [],
   serviceOptions = [],
   onCancel,
@@ -481,7 +484,12 @@ export function ManageClaimsForm({
           />
         );
       case "memberClaimHistory":
-        return <MemberClaimHistoryTab />;
+        return (
+          <MemberClaimHistoryTab
+            rows={memberClaimHistory}
+            memberNo={details.memberNo}
+          />
+        );
       default:
         return null;
     }
