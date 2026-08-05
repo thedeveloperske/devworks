@@ -48,10 +48,10 @@ export function ClaimLineItemsTable({
       <div className="flex shrink-0 items-start justify-between gap-2">
         <div>
           <h3 className="text-[11px] font-bold uppercase text-slate-700">
-            Clinical Diagnosis
+            Claim Line Items
           </h3>
           <p className="text-[11px] text-slate-500">
-            Capture clinical line items and amounts for this claim
+            Capture services and amounts for this claim
           </p>
         </div>
         <Button type="button" size="sm" variant="secondary" onClick={onAddRow}>
