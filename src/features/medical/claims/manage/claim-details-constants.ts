@@ -82,7 +82,7 @@ export const claimDetailsFields: ClaimDetailsField[] = [
     label: "Provider *",
     required: true,
     as: "select",
-    className: "sm:col-span-1",
+    className: "sm:col-span-2",
   },
   {
     name: "service",
@@ -289,10 +289,8 @@ export const claimDetailsFields: ClaimDetailsField[] = [
 
 const visibleClaimDetailsFieldNames = [
   "claimNo",
-  "invoiceNo",
-  "memberNo",
   "provider",
-  "service",
+  "memberNo",
   "invoiceDate",
   "claimNature",
   "anniv",

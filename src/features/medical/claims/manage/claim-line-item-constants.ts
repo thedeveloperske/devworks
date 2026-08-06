@@ -15,12 +15,11 @@ export const defaultClaimLineItem = (): ClaimLineItemFormData => ({
 });
 
 export const claimLineItemFields: ClaimLineItemField[] = [
-  { name: "service", label: "Service", type: "number" },
-  { name: "invoiceNo", label: "Invoice No" },
+  { name: "service", label: "Service", as: "select", required: true },
+  { name: "invoiceNo", label: "Invoice No", required: true },
   { name: "itemCode", label: "Item Code" },
   { name: "itemName", label: "Item Name" },
-  { name: "groupName", label: "Group Name" },
   { name: "quantity", label: "Qty", type: "number" },
-  { name: "amount", label: "Amount", type: "number" },
   { name: "unitPrice", label: "Unit Price", type: "number" },
+  { name: "amount", label: "Amount", type: "number" },
 ];

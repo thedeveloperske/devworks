@@ -8,6 +8,7 @@ import type {
   ClaimLineItemField,
   ClaimLineItemFormData,
 } from "@/features/medical/claims/manage/types";
+import type { LookupOption } from "@/features/medical/lookups/types";
 import { inputClass } from "@/lib/form-styles";
 
 type ClaimLineItemsTableProps = {
@@ -18,14 +19,17 @@ type ClaimLineItemsTableProps = {
   ) => void;
   onAddRow: () => void;
   onRemoveRow: (index: number) => void;
+  serviceOptions?: LookupOption[];
 };
 
 const columnMinWidth = 120;
 const itemNameColumnWidth = 220;
+const serviceColumnWidth = 160;
 const removeColumnWidth = 72;
 const tableMinWidth =
-  (claimLineItemFields.length - 1) * columnMinWidth +
+  (claimLineItemFields.length - 2) * columnMinWidth +
   itemNameColumnWidth +
+  serviceColumnWidth +
   removeColumnWidth;
 const tableBodyMaxHeight = 200;
 
@@ -34,7 +38,9 @@ const thClass =
 const tdClass = "border-b border-slate-200 px-1 py-1.5 align-middle";
 
 function getColumnWidth(fieldName: ClaimLineItemField["name"]) {
-  return fieldName === "itemName" ? itemNameColumnWidth : columnMinWidth;
+  if (fieldName === "itemName") return itemNameColumnWidth;
+  if (fieldName === "service") return serviceColumnWidth;
+  return columnMinWidth;
 }
 
 export function ClaimLineItemsTable({
@@ -42,6 +48,7 @@ export function ClaimLineItemsTable({
   onRowChange,
   onAddRow,
   onRemoveRow,
+  serviceOptions = [],
 }: ClaimLineItemsTableProps) {
   return (
     <section className="flex min-h-0 flex-col gap-1.5">
@@ -116,16 +123,40 @@ export function ClaimLineItemsTable({
                         minWidth: getColumnWidth(field.name),
                       }}
                     >
-                      <input
-                        id={`claim-line-${rowIndex}-${field.name}`}
-                        name={field.name}
-                        aria-label={field.label}
-                        type={field.type ?? "text"}
-                        required={field.required}
-                        value={row[field.name]}
-                        onChange={(e) => onRowChange(rowIndex, e)}
-                        className={`${inputClass} min-w-[100px]`}
-                      />
+                      {field.as === "select" ? (
+                        <select
+                          id={`claim-line-${rowIndex}-${field.name}`}
+                          name={field.name}
+                          aria-label={field.label}
+                          required={field.required}
+                          value={row[field.name]}
+                          onChange={(e) => onRowChange(rowIndex, e)}
+                          className={`${inputClass} min-w-[100px] h-[30px]`}
+                        >
+                          <option value="">Select service</option>
+                          {serviceOptions.map((option) => (
+                            <option key={option.value} value={option.value}>
+                              {option.label}
+                            </option>
+                          ))}
+                        </select>
+                      ) : (
+                        <input
+                          id={`claim-line-${rowIndex}-${field.name}`}
+                          name={field.name}
+                          aria-label={field.label}
+                          type={field.type ?? "text"}
+                          required={field.required}
+                          value={row[field.name]}
+                          onChange={(e) => onRowChange(rowIndex, e)}
+                          readOnly={field.name === "amount"}
+                          className={`${inputClass} min-w-[100px] ${
+                            field.name === "amount"
+                              ? "cursor-not-allowed bg-slate-50 text-slate-600"
+                              : ""
+                          }`}
+                        />
+                      )}
                     </td>
                   ))}
                   <td

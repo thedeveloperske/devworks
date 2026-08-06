@@ -89,6 +89,7 @@ export type ClaimLineItemField = {
   name: keyof ClaimLineItemFormData;
   label: string;
   type?: "text" | "number";
+  as?: "input" | "select";
   required?: boolean;
 };
 

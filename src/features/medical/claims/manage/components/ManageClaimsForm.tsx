@@ -399,14 +399,36 @@ export function ManageClaimsForm({
   ) => {
     const { name, value } = e.target;
     setLineItems((prev) =>
-      prev.map((row, rowIndex) =>
-        rowIndex === index ? { ...row, [name]: value } : row
-      )
+      prev.map((row, rowIndex) => {
+        if (rowIndex !== index) return row;
+        const nextRow = { ...row, [name]: value };
+        const quantity = Number.parseFloat(nextRow.quantity || "0");
+        const unitPrice = Number.parseFloat(nextRow.unitPrice || "0");
+        const computedAmount =
+          (Number.isFinite(quantity) ? quantity : 0) *
+          (Number.isFinite(unitPrice) ? unitPrice : 0);
+        nextRow.amount = String(computedAmount);
+        return nextRow;
+      })
     );
+
+    // Keep bill-level invoice/service in sync for persistence (hidden on Claim Details).
+    if (name === "invoiceNo" || name === "service") {
+      setDetails((prev) =>
+        prev[name] === value ? prev : { ...prev, [name]: value }
+      );
+    }
   };
 
   const handleAddLineItem = () => {
-    setLineItems((prev) => [...prev, defaultClaimLineItem()]);
+    setLineItems((prev) => [
+      ...prev,
+      {
+        ...defaultClaimLineItem(),
+        invoiceNo: details.invoiceNo,
+        service: details.service,
+      },
+    ]);
   };
 
   const handleRemoveLineItem = (index: number) => {
@@ -481,6 +503,7 @@ export function ManageClaimsForm({
             onLineItemChange={handleLineItemChange}
             onAddLineItem={handleAddLineItem}
             onRemoveLineItem={handleRemoveLineItem}
+            serviceOptions={serviceOptions}
           />
         );
       case "memberClaimHistory":

@@ -2,6 +2,7 @@
 
 import type { ChangeEvent } from "react";
 import type { ClaimLineItemFormData } from "@/features/medical/claims/manage/types";
+import type { LookupOption } from "@/features/medical/lookups/types";
 import { ClaimLineItemsTable } from "./ClaimLineItemsTable";
 
 type ClinicalDiagnosisTabProps = {
@@ -12,6 +13,7 @@ type ClinicalDiagnosisTabProps = {
   ) => void;
   onAddLineItem: () => void;
   onRemoveLineItem: (index: number) => void;
+  serviceOptions?: LookupOption[];
 };
 
 export function ClinicalDiagnosisTab({
@@ -19,6 +21,7 @@ export function ClinicalDiagnosisTab({
   onLineItemChange,
   onAddLineItem,
   onRemoveLineItem,
+  serviceOptions = [],
 }: ClinicalDiagnosisTabProps) {
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
@@ -27,6 +30,7 @@ export function ClinicalDiagnosisTab({
         onRowChange={onLineItemChange}
         onAddRow={onAddLineItem}
         onRemoveRow={onRemoveLineItem}
+        serviceOptions={serviceOptions}
       />
     </div>
   );
