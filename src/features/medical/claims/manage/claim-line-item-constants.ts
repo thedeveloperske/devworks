@@ -17,7 +17,6 @@ export const defaultClaimLineItem = (): ClaimLineItemFormData => ({
 export const claimLineItemFields: ClaimLineItemField[] = [
   { name: "service", label: "Service", as: "select", required: true },
   { name: "invoiceNo", label: "Invoice No", required: true },
-  { name: "itemCode", label: "Item Code" },
   { name: "itemName", label: "Item Name" },
   { name: "quantity", label: "Qty", type: "number" },
   { name: "unitPrice", label: "Unit Price", type: "number" },
