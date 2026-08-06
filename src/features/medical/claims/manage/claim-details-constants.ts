@@ -154,7 +154,7 @@ export const claimDetailsFields: ClaimDetailsField[] = [
   {
     name: "proxyPayee",
     label: "Proxy Payee",
-    className: "sm:col-span-1",
+    className: "sm:col-span-2",
   },
   // Hidden from UI — still in defaultClaimDetailsForm for DB persistence
   {

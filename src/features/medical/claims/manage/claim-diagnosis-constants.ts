@@ -19,11 +19,6 @@ export const claimDiagnosisFields: ClaimDiagnosisField[] = [
     readOnly: true,
   },
   {
-    name: "memberNo",
-    label: "Member No",
-    readOnly: true,
-  },
-  {
     name: "diagnosis",
     label: "Diagnosis *",
     type: "number",

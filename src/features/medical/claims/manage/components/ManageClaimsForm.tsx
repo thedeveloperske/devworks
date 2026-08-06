@@ -421,14 +421,7 @@ export function ManageClaimsForm({
   };
 
   const handleAddLineItem = () => {
-    setLineItems((prev) => [
-      ...prev,
-      {
-        ...defaultClaimLineItem(),
-        invoiceNo: details.invoiceNo,
-        service: details.service,
-      },
-    ]);
+    setLineItems((prev) => [...prev, defaultClaimLineItem()]);
   };
 
   const handleRemoveLineItem = (index: number) => {
