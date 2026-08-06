@@ -5,6 +5,7 @@ import { Button } from "@/components/admin/Button";
 import { claimDiagnosisFields } from "@/features/medical/claims/manage/claim-diagnosis-constants";
 import type { ClaimDiagnosisFormData } from "@/features/medical/claims/manage/types";
 import { inputClass } from "@/lib/form-styles";
+import { ClaimRowActionsMenu } from "../ClaimRowActionsMenu";
 
 type ClaimDiagnosisTableProps = {
   rows: ClaimDiagnosisFormData[];
@@ -17,7 +18,7 @@ type ClaimDiagnosisTableProps = {
 };
 
 const columnMinWidth = 140;
-const removeColumnWidth = 72;
+const removeColumnWidth = 40;
 const tableMinWidth =
   claimDiagnosisFields.length * columnMinWidth + removeColumnWidth;
 const tableBodyMaxHeight = 200;
@@ -128,14 +129,10 @@ export function ClaimDiagnosisTable({
                       minWidth: removeColumnWidth,
                     }}
                   >
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="secondary"
-                      onClick={() => onRemoveRow(rowIndex)}
-                    >
-                      Remove
-                    </Button>
+                    <ClaimRowActionsMenu
+                      label={`Actions for diagnosis ${rowIndex + 1}`}
+                      onRemove={() => onRemoveRow(rowIndex)}
+                    />
                   </td>
                 </tr>
               ))}

@@ -10,6 +10,7 @@ import type {
 } from "@/features/medical/claims/manage/types";
 import type { LookupOption } from "@/features/medical/lookups/types";
 import { inputClass } from "@/lib/form-styles";
+import { ClaimRowActionsMenu } from "../ClaimRowActionsMenu";
 
 type ClaimLineItemsTableProps = {
   rows: ClaimLineItemFormData[];
@@ -25,7 +26,7 @@ type ClaimLineItemsTableProps = {
 const columnMinWidth = 120;
 const itemNameColumnWidth = 220;
 const serviceColumnWidth = 160;
-const removeColumnWidth = 72;
+const removeColumnWidth = 40;
 const tableMinWidth =
   (claimLineItemFields.length - 2) * columnMinWidth +
   itemNameColumnWidth +
@@ -166,14 +167,10 @@ export function ClaimLineItemsTable({
                       minWidth: removeColumnWidth,
                     }}
                   >
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="secondary"
-                      onClick={() => onRemoveRow(rowIndex)}
-                    >
-                      Remove
-                    </Button>
+                    <ClaimRowActionsMenu
+                      label={`Actions for line item ${rowIndex + 1}`}
+                      onRemove={() => onRemoveRow(rowIndex)}
+                    />
                   </td>
                 </tr>
               ))}

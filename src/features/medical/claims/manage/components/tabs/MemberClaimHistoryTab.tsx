@@ -23,7 +23,7 @@ export function MemberClaimHistoryTab({
     <div className="flex min-h-0 flex-1 flex-col gap-1.5 overflow-hidden">
       <div className="shrink-0">
         <h3 className="text-[11px] font-bold uppercase text-slate-700">
-          Member Claim History
+          Claim History
         </h3>
         <p className="text-[11px] text-slate-500">
           {memberNo

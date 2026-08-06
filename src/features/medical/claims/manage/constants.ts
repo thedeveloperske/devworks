@@ -2,7 +2,7 @@ export const manageClaimsTabs = [
   { id: "claimDetails", label: "Claim Details" },
   { id: "claimForm", label: "Claim Form" },
   { id: "clinicalDiagnosis", label: "Line Items" },
-  { id: "memberClaimHistory", label: "Member Claim History" },
+  { id: "memberClaimHistory", label: "Claim History" },
   { id: "claimStatus", label: "Claim Status" },
 ] as const;
 
