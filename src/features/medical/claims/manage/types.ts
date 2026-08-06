@@ -76,10 +76,13 @@ export type ClaimFormTabField = {
 
 export type ClaimLineItemFormData = {
   service: string;
-  description: string;
+  invoiceNo: string;
+  itemCode: string;
+  itemName: string;
+  groupName: string;
   quantity: string;
   amount: string;
-  notes: string;
+  unitPrice: string;
 };
 
 export type ClaimLineItemField = {

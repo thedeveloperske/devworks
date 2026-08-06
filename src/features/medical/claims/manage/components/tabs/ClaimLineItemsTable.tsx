@@ -21,11 +21,11 @@ type ClaimLineItemsTableProps = {
 };
 
 const columnMinWidth = 120;
-const descriptionColumnWidth = 180;
+const itemNameColumnWidth = 220;
 const removeColumnWidth = 72;
 const tableMinWidth =
   (claimLineItemFields.length - 1) * columnMinWidth +
-  descriptionColumnWidth +
+  itemNameColumnWidth +
   removeColumnWidth;
 const tableBodyMaxHeight = 200;
 
@@ -34,7 +34,7 @@ const thClass =
 const tdClass = "border-b border-slate-200 px-1 py-1.5 align-middle";
 
 function getColumnWidth(fieldName: ClaimLineItemField["name"]) {
-  return fieldName === "description" ? descriptionColumnWidth : columnMinWidth;
+  return fieldName === "itemName" ? itemNameColumnWidth : columnMinWidth;
 }
 
 export function ClaimLineItemsTable({
