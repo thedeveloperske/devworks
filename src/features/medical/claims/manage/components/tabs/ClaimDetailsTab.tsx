@@ -113,7 +113,8 @@ export function ClaimDetailsTab({
               ? !proxyPayeeEnabled
               : field.name === "anniv" ||
                   field.name === "preAuthNo" ||
-                  field.name === "memberNo"
+                  field.name === "memberNo" ||
+                  field.name === "claimNo"
                 ? true
                 : field.name === "claimNature"
                   ? !value.anniv || claimNatureOptions.length === 0

@@ -48,7 +48,8 @@ export function ClaimFormTab({
       <div className="grid shrink-0 grid-cols-1 gap-2 sm:grid-cols-6">
         {visibleClaimFormTabFields.map((field) => {
           const needsInvoiceDate = datesOnOrAfterInvoice.has(field.name);
-          const disabled = needsInvoiceDate && !invoiceDateMin;
+          const disabled =
+            field.name === "claimNo" || (needsInvoiceDate && !invoiceDateMin);
           const min = needsInvoiceDate
             ? invoiceDateMin || undefined
             : undefined;
