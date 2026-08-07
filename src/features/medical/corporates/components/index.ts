@@ -2,6 +2,7 @@ export { CategoriesForm } from "./CategoriesForm";
 export { ContactPersonForm } from "./ContactPersonForm";
 export { ProviderRestrictionsForm } from "./ProviderRestrictionsForm";
 export { PremiumRatesForm } from "./PremiumRatesForm";
+export { CorporateActionsMenu } from "./CorporateActionsMenu";
 export { CorporateForm } from "./CorporateForm";
 export { CorporatesPageClient } from "./CorporatesPageClient";
 export { CoverDatesForm } from "./CoverDatesForm";

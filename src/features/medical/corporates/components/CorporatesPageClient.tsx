@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { CorporateActionsMenu } from "./CorporateActionsMenu";
 import { CorporateForm } from "./CorporateForm";
 import { Button } from "@/components/admin/Button";
 import { Modal } from "@/components/admin/Modal";
@@ -38,7 +39,7 @@ type CorporatesPageClientProps = {
   providerOptions: LookupOption[];
 };
 
-type EditCorporateState = {
+type DetailCorporateState = {
   id: string;
   corporate: CorporateFormData | null;
   coverDates: CoverDateFormData | null;
@@ -63,12 +64,17 @@ export function CorporatesPageClient({
   const searchParams = useSearchParams();
   const isNew = searchParams.get("new") === "1";
   const editId = searchParams.get("edit");
+  const viewId = searchParams.get("view");
   const manageOpen = searchParams.get("manage") === "1";
-  const corporateModalOpen = isNew || Boolean(editId);
+  const detailId = editId ?? viewId;
+  const isViewMode = Boolean(viewId) && !editId && !isNew;
+  const corporateModalOpen = isNew || Boolean(detailId);
   const [searchQuery, setSearchQuery] = useState("");
   const modalOpen = manageOpen || corporateModalOpen;
 
-  const [editState, setEditState] = useState<EditCorporateState | null>(null);
+  const [detailState, setDetailState] = useState<DetailCorporateState | null>(
+    null
+  );
 
   const agentLabelById = useMemo(
     () =>
@@ -119,6 +125,7 @@ export function CorporatesPageClient({
     const params = new URLSearchParams(searchParams.toString());
     params.delete("new");
     params.delete("edit");
+    params.delete("view");
     if (manageOpen) params.set("manage", "1");
     else params.delete("manage");
     const query = params.toString();
@@ -136,8 +143,16 @@ export function CorporatesPageClient({
     [pathname, router]
   );
 
-  const getEditCorporateHref = useCallback(
-    (id: string) => `${pathname}?manage=1&edit=${id}`,
+  const openViewModal = useCallback(
+    (id: string) => {
+      router.push(`${pathname}?manage=1&view=${id}`, { scroll: false });
+    },
+    [pathname, router]
+  );
+
+  const getCorporateHref = useCallback(
+    (id: string, mode: "view" | "edit" = "view") =>
+      `${pathname}?manage=1&${mode}=${id}`,
     [pathname]
   );
 
@@ -152,15 +167,15 @@ export function CorporatesPageClient({
   }, [pathname, router, searchParams]);
 
   useEffect(() => {
-    if (!editId) {
-      setEditState(null);
+    if (!detailId) {
+      setDetailState(null);
       return;
     }
 
     let cancelled = false;
-    setEditState(null);
+    setDetailState(null);
 
-    fetch(`/api/medical/corporates/${editId}`)
+    fetch(`/api/medical/corporates/${detailId}`)
       .then(async (res) => {
         if (!res.ok) {
           const data = await res.json().catch(() => ({}));
@@ -170,8 +185,8 @@ export function CorporatesPageClient({
       })
       .then((corporate) => {
         if (cancelled) return;
-        setEditState({
-          id: editId,
+        setDetailState({
+          id: detailId,
           corporate: corporateToFormValues(corporate),
           coverDates: corporate.coverAnniversary ?? null,
           contactPersons: corporate.contactPersons ?? [],
@@ -184,8 +199,8 @@ export function CorporatesPageClient({
       })
       .catch((error: unknown) => {
         if (cancelled) return;
-        setEditState({
-          id: editId,
+        setDetailState({
+          id: detailId,
           corporate: null,
           coverDates: null,
           contactPersons: [],
@@ -201,24 +216,26 @@ export function CorporatesPageClient({
     return () => {
       cancelled = true;
     };
-  }, [editId]);
+  }, [detailId]);
 
-  const editLoading = Boolean(editId && editState?.id !== editId);
-  const editCorporate = editState?.id === editId ? editState.corporate : null;
-  const editCoverDates = editState?.id === editId ? editState.coverDates : null;
-  const editContactPersons =
-    editState?.id === editId ? editState.contactPersons : [];
-  const editCategoryGroups =
-    editState?.id === editId ? editState.categoryGroups : [];
-  const editProviderRestrictions =
-    editState?.id === editId ? editState.providerRestrictions : [];
-  const editPremiumRates =
-    editState?.id === editId ? editState.premiumRates : [];
-  const editName = editState?.id === editId ? editState.name : "";
-  const editError = editState?.id === editId ? editState.error : "";
+  const detailLoading = Boolean(detailId && detailState?.id !== detailId);
+  const detailCorporate =
+    detailState?.id === detailId ? detailState.corporate : null;
+  const detailCoverDates =
+    detailState?.id === detailId ? detailState.coverDates : null;
+  const detailContactPersons =
+    detailState?.id === detailId ? detailState.contactPersons : [];
+  const detailCategoryGroups =
+    detailState?.id === detailId ? detailState.categoryGroups : [];
+  const detailProviderRestrictions =
+    detailState?.id === detailId ? detailState.providerRestrictions : [];
+  const detailPremiumRates =
+    detailState?.id === detailId ? detailState.premiumRates : [];
+  const detailName = detailState?.id === detailId ? detailState.name : "";
+  const detailError = detailState?.id === detailId ? detailState.error : "";
 
-  const editingCorporate = editId
-    ? corporates.find((corporate) => corporate.id === editId)
+  const activeCorporate = detailId
+    ? corporates.find((corporate) => corporate.id === detailId)
     : undefined;
 
   const corporatesTable = (
@@ -237,7 +254,9 @@ export function CorporatesPageClient({
             <th className={thClass}>Policy No</th>
             <th className={thClass}>Intermediary</th>
             <th className={thClass}>Business Class</th>
-            <th className={thClass}>Actions</th>
+            <th className={thClass}>
+              <span className="sr-only">Actions</span>
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -265,7 +284,7 @@ export function CorporatesPageClient({
               <tr key={corporate.id} className="bg-white hover:bg-slate-50">
                 <td className={tdClass}>
                   <Link
-                    href={getEditCorporateHref(corporate.id)}
+                    href={getCorporateHref(corporate.id, "view")}
                     scroll={false}
                     className="font-semibold text-maroon hover:underline"
                   >
@@ -286,14 +305,13 @@ export function CorporatesPageClient({
                     : "—"}
                 </td>
                 <td className={tdClass}>
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant="secondary"
-                    onClick={() => openEditModal(corporate.id)}
-                  >
-                    Edit Corporate
-                  </Button>
+                  <CorporateActionsMenu
+                    corporateName={corporate.corporate}
+                    onAction={(action) => {
+                      if (action === "view") openViewModal(corporate.id);
+                      else openEditModal(corporate.id);
+                    }}
+                  />
                 </td>
               </tr>
             ))
@@ -313,7 +331,7 @@ export function CorporatesPageClient({
       </div>
 
       <Modal
-        open={manageOpen}
+        open={manageOpen && !corporateModalOpen}
         onClose={closeManageModal}
         title="Corporate Management"
         description="Manage corporate accounts and their details"
@@ -339,13 +357,21 @@ export function CorporatesPageClient({
       <Modal
         open={corporateModalOpen}
         onClose={closeCorporateModal}
-        title={isNew ? "New Corporate" : "Edit Corporate"}
+        title={
+          isNew
+            ? "New Corporate"
+            : isViewMode
+              ? "View Corporate"
+              : "Edit Corporate"
+        }
         description={
           isNew
             ? "Register a new corporate account"
-            : editName ||
-              editingCorporate?.corporate ||
-              "Update corporate details"
+            : detailName ||
+              activeCorporate?.corporate ||
+              (isViewMode
+                ? "Corporate account details"
+                : "Update corporate details")
         }
       >
         {isNew ? (
@@ -359,21 +385,22 @@ export function CorporatesPageClient({
             onSuccess={handleSaved}
             onCancel={closeCorporateModal}
           />
-        ) : editLoading ? (
+        ) : detailLoading ? (
           <p className="text-[11px] text-slate-500">Loading corporate...</p>
-        ) : editError ? (
-          <p className="text-[11px] text-red-600">{editError}</p>
-        ) : editCorporate && editId ? (
+        ) : detailError ? (
+          <p className="text-[11px] text-red-600">{detailError}</p>
+        ) : detailCorporate && detailId ? (
           <CorporateForm
-            key={`${editId}-${editName}`}
+            key={`${isViewMode ? "view" : "edit"}-${detailId}-${detailName}`}
             embedded
-            corporateId={editId}
-            initial={editCorporate}
-            initialCoverDates={editCoverDates ?? undefined}
-            initialContactPersons={editContactPersons}
-            initialCategoryGroups={editCategoryGroups}
-            initialProviderRestrictions={editProviderRestrictions}
-            initialPremiumRates={editPremiumRates}
+            readOnly={isViewMode}
+            corporateId={detailId}
+            initial={detailCorporate}
+            initialCoverDates={detailCoverDates ?? undefined}
+            initialContactPersons={detailContactPersons}
+            initialCategoryGroups={detailCategoryGroups}
+            initialProviderRestrictions={detailProviderRestrictions}
+            initialPremiumRates={detailPremiumRates}
             agentOptions={agentOptions}
             benefitOptions={benefitOptions}
             categoryOptions={categoryOptions}
