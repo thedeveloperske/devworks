@@ -151,6 +151,7 @@ export async function loadManageClaimsPageData(): Promise<{
     }),
     prisma.bill.findMany({
       select: {
+        id: true,
         invoiceNo: true,
         claimNo: true,
         memberNo: true,
@@ -293,7 +294,7 @@ export async function loadManageClaimsPageData(): Promise<{
     const serviceCode = String(row.service);
     const benefitCode = String(row.claimNature);
     return {
-      id: row.invoiceNo,
+      id: String(row.id),
       memberNo: row.memberNo,
       provider: providerLabelByCode.get(providerCode) ?? providerCode,
       claimNo: row.claimNo,
