@@ -11,7 +11,7 @@ import { Button } from "@/components/admin/Button";
 import { defaultClaimDetailsForm } from "@/features/medical/claims/manage/claim-details-constants";
 import { defaultClaimDiagnosis } from "@/features/medical/claims/manage/claim-diagnosis-constants";
 import { defaultClaimFormTab } from "@/features/medical/claims/manage/claim-form-constants";
-import { defaultClaimLineItem } from "@/features/medical/claims/manage/claim-line-item-constants";
+import { defaultClaimLineItem, sumClaimLineItemAmounts } from "@/features/medical/claims/manage/claim-line-item-constants";
 import {
   defaultManageClaimsTab,
   visibleManageClaimsTabs,
@@ -304,6 +304,15 @@ export function ManageClaimsForm({
       return changed ? next : prev;
     });
   }, [details.claimNo, details.memberNo]);
+
+  useEffect(() => {
+    const nextInvoicedAmount = sumClaimLineItemAmounts(lineItems);
+    setDetails((prev) =>
+      prev.invoicedAmount === nextInvoicedAmount
+        ? prev
+        : { ...prev, invoicedAmount: nextInvoicedAmount }
+    );
+  }, [lineItems]);
 
   useEffect(() => {
     if (!details.preAuthNo.trim()) return;

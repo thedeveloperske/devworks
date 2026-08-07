@@ -114,7 +114,8 @@ export function ClaimDetailsTab({
               : field.name === "anniv" ||
                   field.name === "preAuthNo" ||
                   field.name === "memberNo" ||
-                  field.name === "claimNo"
+                  field.name === "claimNo" ||
+                  field.name === "invoicedAmount"
                 ? true
                 : field.name === "claimNature"
                   ? !value.anniv || claimNatureOptions.length === 0

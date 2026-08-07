@@ -3,12 +3,14 @@
 import { Button } from "@/components/admin/Button";
 import {
   claimLineItemFields,
+  sumClaimLineItemAmounts,
 } from "@/features/medical/claims/manage/claim-line-item-constants";
 import type {
   ClaimLineItemField,
   ClaimLineItemFormData,
 } from "@/features/medical/claims/manage/types";
 import type { LookupOption } from "@/features/medical/lookups/types";
+import { formatThousands } from "@/lib/format";
 import { inputClass } from "@/lib/form-styles";
 import { ClaimRowActionsMenu } from "../ClaimRowActionsMenu";
 
@@ -51,6 +53,9 @@ export function ClaimLineItemsTable({
   onRemoveRow,
   serviceOptions = [],
 }: ClaimLineItemsTableProps) {
+  const totalAmount = sumClaimLineItemAmounts(rows);
+  const formattedTotal = formatThousands(Number(totalAmount).toFixed(2));
+
   return (
     <section className="flex min-h-0 flex-col gap-1.5">
       <div className="flex shrink-0 items-start justify-between gap-2">
@@ -79,104 +84,114 @@ export function ClaimLineItemsTable({
           </button>
         </div>
       ) : (
-        <div
-          className="min-h-0 overflow-x-auto overflow-y-scroll border border-slate-200"
-          style={{ height: tableBodyMaxHeight }}
-        >
-          <table
-            className="w-full border-collapse"
-            style={{ minWidth: tableMinWidth }}
+        <>
+          <div
+            className="min-h-0 overflow-x-auto overflow-y-scroll border border-slate-200"
+            style={{ height: tableBodyMaxHeight }}
           >
-            <thead className="sticky top-0 z-10 bg-slate-50">
-              <tr>
-                {claimLineItemFields.map((field) => (
-                  <th
-                    key={field.name}
-                    className={thClass}
-                    style={{
-                      width: getColumnWidth(field.name),
-                      minWidth: getColumnWidth(field.name),
-                    }}
-                  >
-                    {field.label}
-                  </th>
-                ))}
-                <th
-                  className={thClass}
-                  style={{
-                    width: removeColumnWidth,
-                    minWidth: removeColumnWidth,
-                  }}
-                >
-                  <span className="sr-only">Actions</span>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((row, rowIndex) => (
-                <tr key={`line-${rowIndex}`} className="bg-white">
+            <table
+              className="w-full border-collapse"
+              style={{ minWidth: tableMinWidth }}
+            >
+              <thead className="sticky top-0 z-10 bg-slate-50">
+                <tr>
                   {claimLineItemFields.map((field) => (
-                    <td
+                    <th
                       key={field.name}
-                      className={tdClass}
+                      className={thClass}
                       style={{
                         width: getColumnWidth(field.name),
                         minWidth: getColumnWidth(field.name),
                       }}
                     >
-                      {field.as === "select" ? (
-                        <select
-                          id={`claim-line-${rowIndex}-${field.name}`}
-                          name={field.name}
-                          aria-label={field.label}
-                          required={field.required}
-                          value={row[field.name]}
-                          onChange={(e) => onRowChange(rowIndex, e)}
-                          className={`${inputClass} min-w-[100px] h-[30px]`}
-                        >
-                          <option value="">Select service</option>
-                          {serviceOptions.map((option) => (
-                            <option key={option.value} value={option.value}>
-                              {option.label}
-                            </option>
-                          ))}
-                        </select>
-                      ) : (
-                        <input
-                          id={`claim-line-${rowIndex}-${field.name}`}
-                          name={field.name}
-                          aria-label={field.label}
-                          type={field.type ?? "text"}
-                          required={field.required}
-                          value={row[field.name]}
-                          onChange={(e) => onRowChange(rowIndex, e)}
-                          readOnly={field.name === "amount"}
-                          className={`${inputClass} min-w-[100px] ${
-                            field.name === "amount"
-                              ? "cursor-not-allowed bg-slate-50 text-slate-600"
-                              : ""
-                          }`}
-                        />
-                      )}
-                    </td>
+                      {field.label}
+                    </th>
                   ))}
-                  <td
-                    className={tdClass}
+                  <th
+                    className={thClass}
                     style={{
                       width: removeColumnWidth,
                       minWidth: removeColumnWidth,
                     }}
                   >
-                    <ClaimRowActionsMenu
-                      label={`Actions for line item ${rowIndex + 1}`}
-                      onRemove={() => onRemoveRow(rowIndex)}
-                    />
-                  </td>
+                    <span className="sr-only">Actions</span>
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {rows.map((row, rowIndex) => (
+                  <tr key={`line-${rowIndex}`} className="bg-white">
+                    {claimLineItemFields.map((field) => (
+                      <td
+                        key={field.name}
+                        className={tdClass}
+                        style={{
+                          width: getColumnWidth(field.name),
+                          minWidth: getColumnWidth(field.name),
+                        }}
+                      >
+                        {field.as === "select" ? (
+                          <select
+                            id={`claim-line-${rowIndex}-${field.name}`}
+                            name={field.name}
+                            aria-label={field.label}
+                            required={field.required}
+                            value={row[field.name]}
+                            onChange={(e) => onRowChange(rowIndex, e)}
+                            className={`${inputClass} min-w-[100px] h-[30px]`}
+                          >
+                            <option value="">Select service</option>
+                            {serviceOptions.map((option) => (
+                              <option key={option.value} value={option.value}>
+                                {option.label}
+                              </option>
+                            ))}
+                          </select>
+                        ) : (
+                          <input
+                            id={`claim-line-${rowIndex}-${field.name}`}
+                            name={field.name}
+                            aria-label={field.label}
+                            type={field.type ?? "text"}
+                            required={field.required}
+                            value={row[field.name]}
+                            onChange={(e) => onRowChange(rowIndex, e)}
+                            readOnly={field.name === "amount"}
+                            className={`${inputClass} min-w-[100px] ${
+                              field.name === "amount"
+                                ? "cursor-not-allowed bg-slate-50 text-slate-600"
+                                : ""
+                            }`}
+                          />
+                        )}
+                      </td>
+                    ))}
+                    <td
+                      className={tdClass}
+                      style={{
+                        width: removeColumnWidth,
+                        minWidth: removeColumnWidth,
+                      }}
+                    >
+                      <ClaimRowActionsMenu
+                        label={`Actions for line item ${rowIndex + 1}`}
+                        onRemove={() => onRemoveRow(rowIndex)}
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="flex items-center justify-end gap-3 border border-t-0 border-slate-200 bg-slate-50 px-3 py-2">
+            <span className="text-[11px] font-bold uppercase tracking-wide text-slate-500">
+              Total
+            </span>
+            <span className="min-w-[6rem] text-right text-[12px] font-semibold text-slate-900">
+              {formattedTotal}
+            </span>
+          </div>
+        </>
       )}
     </section>
   );

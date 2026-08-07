@@ -22,3 +22,14 @@ export const claimLineItemFields: ClaimLineItemField[] = [
   { name: "unitPrice", label: "Unit Price", type: "number" },
   { name: "amount", label: "Amount", type: "number" },
 ];
+
+/** Sum of line-item amounts for bill invoiced_amount. */
+export function sumClaimLineItemAmounts(
+  rows: ClaimLineItemFormData[]
+): string {
+  const total = rows.reduce((sum, row) => {
+    const amount = Number.parseFloat(row.amount || "0");
+    return sum + (Number.isFinite(amount) ? amount : 0);
+  }, 0);
+  return String(Number(total.toFixed(2)));
+}

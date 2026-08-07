@@ -24,6 +24,7 @@ export {
 export {
   defaultClaimLineItem,
   claimLineItemFields,
+  sumClaimLineItemAmounts,
 } from "./claim-line-item-constants";
 export {
   defaultManageClaimsTab,
