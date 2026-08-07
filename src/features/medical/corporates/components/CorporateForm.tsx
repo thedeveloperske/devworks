@@ -53,8 +53,6 @@ type CorporateFormProps = {
   initialPremiumRates?: PremiumRateFormData[];
   corporateId?: string;
   embedded?: boolean;
-  /** When true, all fields are disabled and save actions are hidden. */
-  readOnly?: boolean;
   agentOptions: LookupOption[];
   benefitOptions: LookupOption[];
   categoryOptions: LookupOption[];
@@ -73,7 +71,6 @@ export function CorporateForm({
   initialPremiumRates,
   corporateId,
   embedded = false,
-  readOnly = false,
   agentOptions,
   benefitOptions,
   categoryOptions,
@@ -259,7 +256,6 @@ export function CorporateForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (readOnly) return;
     setLoading(true);
     setError("");
 
@@ -366,9 +362,6 @@ export function CorporateForm({
 
   const readOnlyFields: (keyof CorporateFormData)[] = ["corpId", "policyNo"];
 
-  const isFieldDisabled = (name: keyof CorporateFormData) =>
-    readOnly || readOnlyFields.includes(name);
-
   const renderFields = (fields: CorporateField[]) => (
     <div className={fieldGrid}>
       {fields.map((field) => (
@@ -391,17 +384,13 @@ export function CorporateForm({
           required={field.required}
           value={form[field.name]}
           onChange={handleChange}
-          disabled={isFieldDisabled(field.name)}
+          disabled={readOnlyFields.includes(field.name)}
           inputClassName={
-            isFieldDisabled(field.name)
+            readOnlyFields.includes(field.name)
               ? `${fieldInputClass} cursor-not-allowed bg-slate-50 text-slate-600`
               : fieldInputClass
           }
-          selectClassName={`${fieldInputClass} h-[30px]${
-            isFieldDisabled(field.name)
-              ? " cursor-not-allowed bg-slate-50 text-slate-600"
-              : ""
-          }`}
+          selectClassName={`${fieldInputClass} h-[30px]`}
           labelClassName={fieldLabelClass}
           placeholder={
             readOnlyFields.includes(field.name)
@@ -557,25 +546,7 @@ export function CorporateForm({
     </>
   );
 
-  const formActions = readOnly ? (
-    <div
-      className={`flex gap-3 ${
-        embedded
-          ? "shrink-0 justify-center border-t border-slate-200 bg-white pt-1.5"
-          : "border-t border-slate-200 pt-4"
-      }`}
-    >
-      {onCancel ? (
-        <Button type="button" variant="secondary" size="sm" onClick={onCancel}>
-          Close
-        </Button>
-      ) : (
-        <ButtonLink href="/admin/medical/corporates?manage=1" variant="secondary" size="sm">
-          Close
-        </ButtonLink>
-      )}
-    </div>
-  ) : (
+  const formActions = (
     <div
       className={`flex gap-3 ${
         embedded
@@ -601,12 +572,7 @@ export function CorporateForm({
   if (embedded) {
     return (
       <form onSubmit={handleSubmit} className={formClassName}>
-        <fieldset
-          disabled={readOnly}
-          className="flex min-h-0 flex-1 flex-col space-y-1.5 overflow-hidden border-0 p-0"
-        >
-          {formBody}
-        </fieldset>
+        <div className="flex min-h-0 flex-1 flex-col space-y-1.5 overflow-hidden">{formBody}</div>
         {formActions}
       </form>
     );
@@ -614,9 +580,7 @@ export function CorporateForm({
 
   return (
     <form onSubmit={handleSubmit} className={formClassName}>
-      <fieldset disabled={readOnly} className="space-y-6 border-0 p-0">
-        {formBody}
-      </fieldset>
+      {formBody}
       {formActions}
     </form>
   );
