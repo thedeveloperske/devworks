@@ -34,6 +34,11 @@ export {
   visibleManageClaimsTabs,
   type ManageClaimsTabId,
 } from "./constants";
+export {
+  buildCreateClaimData,
+  type CreateClaimInput,
+  type BuiltClaimData,
+} from "./claim-helpers";
 export type {
   ClaimDetailsField,
   ClaimDetailsFormData,

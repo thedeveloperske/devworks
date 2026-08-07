@@ -8,6 +8,7 @@ import {
   type FormEvent,
 } from "react";
 import { Button } from "@/components/admin/Button";
+import { FormError } from "@/components/admin/FormError";
 import { defaultClaimDetailsForm } from "@/features/medical/claims/manage/claim-details-constants";
 import { defaultClaimDiagnosis } from "@/features/medical/claims/manage/claim-diagnosis-constants";
 import { defaultClaimFormTab } from "@/features/medical/claims/manage/claim-form-constants";
@@ -112,11 +113,13 @@ export function ManageClaimsForm({
   providerOptions = [],
   serviceOptions = [],
   onCancel,
-  onSuccess: _onSuccess,
+  onSuccess,
 }: ManageClaimsFormProps) {
   const [activeTab, setActiveTab] = useState<ManageClaimsTabId>(
     defaultManageClaimsTab
   );
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const [details, setDetails] = useState<ClaimDetailsFormData>({
     ...defaultClaimDetailsForm,
     ...initialDetails,
@@ -465,9 +468,47 @@ export function ManageClaimsForm({
     setDiagnoses((prev) => prev.filter((_, rowIndex) => rowIndex !== index));
   };
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    // Save wiring comes once remaining tabs and API are ready.
+    if (claimId) {
+      setError("Updating claims is not available yet");
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+
+    try {
+      const res = await fetch("/api/medical/claims/manage", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          details,
+          claimForm,
+          lineItems,
+          diagnoses,
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError(
+          typeof data.error === "string" ? data.error : "Failed to create claim"
+        );
+        setLoading(false);
+        return;
+      }
+
+      if (data.claimNo) {
+        setDetails((prev) => ({ ...prev, claimNo: String(data.claimNo) }));
+        setClaimForm((prev) => ({ ...prev, claimNo: String(data.claimNo) }));
+      }
+
+      setLoading(false);
+      onSuccess?.();
+    } catch {
+      setError("Failed to create claim");
+      setLoading(false);
+    }
   };
 
   const activeTabPanel = (() => {
@@ -555,8 +596,12 @@ export function ManageClaimsForm({
           : "border-t border-slate-200 pt-4"
       }`}
     >
-      <Button type="submit" size="sm" disabled>
-        {claimId ? "Update Claim" : "Create Claim"}
+      <Button type="submit" size="sm" disabled={loading || Boolean(claimId)}>
+        {loading
+          ? "Saving..."
+          : claimId
+            ? "Update Claim"
+            : "Create Claim"}
       </Button>
       {onCancel ? (
         <Button type="button" variant="secondary" size="sm" onClick={onCancel}>
@@ -595,6 +640,7 @@ export function ManageClaimsForm({
         onSubmit={handleSubmit}
         className="flex min-h-0 flex-1 flex-col overflow-hidden"
       >
+        <FormError message={error} />
         <div className="flex min-h-0 flex-1 flex-col space-y-1.5 overflow-hidden">
           {formBody}
         </div>
@@ -606,6 +652,7 @@ export function ManageClaimsForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      <FormError message={error} />
       {formBody}
       {formActions}
       {preAuthModals}
