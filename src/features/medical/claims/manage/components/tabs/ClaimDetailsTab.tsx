@@ -236,7 +236,11 @@ export function ClaimDetailsTab({
                   min={min}
                   max={max}
                   labelClassName={labelClass}
-                  inputClassName={inputClass}
+                  inputClassName={
+                    field.name === "invoicedAmount"
+                      ? `${inputClass} text-right`
+                      : inputClass
+                  }
                 />
               )}
             </div>

@@ -11,7 +11,8 @@ import { Button } from "@/components/admin/Button";
 import { defaultClaimDetailsForm } from "@/features/medical/claims/manage/claim-details-constants";
 import { defaultClaimDiagnosis } from "@/features/medical/claims/manage/claim-diagnosis-constants";
 import { defaultClaimFormTab } from "@/features/medical/claims/manage/claim-form-constants";
-import { defaultClaimLineItem, sumClaimLineItemAmounts } from "@/features/medical/claims/manage/claim-line-item-constants";
+import { defaultClaimLineItem, computeClaimLineItemAmount, sumClaimLineItemAmounts } from "@/features/medical/claims/manage/claim-line-item-constants";
+import { formatThousands } from "@/lib/format";
 import {
   defaultManageClaimsTab,
   visibleManageClaimsTabs,
@@ -407,16 +408,16 @@ export function ManageClaimsForm({
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
+    const nextValue =
+      name === "unitPrice" ? formatThousands(value) : value;
     setLineItems((prev) =>
       prev.map((row, rowIndex) => {
         if (rowIndex !== index) return row;
-        const nextRow = { ...row, [name]: value };
-        const quantity = Number.parseFloat(nextRow.quantity || "0");
-        const unitPrice = Number.parseFloat(nextRow.unitPrice || "0");
-        const computedAmount =
-          (Number.isFinite(quantity) ? quantity : 0) *
-          (Number.isFinite(unitPrice) ? unitPrice : 0);
-        nextRow.amount = String(computedAmount);
+        const nextRow = { ...row, [name]: nextValue };
+        nextRow.amount = computeClaimLineItemAmount(
+          nextRow.quantity,
+          nextRow.unitPrice
+        );
         return nextRow;
       })
     );

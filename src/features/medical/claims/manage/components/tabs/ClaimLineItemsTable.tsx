@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/admin/Button";
 import {
+  claimLineItemAmountFields,
   claimLineItemFields,
   sumClaimLineItemAmounts,
 } from "@/features/medical/claims/manage/claim-line-item-constants";
@@ -10,7 +11,6 @@ import type {
   ClaimLineItemFormData,
 } from "@/features/medical/claims/manage/types";
 import type { LookupOption } from "@/features/medical/lookups/types";
-import { formatThousands } from "@/lib/format";
 import { inputClass } from "@/lib/form-styles";
 import { ClaimRowActionsMenu } from "../ClaimRowActionsMenu";
 
@@ -53,8 +53,7 @@ export function ClaimLineItemsTable({
   onRemoveRow,
   serviceOptions = [],
 }: ClaimLineItemsTableProps) {
-  const totalAmount = sumClaimLineItemAmounts(rows);
-  const formattedTotal = formatThousands(Number(totalAmount).toFixed(2));
+  const formattedTotal = sumClaimLineItemAmounts(rows);
 
   return (
     <section className="flex min-h-0 flex-col gap-1.5">
@@ -157,7 +156,16 @@ export function ClaimLineItemsTable({
                             value={row[field.name]}
                             onChange={(e) => onRowChange(rowIndex, e)}
                             readOnly={field.name === "amount"}
+                            inputMode={
+                              claimLineItemAmountFields.has(field.name)
+                                ? "decimal"
+                                : undefined
+                            }
                             className={`${inputClass} min-w-[100px] ${
+                              claimLineItemAmountFields.has(field.name)
+                                ? "text-right"
+                                : ""
+                            } ${
                               field.name === "amount"
                                 ? "cursor-not-allowed bg-slate-50 text-slate-600"
                                 : ""
