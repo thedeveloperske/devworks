@@ -332,7 +332,6 @@ export function buildCreateClaimData(body: CreateClaimInput):
     claimNature: claimNatureResult.value,
     invoiceDate: invoiceDateResult.value,
     invoicedAmount,
-    amountPayable: invoicedAmount,
     batchNo: trimOrNull(details.batchNo, 15),
     dateReceived: dateReceivedResult.value,
     anniv: annivResult.value,
