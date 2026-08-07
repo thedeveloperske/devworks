@@ -21,7 +21,18 @@ function trimOrNull(value?: string | null, maxLength?: number) {
   return maxLength ? trimmed.slice(0, maxLength) : trimmed;
 }
 
-function parseRequiredString(value: string | undefined, label: string) {
+type ParseSuccess<T> = { value: T };
+type ParseFailure = { error: string };
+type ParseResult<T> = ParseSuccess<T> | ParseFailure;
+
+function isParseFailure<T>(result: ParseResult<T>): result is ParseFailure {
+  return "error" in result;
+}
+
+function parseRequiredString(
+  value: string | undefined,
+  label: string
+): ParseResult<string> {
   const trimmed = value?.trim();
   if (!trimmed) {
     return { error: `${label} is required` };
@@ -29,7 +40,10 @@ function parseRequiredString(value: string | undefined, label: string) {
   return { value: trimmed };
 }
 
-function parseRequiredDecimal(value: string | undefined, label: string) {
+function parseRequiredDecimal(
+  value: string | undefined,
+  label: string
+): ParseResult<string> {
   const trimmed = stripThousands(value);
   if (!trimmed) {
     return { error: `${label} is required` };
@@ -41,9 +55,11 @@ function parseRequiredDecimal(value: string | undefined, label: string) {
   return { value: String(parsed) };
 }
 
-function parseOptionalDecimal(value: string | undefined) {
+function parseOptionalDecimal(
+  value: string | undefined
+): ParseResult<string | null> {
   const trimmed = stripThousands(value);
-  if (!trimmed) return { value: null as string | null };
+  if (!trimmed) return { value: null };
   const parsed = Number(trimmed);
   if (!Number.isFinite(parsed)) {
     return { error: "Invalid number" };
@@ -51,7 +67,10 @@ function parseOptionalDecimal(value: string | undefined) {
   return { value: String(parsed) };
 }
 
-function parseRequiredDate(value: string | undefined, label: string) {
+function parseRequiredDate(
+  value: string | undefined,
+  label: string
+): ParseResult<Date> {
   const trimmed = value?.trim();
   if (!trimmed) {
     return { error: `${label} is required` };
@@ -66,9 +85,12 @@ function parseRequiredDate(value: string | undefined, label: string) {
   return { value: date };
 }
 
-function parseOptionalDate(value: string | undefined, label: string) {
+function parseOptionalDate(
+  value: string | undefined,
+  label: string
+): ParseResult<Date | null> {
   const trimmed = value?.trim();
-  if (!trimmed) return { value: null as Date | null };
+  if (!trimmed) return { value: null };
   if (!/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
     return { error: `Invalid ${label.toLowerCase()}` };
   }
@@ -105,16 +127,16 @@ export function buildCreateClaimData(body: CreateClaimInput):
   const diagnoses = Array.isArray(body.diagnoses) ? body.diagnoses : [];
 
   const memberNoResult = parseRequiredString(details.memberNo, "Member no");
-  if ("error" in memberNoResult) return errorResponse(memberNoResult.error);
+  if (isParseFailure(memberNoResult)) return errorResponse(memberNoResult.error);
 
   const providerResult = parseRequiredDecimal(details.provider, "Provider");
-  if ("error" in providerResult) return errorResponse(providerResult.error);
+  if (isParseFailure(providerResult)) return errorResponse(providerResult.error);
 
   const claimNatureResult = parseRequiredDecimal(
     details.claimNature,
     "Claim nature"
   );
-  if ("error" in claimNatureResult) {
+  if (isParseFailure(claimNatureResult)) {
     return errorResponse(claimNatureResult.error);
   }
 
@@ -122,12 +144,12 @@ export function buildCreateClaimData(body: CreateClaimInput):
     details.invoiceDate,
     "Invoice date"
   );
-  if ("error" in invoiceDateResult) {
+  if (isParseFailure(invoiceDateResult)) {
     return errorResponse(invoiceDateResult.error);
   }
 
   const visitDateResult = parseRequiredDate(claimForm.visitDate, "Visit date");
-  if ("error" in visitDateResult) return errorResponse(visitDateResult.error);
+  if (isParseFailure(visitDateResult)) return errorResponse(visitDateResult.error);
 
   const filledLineItems = lineItems.filter((row) => {
     const hasService = Boolean(row.service?.trim());
@@ -172,13 +194,14 @@ export function buildCreateClaimData(body: CreateClaimInput):
   const primaryService =
     details.service?.trim() || filledLineItems[0]?.service?.trim() || "";
   const serviceResult = parseRequiredDecimal(primaryService, "Service");
-  if ("error" in serviceResult) return errorResponse(serviceResult.error);
+  if (isParseFailure(serviceResult)) return errorResponse(serviceResult.error);
 
   const invoicedAmountResult = parseRequiredDecimal(
     details.invoicedAmount,
     "Invoiced amount"
   );
-  if ("error" in invoicedAmountResult) {
+  let invoicedAmount: string;
+  if (isParseFailure(invoicedAmountResult)) {
     // Fall back to summing line items if details amount missing.
     const total = filledLineItems.reduce((sum, row) => {
       const amount = Number.parseFloat(stripThousands(row.amount || "0") || "0");
@@ -187,40 +210,29 @@ export function buildCreateClaimData(body: CreateClaimInput):
     if (total <= 0) {
       return errorResponse(invoicedAmountResult.error);
     }
+    invoicedAmount = String(Number(total.toFixed(2)));
+  } else {
+    invoicedAmount = invoicedAmountResult.value;
   }
-
-  const invoicedAmount =
-    "error" in invoicedAmountResult
-      ? String(
-          Number(
-            filledLineItems
-              .reduce((sum, row) => {
-                const amount = Number.parseFloat(
-                  stripThousands(row.amount || "0") || "0"
-                );
-                return sum + (Number.isFinite(amount) ? amount : 0);
-              }, 0)
-              .toFixed(2)
-          )
-        )
-      : invoicedAmountResult.value;
 
   const dateReceivedResult = parseOptionalDate(
     details.dateReceived,
     "Date received"
   );
-  if ("error" in dateReceivedResult) {
+  if (isParseFailure(dateReceivedResult)) {
     return errorResponse(dateReceivedResult.error);
   }
 
   const doctorDateResult = parseOptionalDate(claimForm.doctorDate, "Doctor date");
-  if ("error" in doctorDateResult) return errorResponse(doctorDateResult.error);
+  if (isParseFailure(doctorDateResult)) {
+    return errorResponse(doctorDateResult.error);
+  }
 
   const dateAdmittedResult = parseOptionalDate(
     claimForm.dateAdmitted,
     "Date admitted"
   );
-  if ("error" in dateAdmittedResult) {
+  if (isParseFailure(dateAdmittedResult)) {
     return errorResponse(dateAdmittedResult.error);
   }
 
@@ -228,41 +240,41 @@ export function buildCreateClaimData(body: CreateClaimInput):
     claimForm.dateDischarged,
     "Date discharged"
   );
-  if ("error" in dateDischargedResult) {
+  if (isParseFailure(dateDischargedResult)) {
     return errorResponse(dateDischargedResult.error);
   }
 
   const annivResult = parseOptionalDecimal(details.anniv);
-  if ("error" in annivResult) return errorResponse("Anniv must be a number");
+  if (isParseFailure(annivResult)) return errorResponse("Anniv must be a number");
 
   const preAuthResult = parseOptionalDecimal(details.preAuthNo);
-  if ("error" in preAuthResult) {
+  if (isParseFailure(preAuthResult)) {
     return errorResponse("Preauth no must be a number");
   }
 
   const refundResult = parseOptionalDecimal(details.refund);
-  if ("error" in refundResult) return errorResponse("Pay to is invalid");
+  if (isParseFailure(refundResult)) return errorResponse("Pay to is invalid");
 
   const fundResult = parseOptionalDecimal(details.fund);
-  if ("error" in fundResult) return errorResponse("Fund is invalid");
+  if (isParseFailure(fundResult)) return errorResponse("Fund is invalid");
 
   const attendingDocResult = parseOptionalDecimal(claimForm.attendingDoc);
-  if ("error" in attendingDocResult) {
+  if (isParseFailure(attendingDocResult)) {
     return errorResponse("Attending doctor must be a number");
   }
 
   const visitDaysResult = parseOptionalDecimal(claimForm.visitDays);
-  if ("error" in visitDaysResult) {
+  if (isParseFailure(visitDaysResult)) {
     return errorResponse("Visit days must be a number");
   }
 
   const doctorSignResult = parseOptionalDecimal(claimForm.doctorSign);
-  if ("error" in doctorSignResult) {
+  if (isParseFailure(doctorSignResult)) {
     return errorResponse("Doctor sign is invalid");
   }
 
   const claimFormSignedResult = parseOptionalDecimal(claimForm.claimFormSigned);
-  if ("error" in claimFormSignedResult) {
+  if (isParseFailure(claimFormSignedResult)) {
     return errorResponse("Patient sign is invalid");
   }
 
