@@ -143,6 +143,7 @@ export const claimDetailsFields: ClaimDetailsField[] = [
   {
     name: "claimSource",
     label: "Claim Source",
+    as: "select",
     className: "sm:col-span-1",
   },
   {

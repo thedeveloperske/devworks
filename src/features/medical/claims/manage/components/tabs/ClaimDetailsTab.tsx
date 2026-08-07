@@ -9,6 +9,7 @@ import {
   visibleClaimDetailsFields,
 } from "@/features/medical/claims/manage/claim-details-constants";
 import type { ClaimDetailsFormData } from "@/features/medical/claims/manage/types";
+import { channelOptions } from "@/features/medical/lookups";
 import type { LookupOption } from "@/features/medical/lookups/types";
 import { inputClass, labelClass } from "@/lib/form-styles";
 
@@ -103,7 +104,12 @@ export function ClaimDetailsTab({
                     ]
                   : field.name === "refund"
                     ? [...claimPayToOptions]
-                    : undefined;
+                    : field.name === "claimSource"
+                      ? [
+                          { value: "", label: "Select claim source" },
+                          ...channelOptions,
+                        ]
+                      : undefined;
 
           const dateReceivedDisabled =
             field.name === "dateReceived" && !value.invoiceDate.trim();
